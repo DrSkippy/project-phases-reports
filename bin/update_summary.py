@@ -135,8 +135,10 @@ def parse_project_info(project_info_file):
                 params_dict["COMMIT_JUSTIFICATION"] = []
             params_dict["COMMIT_JUSTIFICATION"].append(line.strip())
     # order the notes by date
-    params_dict["NOTES"] = order_strings_by_date(params_dict["NOTES"])
-    params_dict["COMMIT_JUSTIFICATION"] = " ".join(params_dict["COMMIT_JUSTIFICATION"])
+    if  params_dict["NOTES"] is not None:
+        params_dict["NOTES"] = order_strings_by_date(params_dict["NOTES"])
+    if  params_dict["COMMIT_JUSTIFICATION"] is not None:
+        params_dict["COMMIT_JUSTIFICATION"] = " ".join(params_dict["COMMIT_JUSTIFICATION"])
     return params_dict
 
 
@@ -221,16 +223,16 @@ def synthesize_owner_block(owner, phase_filter='active', lines_key='ANALYTICS_DS
     result = [f"## {owner:}\n\n"]
     counts = defaultdict(lambda: 0)
 
-    if phase_filter.lower() == "active":
-        # convert phase names to sequence numbers
-        phases_order = [project_phases[x] for x in active_projects_order]
-    elif isinstance(phase_filter, list)
+    if isinstance(phase_filter, list):
         if isinstance(phase_filter[0], int):
             # phase_filter is a list of phase numbers
             phases_order = phase_filter
         else:
             # convert phase names to sequence numbers
             phases_order = [project_phases[x] for x in phase_filter]
+    elif phase_filter.lower() == "active":
+        # convert phase names to sequence numbers
+        phases_order = [project_phases[x] for x in active_projects_order]
     else:
         return "ERROR: Invalid phase_filter"
 

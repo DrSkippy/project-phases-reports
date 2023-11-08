@@ -124,14 +124,19 @@ def parse_project_info(project_info_file):
             continue
         fields = line.split(":")
         if fields[0].strip() in params_dict:
+            # In Split on ":", so reassemble the rest of the line in case there were colons in it
             params_dict[fields[0].strip()] = ":".join(fields[1:]).strip().strip('"')
         elif fields[0].startswith("NOTE"):
             if params_dict["NOTES"] is None:
                 params_dict["NOTES"] = []
             params_dict["NOTES"].append(line.strip())
+        elif fields[0].startswith("COMMIT_JUSTIFICATION"):
+            if params_dict["COMMIT_JUSTIFICATION"] is None:
+                params_dict["COMMIT_JUSTIFICATION"] = []
+            params_dict["COMMIT_JUSTIFICATION"].append(line.strip())
     # order the notes by date
     params_dict["NOTES"] = order_strings_by_date(params_dict["NOTES"])
-
+    params_dict["COMMIT_JUSTIFICATION"] = " ".join(params_dict["COMMIT_JUSTIFICATION"])
     return params_dict
 
 
@@ -182,7 +187,7 @@ def create_stakeholders_views(out_lines):
         outfile.write("# Data Accelerator - Project Stakeholders Views - ACTIVE\n\n")
         outfile.write(f"({str(datetime.datetime.now())[:19]})\n\n")
         for owner in owners:
-            outfile.write(synthesize_owner_output(owner, lines_key="BUSINESS_SPONSOR"))
+            outfile.write(synthesize_owner_block(owner, lines_key="BUSINESS_SPONSOR"))
 
 
 def create_weekly_owners_views(out_lines):
@@ -195,10 +200,10 @@ def create_weekly_owners_views(out_lines):
         for owner in owners:
             outfile.write(f"| **{owner:}** | | |\n")
             counts = defaultdict(lambda: 0)
-            for order in active_projects_order:
+            for next_phase in active_projects_order:
                 for lines in out_lines:
                     _phase = lines["Phases"]
-                    if lines["ANALYTICS_DS_OWNER"] == owner and _phase == order:
+                    if lines["ANALYTICS_DS_OWNER"] == owner and _phase == next_phase:
                         counts[_phase] += 1
                         outfile.write(f'|{lines["Project"]}|[{_phase}]|\n')
                         for c, note in enumerate(lines["NOTES"].split(NOTES_DELIMITER)):
@@ -206,7 +211,7 @@ def create_weekly_owners_views(out_lines):
                                 outfile.write(f'| |{note.strip()[6:]}| |\n')
 
 
-def synthesize_owner_output(owner, phase_filter=["ACTIVE"], lines_key="ANALYTICS_DS_OWNER"):
+def synthesize_owner_block(owner, phase_filter='active', lines_key='ANALYTICS_DS_OWNER'):
     """
     Create output units by owner
         Skip empty blocks
@@ -215,19 +220,30 @@ def synthesize_owner_output(owner, phase_filter=["ACTIVE"], lines_key="ANALYTICS
     ret = ""
     result = [f"## {owner:}\n\n"]
     counts = defaultdict(lambda: 0)
-    for order in active_projects_order:
-        if phase_filter[0] == "ACTIVE":
-            _phase_filter = [order]
+
+    if phase_filter.lower() == "active":
+        # convert phase names to sequence numbers
+        phases_order = [project_phases[x] for x in active_projects_order]
+    elif isinstance(phase_filter, list)
+        if isinstance(phase_filter[0], int):
+            # phase_filter is a list of phase numbers
+            phases_order = phase_filter
         else:
-            _phase_filter = phase_filter
+            # convert phase names to sequence numbers
+            phases_order = [project_phases[x] for x in phase_filter]
+    else:
+        return "ERROR: Invalid phase_filter"
+
+    for next_phase in phases_order:
         for lines in out_lines:
             # step through the project list to find owners and active projects of the ordered type
-            _phase = lines["Phases"]
-            if owner in lines[lines_key] and _phase in _phase_filter:
-                counts[_phase] += 1
+            _current_project_phase = project_phases[lines["Phases"]]   # convert phase name to sequence number
+            if owner in lines[lines_key] and _current_project_phase == next_phase:
+                counts[_current_project_phase] += 1
                 result.append(f'### {lines["Project"]} | *Mission: {lines["MISSION_ALIGNMENT"]}*\n\n')
-                result.append(f'Project currently in phase _[{_phase}]_ has been active for {lines["COMPUTED_AGE_DAYS"]} days\n\n')
-                result.append(f'Project sponsor(s):  {lines["BUSINESS_SPONSOR"]}\n\n')
+                result.append( f'Project currently in phase _[{_current_project_phase}]_ ')
+                result.append(f'has been active for {lines["COMPUTED_AGE_DAYS"]} days\n\n')
+                result.append(f'Project sponsor(s): {lines["BUSINESS_SPONSOR"]}\n\n')
                 for note in lines["NOTES"].split(NOTES_DELIMITER):
                     result.append(f'  - {note.strip()[6:]}\n')
     if len(counts) > 0:
@@ -245,13 +261,13 @@ def create_owners_views(out_lines):
         outfile.write("# Data Accelerator - Project Owner Views - ACTIVE\n\n")
         outfile.write(f"({str(datetime.datetime.now())[:19]})\n\n")
         for owner in owners:
-            outfile.write(synthesize_owner_output(owner))
+            outfile.write(synthesize_owner_block(owner))
 
     with open(owner_views_completed_path, "w") as outfile:
         outfile.write("# Data Accelerator - Project Owner Views - COMPLETED & MAINTENANCE\n\n")
         outfile.write(f"({str(datetime.datetime.now())[:19]})\n\n")
         for owner in owners:
-            outfile.write(synthesize_owner_output(owner, phase_filter= ["6-Completed", "7-Maintenance"]))
+            outfile.write(synthesize_owner_block(owner, phase_filter=["6-Completed", "7-Maintenance"]))
 
 
 def create_data_product_links(out_lines):
@@ -319,7 +335,7 @@ if __name__ == "__main__":
                 else:
                     project_end_date = datetime.datetime.strptime(params["COMPUTED_PROJECT_END_DATE"][:10], DATE_FMT)
 
-            if project_phases[phase] >= 1:
+            if project_phases[phase] >= 2:
                 # Active projects
                 if params["COMPUTED_PROJECT_START_DATE"] is None:
                     # First time we processed file since project phase changed to active

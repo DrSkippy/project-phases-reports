@@ -225,8 +225,9 @@ def synthesize_owner_output(owner, phase_filter=["ACTIVE"], lines_key="ANALYTICS
             _phase = lines["Phases"]
             if owner in lines[lines_key] and _phase in _phase_filter:
                 counts[_phase] += 1
-                result.append(f'### {lines["Project"]} | *Mission: {lines["MISSION_ALIGNMENT"]}*\n\n_[{_phase}]_\n\n')
-                result.append(f'  {lines["BUSINESS_SPONSOR"]} [{lines["COMPUTED_AGE_DAYS"]} days]\n\n')
+                result.append(f'### {lines["Project"]} | *Mission: {lines["MISSION_ALIGNMENT"]}*\n\n')
+                result.append(f'Project phase: _[{_phase}]_ has been active for {lines["COMPUTED_AGE_DAYS"]} days\n\n')
+                result.append(f'  {lines["BUSINESS_SPONSOR"]}\n\n')
                 for note in lines["NOTES"].split(NOTES_DELIMITER):
                     result.append(f'  - {note.strip()[6:]}\n')
     if len(counts) > 0:

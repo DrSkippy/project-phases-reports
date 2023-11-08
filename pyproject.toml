@@ -1,0 +1,15 @@
+[tool.poetry]
+name = "2023-08-23-project-visibility"
+version = "0.1.0"
+description = ""
+authors = ["Scott Hendricskon"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.10"
+docx2txt = "^0.8"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

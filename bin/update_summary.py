@@ -240,7 +240,7 @@ def create_owners_views(out_lines):
     # find unique owners
     owners = set([lines["ANALYTICS_DS_OWNER"] for lines in out_lines])
 
-    with open(owner_views_path, "w") as outfile:
+    with open(owner_views_active_path, "w") as outfile:
         outfile.write("# Data Accelerator - Project Owner Views - ACTIVE\n\n")
         outfile.write(f"({str(datetime.datetime.now())[:19]})\n\n")
         for owner in owners:

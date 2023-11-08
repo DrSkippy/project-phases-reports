@@ -79,13 +79,14 @@ project_phases = {
     "5-Rollout": 5,
     "6-Completed": 6,
     "7-Maintenance": 7,
-    "9-Ad Hoc": 3  # Ad Hoc projects are treated as In Progress WRT ordering and active status
+    "9-Ad Hoc": 9  # Ad Hoc projects are treated as In Progress WRT ordering and active status
 }
 index_project_phases = {v: k for k, v in project_phases.items()}
 
 # Ordering determined by Data Accelerator Analysts for Owners Reports etc.
 active_projects_order = [
     "3-In Progress",
+    "9-Ad Hoc",
     "4-On Hold",
     "2-Committed",
     "1-Chartering",

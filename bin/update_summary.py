@@ -81,6 +81,7 @@ project_phases = {
     "7-Maintenance": 7,
     "9-Ad Hoc": 3  # Ad Hoc projects are treated as In Progress WRT ordering and active status
 }
+index_project_phases = {v: k for k, v in project_phases.items()}
 
 # Ordering determined by Data Accelerator Analysts for Owners Reports etc.
 active_projects_order = [
@@ -173,7 +174,7 @@ def summarize_phase_counts(count_dict):
     res = "\n| Phase| # Projects|\n"
     res += "|----------------|----------|\n"
     for k, v in count_dict.items():
-        res += f"|{k:10}| {v:5d}|\n"
+        res += f"|{index_project_phases[k]:10}| {v:5d}|\n"
     res += "\n\n"
     return res
 

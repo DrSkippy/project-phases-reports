@@ -223,7 +223,7 @@ def synthesize_owner_output(owner, phase_filter=["ACTIVE"], lines_key="ANALYTICS
         for lines in out_lines:
             # step through the project list to find owners and active projects of the ordered type
             _phase = lines["Phases"]
-            if lines[lines_key] == owner and _phase in _phase_filter:
+            if owner in lines[lines_key] and _phase in _phase_filter:
                 counts[_phase] += 1
                 result.append(f'### {lines["Project"]} | *Mission: {lines["MISSION_ALIGNMENT"]}* [{_phase}]\n\n')
                 result.append(f'  {lines["BUSINESS_SPONSOR"]} [{lines["COMPUTED_AGE_DAYS"]} days]\n\n')
@@ -250,7 +250,7 @@ def create_owners_views(out_lines):
         outfile.write("# Data Accelerator - Project Owner Views - COMPLETED & MAINTENANCE\n\n")
         outfile.write(f"({str(datetime.datetime.now())[:19]})\n\n")
         for owner in owners:
-            outfile.write(synthesize_owner_output(owner, [6, 7]))
+            outfile.write(synthesize_owner_output(owner, phase_filter= ["6-Completed", "7-Maintenance"]))
 
 
 def create_data_product_links(out_lines):

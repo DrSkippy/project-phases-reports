@@ -151,8 +151,8 @@ def extract_params(root):
     Extract phase and project names for the file path.
         Assume start one directory above "Projects Folders"
     """
-    assert(len(root) == 4 and root[1] == "Projects Folders")
     names = root.split("/")    # phase, project
+    assert(len(names) == 4 and names[1] == "Projects Folders")
     return names[2], names[3]
 
 

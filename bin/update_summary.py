@@ -81,6 +81,7 @@ project_phases = {
     "7-Maintenance": 7,
     "9-Ad Hoc": 9  # Ad Hoc projects are treated as In Progress WRT ordering and active status
 }
+# keep a reverse map for lookup
 index_project_phases = {v: k for k, v in project_phases.items()}
 
 # Ordering determined by Data Accelerator Analysts for Owners Reports etc.
@@ -107,7 +108,7 @@ def extract_stakeholders(stake_str):
 def order_strings_by_date(string_list):
     """
     Used for notes ordering in reports
-    This works if dates are yyyy-mm-dd format
+        This works as desired if dates are yyyy-mm-dd format
     """
     res = sorted(string_list, reverse=True)
     return res
@@ -131,15 +132,16 @@ def parse_project_info(project_info_file):
         elif fields[0].startswith("NOTE"):
             if params_dict["NOTES"] is None:
                 params_dict["NOTES"] = []
-            params_dict["NOTES"].append(line.strip())
+            params_dict["NOTES"].append(line.strip())    # records include date field and colon
         elif fields[0].startswith("COMMIT_JUSTIFICATION"):
             if params_dict["COMMIT_JUSTIFICATION"] is None:
                 params_dict["COMMIT_JUSTIFICATION"] = []
-            params_dict["COMMIT_JUSTIFICATION"].append(line.strip())
+            params_dict["COMMIT_JUSTIFICATION"].append(line.strip())  # lines will be concatenated in order they appear
     # order the notes by date
     if  params_dict["NOTES"] is not None:
         params_dict["NOTES"] = order_strings_by_date(params_dict["NOTES"])
     if  params_dict["COMMIT_JUSTIFICATION"] is not None:
+        # Concatenated in order they appear
         params_dict["COMMIT_JUSTIFICATION"] = " ".join(params_dict["COMMIT_JUSTIFICATION"])
     return params_dict
 
@@ -147,8 +149,10 @@ def parse_project_info(project_info_file):
 def extract_params(root):
     """
     Extract phase and project names for the file path.
+        Assume start one directory above "Projects Folders"
     """
-    names = root.split("/")
+    assert(len(root) == 4 and root[1] == "Projects Folders")
+    names = root.split("/")    # phase, project
     return names[2], names[3]
 
 
@@ -191,10 +195,13 @@ def create_stakeholders_views(out_lines):
         outfile.write("# Data Accelerator - Project Stakeholders Views - ACTIVE\n\n")
         outfile.write(f"({str(datetime.datetime.now())[:19]})\n\n")
         for owner in owners:
-            outfile.write(synthesize_owner_block(owner, lines_key="BUSINESS_SPONSOR"))
+            outfile.write(synthesize_owner_block(owner, project_owner_key="BUSINESS_SPONSOR"))
 
 
 def create_weekly_owners_views(out_lines):
+    """
+    Create output units by owner for weekly meeting update table
+    """
     # find unique owners
     owners = set([lines["ANALYTICS_DS_OWNER"] for lines in out_lines])
     with open(weekly_owner_views_active_path, "w") as outfile:
@@ -215,7 +222,7 @@ def create_weekly_owners_views(out_lines):
                                 outfile.write(f'| |{note.strip()[6:]}| |\n')
 
 
-def synthesize_owner_block(owner, phase_filter='active', lines_key='ANALYTICS_DS_OWNER'):
+def synthesize_owner_block(owner, phase_filter='active', project_owner_key='ANALYTICS_DS_OWNER'):
     """
     Create output units by owner
         Skip empty blocks
@@ -242,7 +249,7 @@ def synthesize_owner_block(owner, phase_filter='active', lines_key='ANALYTICS_DS
         for lines in out_lines:
             # step through the project list to find owners and active projects of the ordered type
             _current_project_phase = project_phases[lines["Phases"]]   # convert phase name to sequence number
-            if owner in lines[lines_key] and _current_project_phase == next_phase:
+            if owner in lines[project_owner_key] and _current_project_phase == next_phase:
                 counts[_current_project_phase] += 1
                 result.append(f'### {lines["Project"]} | *Mission: {lines["MISSION_ALIGNMENT"]}*\n\n')
                 result.append( f'Project currently in phase _[{lines["Phases"]}]_ ')

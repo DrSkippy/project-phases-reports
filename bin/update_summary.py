@@ -184,10 +184,10 @@ def summarize_phase_counts(count_dict):
     return res
 
 
-def create_stakeholders_views(out_lines):
+def create_stakeholders_views(project_records_list):
     # find unique stakeholders
     owners = []
-    for lines in out_lines:
+    for lines in project_records_list:
         owners.extend(extract_stakeholders(lines["BUSINESS_SPONSOR"]))
     owners = set(owners)
 
@@ -198,12 +198,12 @@ def create_stakeholders_views(out_lines):
             outfile.write(synthesize_owner_block(owner, project_owner_key="BUSINESS_SPONSOR"))
 
 
-def create_weekly_owners_views(out_lines):
+def create_weekly_owners_views(project_records_list):
     """
     Create output units by owner for weekly meeting update table
     """
     # find unique owners
-    owners = set([lines["ANALYTICS_DS_OWNER"] for lines in out_lines])
+    owners = set([lines["ANALYTICS_DS_OWNER"] for lines in project_records_list])
     with open(weekly_owner_views_active_path, "w") as outfile:
         outfile.write("# Data Accelerator Weekly - Project Owner Views - ACTIVE\n\n")
         outfile.write("| Projects | Info | Notes |\n")
@@ -212,7 +212,7 @@ def create_weekly_owners_views(out_lines):
             outfile.write(f"| **{owner:}** | | |\n")
             counts = defaultdict(lambda: 0)
             for next_phase in active_projects_order:
-                for lines in out_lines:
+                for lines in project_records_list:
                     _phase = lines["Phases"]
                     if lines["ANALYTICS_DS_OWNER"] == owner and _phase == next_phase:
                         counts[_phase] += 1
@@ -246,7 +246,7 @@ def synthesize_owner_block(owner, phase_filter='active', project_owner_key='ANAL
         return "ERROR: Invalid phase_filter"
 
     for next_phase in phases_order:
-        for lines in out_lines:
+        for lines in project_records_list:
             # step through the project list to find owners and active projects of the ordered type
             _current_project_phase = project_phases[lines["Phases"]]   # convert phase name to sequence number
             if owner in lines[project_owner_key] and _current_project_phase == next_phase:
@@ -264,9 +264,9 @@ def synthesize_owner_block(owner, phase_filter='active', project_owner_key='ANAL
     return ret
 
 
-def create_owners_views(out_lines):
+def create_owners_views(project_records_list):
     # find unique owners
-    owners = set([lines["ANALYTICS_DS_OWNER"] for lines in out_lines])
+    owners = set([lines["ANALYTICS_DS_OWNER"] for lines in project_records_list])
 
     with open(owner_views_active_path, "w") as outfile:
         outfile.write("# Data Accelerator - Project Owner Views - ACTIVE\n\n")
@@ -281,13 +281,13 @@ def create_owners_views(out_lines):
             outfile.write(synthesize_owner_block(owner, phase_filter=["6-Completed", "7-Maintenance"]))
 
 
-def create_data_product_links(out_lines):
+def create_data_product_links(project_records_list):
     """
     Markdown data project links page
     """
     prototype = "- [{}]({}) {}\n"
     links = []
-    for line_dict in out_lines:
+    for line_dict in project_records_list:
         if line_dict["DATA_PRODUCT_LINK"] is not None and not line_dict["DATA_PRODUCT_LINK"].startswith("None") and \
                 line_dict["DATA_PRODUCT_LINK"].strip() != "":
             links.append(prototype.format(line_dict["Project"], line_dict["DATA_PRODUCT_LINK"], line_dict["Phases"]))
@@ -298,7 +298,7 @@ def create_data_product_links(out_lines):
                 outfile.write(link)
 
 
-def create_summary_csv(outlines):
+def create_summary_csv(project_records_list):
     """
     Create the summary csv file of all the projects in the tree
     """
@@ -307,13 +307,13 @@ def create_summary_csv(outlines):
         w = csv.DictWriter(outfile, project_params_dict.keys(), dialect='excel')
         w.writerow(field_name_map)
         # Write the project data, 1 project per line
-        for line in out_lines:
+        for line in project_records_list:
             w.writerow(line)
 
 
 if __name__ == "__main__":
     os.chdir(projects_tree_root)
-    out_lines = []
+    project_records_list = []
     projects_processed_counter = 0
 
     # Walk the file system from the root directory
@@ -359,7 +359,7 @@ if __name__ == "__main__":
                     dt_delta = project_end_date - project_start_date
                     params["COMPUTED_AGE_DAYS"] = dt_delta.days
 
-            out_lines.append(params)
+            project_records_list.append(params)
 
         if new_project_start_date is not None:
             with open(os.path.join(root, project_info_filename), "a") as project_info_file:
@@ -370,8 +370,8 @@ if __name__ == "__main__":
                 project_info_file.write(f'COMPUTED_PROJECT_END_DATE: {project_end_date.strftime(DATE_FMT)}\n')
 
     # Create reports
-    create_summary_csv(out_lines)
-    create_data_product_links(out_lines)
-    create_owners_views(out_lines)
-    create_weekly_owners_views(out_lines)
-    create_stakeholders_views(out_lines)
+    create_summary_csv(project_records_list)
+    create_data_product_links(project_records_list)
+    create_owners_views(project_records_list)
+    create_weekly_owners_views(project_records_list)
+    create_stakeholders_views(project_records_list)

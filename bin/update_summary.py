@@ -142,7 +142,7 @@ def parse_project_info(project_info_file):
         params_dict["NOTES"] = order_strings_by_date(params_dict["NOTES"])
     if  params_dict["COMMIT_JUSTIFICATION"] is not None:
         # Concatenated in order they appear
-        params_dict["COMMIT_JUSTIFICATION"] = " ".join(params_dict["COMMIT_JUSTIFICATION"])
+        params_dict["COMMIT_JUSTIFICATION"] = " ".join(params_dict["COMMIT_JUSTIFICATION"]) + "\n"
     return params_dict
 
 
@@ -333,7 +333,7 @@ if __name__ == "__main__":
             print(f"Processing file {projects_processed_counter} ({phase}: {project})")
 
             params["Project Folder"] = synthesize_sharepoint_url(phase, project)
-            params["NOTES"] = NOTES_DELIMITER.join(params["NOTES"])
+            params["NOTES"] = NOTES_DELIMITER.join(params["NOTES"]) + "\n"
 
             project_end_date = datetime.datetime.now()  # current last day of unfinished projects
             if project_phases[phase] >= 6:

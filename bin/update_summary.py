@@ -252,9 +252,11 @@ def synthesize_owner_block(owner, phase_filter='active', project_owner_key='ANAL
             if owner in lines[project_owner_key] and _current_project_phase == next_phase:
                 counts[_current_project_phase] += 1
                 result.append(f'### {lines["Project"]} | *Mission: {lines["MISSION_ALIGNMENT"]}*\n\n')
-                result.append( f'Project currently in phase _[{lines["Phases"]}]_ ')
-                result.append(f'has been active for {lines["COMPUTED_AGE_DAYS"]} days\n\n')
+                result.append( f'Project phase:  _[{lines["Phases"]}]_ ')
+                result.append(f'and has been active for {lines["COMPUTED_AGE_DAYS"]} days\n\n')
                 result.append(f'Project sponsor(s): {lines["BUSINESS_SPONSOR"]}\n\n')
+                if project_owner_key != "ANALYTICS_DS_OWNER":
+                    result.append(f'Data Analyst: {lines["ANALYTICS_DS_OWNER"]}\n\n')
                 for note in lines["NOTES"].split(NOTES_DELIMITER):
                     result.append(f'  - {note.strip()[6:]}\n')
     if len(counts) > 0:

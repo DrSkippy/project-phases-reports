@@ -259,6 +259,7 @@ def synthesize_owner_block(owner, phase_filter='active', project_owner_key='ANAL
                     result.append(f'Data Analyst: {lines["ANALYTICS_DS_OWNER"]}\n\n')
                 for note in lines["NOTES"].split(NOTES_DELIMITER):
                     result.append(f'  - {note.strip()[6:]}\n')
+                result.append("\n\n")
     if len(counts) > 0:
         # Only include this block if 1 or more projects found
         result.append(summarize_phase_counts(counts))

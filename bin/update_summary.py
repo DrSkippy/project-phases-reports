@@ -331,7 +331,8 @@ if __name__ == "__main__":
 
     # Walk the file system from the root directory
     for root, dirs, files in os.walk(".", topdown=False):
-        if dirs != [] or project_info_filename not in files:
+        #if dirs != [] or project_info_filename not in files:
+        if project_info_filename not in files:
             continue
         new_project_start_date = None
         new_project_end_date = None
@@ -352,9 +353,6 @@ if __name__ == "__main__":
                 params["COMMIT_JUSTIFICATION"] = " ".join(params["COMMIT_JUSTIFICATION"]) + "\n\n"
             else:
                 params["COMMIT_JUSTIFICATION"] = "Commit justification required!\n\n"
-
-            print(">>>>",params["COMMIT_JUSTIFICATION"])
-
 
             project_end_date = datetime.datetime.now()  # current last day of unfinished projects
             if project_phases[phase] >= 6:

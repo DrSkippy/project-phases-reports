@@ -18,6 +18,7 @@ summary_path = os.path.join(projects_tree_project_folders, "summary.csv")
 data_product_links_path = os.path.join(projects_tree_project_folders, "data_product_links.md")
 owner_views_active_path = os.path.join(projects_tree_project_folders, "owner_views_active.md")
 weekly_owner_views_active_path = os.path.join(projects_tree_project_folders, "weekly_owner_views_active.md")
+weekly_owner_views_commit_path= os.path.join(projects_tree_project_folders, "weekly_owner_views_commit.md")
 owner_views_completed_path = os.path.join(projects_tree_project_folders, "owner_views_completed.md")
 stakeholders_views_active_path = os.path.join(projects_tree_project_folders, "stakeholders_views_active.md")
 
@@ -132,15 +133,15 @@ def parse_project_info(project_info_file):
         elif fields[0].startswith("NOTE"):
             if params_dict["NOTES"] is None:
                 params_dict["NOTES"] = []
-            params_dict["NOTES"].append(line.strip())    # records include date field and colon
+            params_dict["NOTES"].append(line.strip())  # records include date field and colon
         elif fields[0].startswith("COMMIT_JUSTIFICATION"):
             if params_dict["COMMIT_JUSTIFICATION"] is None:
                 params_dict["COMMIT_JUSTIFICATION"] = []
             params_dict["COMMIT_JUSTIFICATION"].append(line.strip())  # lines will be concatenated in order they appear
     # order the notes by date
-    if  params_dict["NOTES"] is not None:
+    if params_dict["NOTES"] is not None:
         params_dict["NOTES"] = order_strings_by_date(params_dict["NOTES"])
-    if  params_dict["COMMIT_JUSTIFICATION"] is not None:
+    if params_dict["COMMIT_JUSTIFICATION"] is not None:
         # Concatenated in order they appear
         params_dict["COMMIT_JUSTIFICATION"] = " ".join(params_dict["COMMIT_JUSTIFICATION"]) + "\n"
     return params_dict
@@ -151,8 +152,8 @@ def extract_params(root):
     Extract phase and project names for the file path.
         Assume start one directory above "Projects Folders"
     """
-    names = root.split("/")    # phase, project
-    assert(len(names) == 4 and names[1] == "Projects Folders")
+    names = root.split("/")  # phase, project
+    assert (len(names) == 4 and names[1] == "Projects Folders")
     return names[2], names[3]
 
 
@@ -216,13 +217,13 @@ def create_weekly_owners_views(project_records_list):
                     _phase = lines["Phases"]
                     if lines["ANALYTICS_DS_OWNER"] == owner and _phase == next_phase:
                         counts[_phase] += 1
-                        outfile.write(f'|{lines["Project"]}|[{_phase}]|\n')
+                        outfile.write(f'|{lines["Project"]}|[{_phase}] {lines["COMPUTED_AGE_DAYS"]}|\n')
                         for c, note in enumerate(lines["NOTES"].split(NOTES_DELIMITER)):
                             if c < 3:
                                 outfile.write(f'| |{note.strip()[6:]}| |\n')
 
 
-def synthesize_owner_block(owner, phase_filter='active', project_owner_key='ANALYTICS_DS_OWNER'):
+def synthesize_owner_block(owner, phase_filter='active', project_owner_key='ANALYTICS_DS_OWNER', justification_block=False):
     """
     Create output units by owner
         Skip empty blocks
@@ -248,17 +249,20 @@ def synthesize_owner_block(owner, phase_filter='active', project_owner_key='ANAL
     for next_phase in phases_order:
         for lines in project_records_list:
             # step through the project list to find owners and active projects of the ordered type
-            _current_project_phase = project_phases[lines["Phases"]]   # convert phase name to sequence number
+            _current_project_phase = project_phases[lines["Phases"]]  # convert phase name to sequence number
             if owner in lines[project_owner_key] and _current_project_phase == next_phase:
                 counts[_current_project_phase] += 1
                 result.append(f'### {lines["Project"]} | *Mission: {lines["MISSION_ALIGNMENT"]}*\n\n')
-                result.append( f'Project phase:  _[{lines["Phases"]}]_ ')
+                result.append(f'Project phase:  _[{lines["Phases"]}]_ ')
                 result.append(f'and has been active for {lines["COMPUTED_AGE_DAYS"]} days\n\n')
                 result.append(f'Project sponsor(s): {lines["BUSINESS_SPONSOR"]}\n\n')
                 if project_owner_key != "ANALYTICS_DS_OWNER":
                     result.append(f'Data Analyst: {lines["ANALYTICS_DS_OWNER"]}\n\n')
                 for note in lines["NOTES"].split(NOTES_DELIMITER):
                     result.append(f'  - {note.strip()[6:]}\n')
+                if justification_block:
+                    for justify in lines["COMMIT_JUSTIFICATION"].split(NOTES_DELIMITER):
+                        result.append(f'  - {justify.strip()[6:]}\n')
                 result.append("\n\n")
     if len(counts) > 0:
         # Only include this block if 1 or more projects found
@@ -266,6 +270,15 @@ def synthesize_owner_block(owner, phase_filter='active', project_owner_key='ANAL
         ret = "".join(result)
     return ret
 
+def create_owners_commit_views(project_records_list):
+    # find unique owners
+    owners = set([lines["ANALYTICS_DS_OWNER"] for lines in project_records_list])
+
+    with open(owner_views_commit_path, "w") as outfile:
+        outfile.write("# Data Accelerator - Project Owner Views - COMMIT\n\n")
+        outfile.write(f"({str(datetime.datetime.now())[:19]})\n\n")
+        for owner in owners:
+            outfile.write(synthesize_owner_block(owner), phase_filter=["2-Committed", "1-Chartering"], justification_block=True)
 
 def create_owners_views(project_records_list):
     # find unique owners
@@ -376,5 +389,6 @@ if __name__ == "__main__":
     create_summary_csv(project_records_list)
     create_data_product_links(project_records_list)
     create_owners_views(project_records_list)
+    create_owners_commit_views(project_records_list)
     create_weekly_owners_views(project_records_list)
     create_stakeholders_views(project_records_list)

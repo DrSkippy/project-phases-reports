@@ -41,7 +41,9 @@ project_params_dict = {
     "DATA_PRODUCT_LINK": None,
     "NOTES": None,
     "COMPUTED_AGE_DAYS": 0,
+    "COMPUTED_IN_PROGRESS_AGE_DAYS": 0,
     "COMPUTED_PROJECT_START_DATE": None,
+    "COMPUTED_PROJECT_IN_PROGRESS_DATE": None,
     "COMPUTED_PROJECT_END_DATE": None,
     "COMMIT_JUSTIFICATION": None
 }
@@ -63,7 +65,9 @@ name_field_map = {
     "Data Product Link": "DATA_PRODUCT_LINK",
     "Notes": "NOTES",
     "Age": "COMPUTED_AGE_DAYS",
+    "In Progress Age": "COMPUTED_IN_PROGRESS_AGE_DAYS",
     "Project Start Date": "COMPUTED_PROJECT_START_DATE",
+    "Project In-Progress Date": "COMPUTED_PROJECT_IN_PROGRESS_DATE",
     "Project End Date": "COMPUTED_PROJECT_END_DATE",
     "Commit Justification": "COMMIT_JUSTIFICATION"
 }
@@ -215,7 +219,8 @@ def create_weekly_owners_views(project_records_list):
                     _phase = lines["Phases"]
                     if lines["ANALYTICS_DS_OWNER"] == owner and _phase == next_phase:
                         counts[_phase] += 1
-                        outfile.write(f'|{lines["Project"]}|[{_phase}] active for {lines["COMPUTED_AGE_DAYS"]} days|\n')
+                        outfile.write(f'|{lines["Project"]}|[{_phase}] active {lines["COMPUTED_AGE_DAYS"]} d &',
+                                    ' in-progress {lines["COMPUTED_IN_PROGRESS_AGE_DAYS"]} d|\n')
                         for c, note in enumerate(lines["NOTES"].split(NOTES_DELIMITER)):
                             if c < 3:
                                 outfile.write(f'| |{note.strip()[6:]}| |\n')
@@ -252,7 +257,8 @@ def synthesize_owner_block(owner, phase_filter='active', project_owner_key='ANAL
                 counts[_current_project_phase] += 1
                 result.append(f'### {lines["Project"]} | *Mission: {lines["MISSION_ALIGNMENT"]}*\n\n')
                 result.append(f'Project phase:  _[{lines["Phases"]}]_ ')
-                result.append(f'and has been active for {lines["COMPUTED_AGE_DAYS"]} days\n\n')
+                result.append(f'active for {lines["COMPUTED_AGE_DAYS"]} d &',
+                              ' in-progress for {lines["COMPUTED_IN_PROGRESS_AGE_DAYS"]} d \n\n')
                 result.append(f'Project sponsor(s): {lines["BUSINESS_SPONSOR"]}\n\n')
                 if project_owner_key != "ANALYTICS_DS_OWNER":
                     result.append(f'Data Analyst: {lines["ANALYTICS_DS_OWNER"]}\n\n')
@@ -364,6 +370,18 @@ if __name__ == "__main__":
                     new_project_end_date = project_end_date
                 else:
                     project_end_date = datetime.datetime.strptime(params["COMPUTED_PROJECT_END_DATE"][:10], DATE_FMT)
+
+            if project_phases[phase] >= 3:
+                # In Progress projects
+                if params["COMPUTED_PROJECT_IN_PROGRESS_DATE"] is None:
+                    # First time we processed file since project phase changed to In Progress
+                    project_in_progress_date = datetime.datetime.now()
+                    params["COMPUTED_PROJECT_IN_PROGRESS_DATE"] = project_in_progress_date.strftime(DATE_FMT)
+                else:
+                    project_in_progress_date = datetime.datetime.strptime(params["COMPUTED_PROJECT_IN_PROGRESS_DATE"][:10],
+                                                                          DATE_FMT)
+                    dt_delta = project_end_date - project_in_progress_date
+                    params["COMPUTED_IN_PROGRESS_AGE_DAYS"] = dt_delta.days
 
             if project_phases[phase] >= 2:
                 # Active projects

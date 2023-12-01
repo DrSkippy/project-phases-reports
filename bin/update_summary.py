@@ -219,8 +219,8 @@ def create_weekly_owners_views(project_records_list):
                     _phase = lines["Phases"]
                     if lines["ANALYTICS_DS_OWNER"] == owner and _phase == next_phase:
                         counts[_phase] += 1
-                        outfile.write(f'|{lines["Project"]}|[{_phase}] active {lines["COMPUTED_AGE_DAYS"]} d &',
-                                    ' in-progress {lines["COMPUTED_IN_PROGRESS_AGE_DAYS"]} d|\n')
+                        outfile.write(f'|{lines["Project"]}|[{_phase}] active {lines["COMPUTED_AGE_DAYS"]} days &'
+                                    f' In-progress {lines["COMPUTED_IN_PROGRESS_AGE_DAYS"]} days|\n')
                         for c, note in enumerate(lines["NOTES"].split(NOTES_DELIMITER)):
                             if c < 3:
                                 outfile.write(f'| |{note.strip()[6:]}| |\n')
@@ -257,8 +257,8 @@ def synthesize_owner_block(owner, phase_filter='active', project_owner_key='ANAL
                 counts[_current_project_phase] += 1
                 result.append(f'### {lines["Project"]} | *Mission: {lines["MISSION_ALIGNMENT"]}*\n\n')
                 result.append(f'Project phase:  _[{lines["Phases"]}]_ ')
-                result.append(f'active for {lines["COMPUTED_AGE_DAYS"]} d &',
-                              ' in-progress for {lines["COMPUTED_IN_PROGRESS_AGE_DAYS"]} d \n\n')
+                result.append(f'active for {lines["COMPUTED_AGE_DAYS"]} days &'
+                              f' In-progress for {lines["COMPUTED_IN_PROGRESS_AGE_DAYS"]} days\n\n')
                 result.append(f'Project sponsor(s): {lines["BUSINESS_SPONSOR"]}\n\n')
                 if project_owner_key != "ANALYTICS_DS_OWNER":
                     result.append(f'Data Analyst: {lines["ANALYTICS_DS_OWNER"]}\n\n')
@@ -342,6 +342,7 @@ if __name__ == "__main__":
             continue
         new_project_start_date = None
         new_project_end_date = None
+        new_project_in_progress_date = None
         # Process Project Info file
         with open(os.path.join(root, project_info_filename), "r") as project_info_file:
             projects_processed_counter += 1
@@ -377,6 +378,7 @@ if __name__ == "__main__":
                     # First time we processed file since project phase changed to In Progress
                     project_in_progress_date = datetime.datetime.now()
                     params["COMPUTED_PROJECT_IN_PROGRESS_DATE"] = project_in_progress_date.strftime(DATE_FMT)
+                    new_project_in_progress_date = project_in_progress_date
                 else:
                     project_in_progress_date = datetime.datetime.strptime(params["COMPUTED_PROJECT_IN_PROGRESS_DATE"][:10],
                                                                           DATE_FMT)
@@ -400,11 +402,15 @@ if __name__ == "__main__":
 
         if new_project_start_date is not None:
             with open(os.path.join(root, project_info_filename), "a") as project_info_file:
-                project_info_file.write(f'COMPUTED_PROJECT_START_DATE: {project_start_date.strftime(DATE_FMT)}\n')
+                project_info_file.write(f'COMPUTED_PROJECT_START_DATE: {new_project_start_date.strftime(DATE_FMT)}\n')
+
+        if new_project_in_progress_date is not None:
+            with open(os.path.join(root, project_info_filename), "a") as project_info_file:
+                project_info_file.write(f'COMPUTED_PROJECT_IN_PROGRESS_DATE: {new_project_in_progress_date.strftime(DATE_FMT)}\n')
 
         if new_project_end_date is not None:
             with open(os.path.join(root, project_info_filename), "a") as project_info_file:
-                project_info_file.write(f'COMPUTED_PROJECT_END_DATE: {project_end_date.strftime(DATE_FMT)}\n')
+                project_info_file.write(f'COMPUTED_PROJECT_END_DATE: {new_project_end_date.strftime(DATE_FMT)}\n')
 
     # Create reports
     create_summary_csv(project_records_list)

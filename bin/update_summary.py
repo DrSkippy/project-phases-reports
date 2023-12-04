@@ -17,7 +17,7 @@ projects_tree_project_folders = os.path.join(projects_tree_root, "Projects Folde
 summary_path = os.path.join(projects_tree_project_folders, "summary.csv")
 data_product_links_path = os.path.join(projects_tree_project_folders, "data_product_links.md")
 owner_views_active_path = os.path.join(projects_tree_project_folders, "owner_views_active.md")
-owner_views_commit_path= os.path.join(projects_tree_project_folders, "owner_views_commit.md")
+owner_views_commit_path = os.path.join(projects_tree_project_folders, "owner_views_commit.md")
 weekly_owner_views_active_path = os.path.join(projects_tree_project_folders, "weekly_owner_views_active.md")
 owner_views_completed_path = os.path.join(projects_tree_project_folders, "owner_views_completed.md")
 stakeholders_views_active_path = os.path.join(projects_tree_project_folders, "stakeholders_views_active.md")
@@ -141,7 +141,8 @@ def parse_project_info(project_info_file):
         elif fields[0].startswith("COMMIT_JUSTIFICATION"):
             if params_dict["COMMIT_JUSTIFICATION"] is None:
                 params_dict["COMMIT_JUSTIFICATION"] = []
-            params_dict["COMMIT_JUSTIFICATION"].append(line.split(":")[1].strip())  # lines will be concatenated in order they appear
+            params_dict["COMMIT_JUSTIFICATION"].append(
+                line.split(":")[1].strip())  # lines will be concatenated in order they appear
     # order the notes by date
     if params_dict["NOTES"] is not None:
         params_dict["NOTES"] = order_strings_by_date(params_dict["NOTES"])
@@ -220,13 +221,14 @@ def create_weekly_owners_views(project_records_list):
                     if lines["ANALYTICS_DS_OWNER"] == owner and _phase == next_phase:
                         counts[_phase] += 1
                         outfile.write(f'|{lines["Project"]}|[{_phase}] active {lines["COMPUTED_AGE_DAYS"]} days &'
-                                    f' In-progress {lines["COMPUTED_IN_PROGRESS_AGE_DAYS"]} days|\n')
+                                      f' In-progress {lines["COMPUTED_IN_PROGRESS_AGE_DAYS"]} days|\n')
                         for c, note in enumerate(lines["NOTES"].split(NOTES_DELIMITER)):
                             if c < 3:
                                 outfile.write(f'| |{note.strip()[6:]}| |\n')
 
 
-def synthesize_owner_block(owner, phase_filter='active', project_owner_key='ANALYTICS_DS_OWNER', justification_block=False):
+def synthesize_owner_block(owner, phase_filter='active', project_owner_key='ANALYTICS_DS_OWNER',
+                           justification_block=False):
     """
     Create output units by owner
         Skip empty blocks
@@ -273,6 +275,7 @@ def synthesize_owner_block(owner, phase_filter='active', project_owner_key='ANAL
         ret = "".join(result)
     return ret
 
+
 def create_owners_commit_views(project_records_list):
     # find unique owners
     owners = set([lines["ANALYTICS_DS_OWNER"] for lines in project_records_list])
@@ -281,7 +284,9 @@ def create_owners_commit_views(project_records_list):
         outfile.write("# Data Accelerator - Project Owner Views - COMMIT\n\n")
         outfile.write(f"({str(datetime.datetime.now())[:19]})\n\n")
         for owner in owners:
-            outfile.write(synthesize_owner_block(owner, phase_filter=["2-Committed", "1-Chartering"], justification_block=True))
+            outfile.write(
+                synthesize_owner_block(owner, phase_filter=["2-Committed", "1-Chartering"], justification_block=True))
+
 
 def create_owners_views(project_records_list):
     # find unique owners
@@ -337,7 +342,7 @@ if __name__ == "__main__":
 
     # Walk the file system from the root directory
     for root, dirs, files in os.walk(".", topdown=False):
-        #if dirs != [] or project_info_filename not in files:
+        # if dirs != [] or project_info_filename not in files:
         if project_info_filename not in files:
             continue
         new_project_start_date = None
@@ -361,6 +366,7 @@ if __name__ == "__main__":
             else:
                 params["COMMIT_JUSTIFICATION"] = "Commit justification required!\n\n"
 
+            # Compute derived values for timing of phases
             project_end_date = datetime.datetime.now()  # current last day of unfinished projects
             if project_phases[phase] >= 6:
                 # Completed projects
@@ -370,7 +376,9 @@ if __name__ == "__main__":
                     params["COMPUTED_PROJECT_END_DATE"] = project_end_date.strftime(DATE_FMT)
                     new_project_end_date = project_end_date
                 else:
-                    project_end_date = datetime.datetime.strptime(params["COMPUTED_PROJECT_END_DATE"][:10], DATE_FMT)
+                    project_end_date = datetime.datetime.strptime(
+                        params["COMPUTED_PROJECT_END_DATE"][:10],
+                        DATE_FMT)
 
             if project_phases[phase] >= 3:
                 # In Progress projects
@@ -380,33 +388,37 @@ if __name__ == "__main__":
                     params["COMPUTED_PROJECT_IN_PROGRESS_DATE"] = project_in_progress_date.strftime(DATE_FMT)
                     new_project_in_progress_date = project_in_progress_date
                 else:
-                    project_in_progress_date = datetime.datetime.strptime(params["COMPUTED_PROJECT_IN_PROGRESS_DATE"][:10],
-                                                                          DATE_FMT)
+                    project_in_progress_date = datetime.datetime.strptime(
+                        params["COMPUTED_PROJECT_IN_PROGRESS_DATE"][:10],
+                        DATE_FMT)
                     dt_delta = project_end_date - project_in_progress_date
                     params["COMPUTED_IN_PROGRESS_AGE_DAYS"] = dt_delta.days
 
-            if project_phases[phase] >= 2:
-                # Active projects
+            if project_phases[phase] >= 1:
+                # Chartering - Active projects
                 if params["COMPUTED_PROJECT_START_DATE"] is None:
                     # First time we processed file since project phase changed to active
                     project_start_date = datetime.datetime.now()
                     params["COMPUTED_PROJECT_START_DATE"] = project_start_date.strftime(DATE_FMT)
                     new_project_start_date = project_start_date
                 else:
-                    project_start_date = datetime.datetime.strptime(params["COMPUTED_PROJECT_START_DATE"][:10],
-                                                                    DATE_FMT)
+                    project_start_date = datetime.datetime.strptime(
+                        params["COMPUTED_PROJECT_START_DATE"][:10],
+                        DATE_FMT)
                     dt_delta = project_end_date - project_start_date
                     params["COMPUTED_AGE_DAYS"] = dt_delta.days
 
             project_records_list.append(params)
 
+        # Update the project info file with time values for phase transitions
         if new_project_start_date is not None:
             with open(os.path.join(root, project_info_filename), "a") as project_info_file:
                 project_info_file.write(f'COMPUTED_PROJECT_START_DATE: {new_project_start_date.strftime(DATE_FMT)}\n')
 
         if new_project_in_progress_date is not None:
             with open(os.path.join(root, project_info_filename), "a") as project_info_file:
-                project_info_file.write(f'COMPUTED_PROJECT_IN_PROGRESS_DATE: {new_project_in_progress_date.strftime(DATE_FMT)}\n')
+                project_info_file.write(
+                    f'COMPUTED_PROJECT_IN_PROGRESS_DATE: {new_project_in_progress_date.strftime(DATE_FMT)}\n')
 
         if new_project_end_date is not None:
             with open(os.path.join(root, project_info_filename), "a") as project_info_file:

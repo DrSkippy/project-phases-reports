@@ -227,15 +227,16 @@ def create_weekly_owners_views(project_records_list):
                                 outfile.write(f'| |{note.strip()[6:]}| |\n')
 
 def size_repr(size_string):
-    res = ""
-    if size_string.lower().startsiwth("s"):
-        res = "*"
-    elif size_string.lower().startswith("m"):
-        res = "**"
-    elif size_string.lower().startswith("l"):
-        res = "***"
-    elif size_string.lower().startswith("xl"):
-        res = "****"
+    res = "Unsized"
+    size_string = size_string.strip().lower()
+    if size_string.startswith("s"):
+        res = "S"
+    elif size_string.startswith("m"):
+        res = "M"
+    elif size_string.startswith("l"):
+        res = "L"
+    elif size_string.startswith("x"):
+        res = "XL"
     return res
 
 def synthesize_owner_block(owner, phase_filter='active', project_owner_key='ANALYTICS_DS_OWNER',
@@ -268,14 +269,14 @@ def synthesize_owner_block(owner, phase_filter='active', project_owner_key='ANAL
             _current_project_phase = project_phases[lines["Phases"]]  # convert phase name to sequence number
             if owner in lines[project_owner_key] and _current_project_phase == next_phase:
                 counts[_current_project_phase] += 1
-                result.append(f'### {lines["Project"]} | *Mission: {lines["MISSION_ALIGNMENT"]}*\n\n')
-                result.append(f'<u>Project phase:</u>  _[{lines["Phases"]}]_ ')
-                result.append(f'Active for {lines["COMPUTED_AGE_DAYS"]} days &'
+                result.append(f'### {lines["Project"]}<br>*Mission: {lines["MISSION_ALIGNMENT"]}*\n\n')
+                result.append(f'<u>Project phase</u>: _{lines["Phases"]}_ ')
+                result.append(f'&nbsp; &nbsp; &nbsp; 📆 Active for {lines["COMPUTED_AGE_DAYS"]} days &'
                               f' In-Progress for {lines["COMPUTED_IN_PROGRESS_AGE_DAYS"]} days\n\n')
-                result.append(f'Project sponsor(s): {lines["BUSINESS_SPONSOR"]} ')
-                result.append(f'  Size: {size_repr(["T-SHIRT_SIZE"])} \n\n')
+                result.append(f'<u>Project sponsor(s)</u>: {lines["BUSINESS_SPONSOR"]} ')
+                result.append(f'&nbsp; &nbsp; &nbsp;  👕 <u>Size</u>: {size_repr(lines["T-SHIRT_SIZE"])} \n\n')
                 if project_owner_key != "ANALYTICS_DS_OWNER":
-                    result.append(f'Data Analyst: {lines["ANALYTICS_DS_OWNER"]}\n\n')
+                    result.append(f'<u>Data Analyst</u>: {lines["ANALYTICS_DS_OWNER"]}\n\n')
                 for note in lines["NOTES"].split(NOTES_DELIMITER):
                     result.append(f'  - {note.strip()[6:]}\n')
                 result.append("\n\n")

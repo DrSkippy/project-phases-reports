@@ -226,6 +226,17 @@ def create_weekly_owners_views(project_records_list):
                             if c < 3:
                                 outfile.write(f'| |{note.strip()[6:]}| |\n')
 
+def size_repr(size_string):
+    res = ""
+    if size_string.lower().startsiwth("s"):
+        res = "*"
+    elif size_string.lower().startswith("m"):
+        res = "**"
+    elif size_string.lower().startswith("l"):
+        res = "***"
+    elif size_string.lower().startswith("xl"):
+        res = "****"
+    return res
 
 def synthesize_owner_block(owner, phase_filter='active', project_owner_key='ANALYTICS_DS_OWNER',
                            justification_block=False):
@@ -258,11 +269,11 @@ def synthesize_owner_block(owner, phase_filter='active', project_owner_key='ANAL
             if owner in lines[project_owner_key] and _current_project_phase == next_phase:
                 counts[_current_project_phase] += 1
                 result.append(f'### {lines["Project"]} | *Mission: {lines["MISSION_ALIGNMENT"]}*\n\n')
-                result.append(f'Project phase:  _[{lines["Phases"]}]_ ')
-                result.append(f'&nbsp; &sbsp; &sbsp; Active for {lines["COMPUTED_AGE_DAYS"]} days &'
+                result.append(f'<u>Project phase:</u>  _[{lines["Phases"]}]_ ')
+                result.append(f'Active for {lines["COMPUTED_AGE_DAYS"]} days &'
                               f' In-Progress for {lines["COMPUTED_IN_PROGRESS_AGE_DAYS"]} days\n\n')
                 result.append(f'Project sponsor(s): {lines["BUSINESS_SPONSOR"]} ')
-                result.append(f' &nbsp); &nbsp &npsp; Size: {lines["T-SHIRT_SIZE"]} \n\n')
+                result.append(f'  Size: {size_repr(["T-SHIRT_SIZE"])} \n\n')
                 if project_owner_key != "ANALYTICS_DS_OWNER":
                     result.append(f'Data Analyst: {lines["ANALYTICS_DS_OWNER"]}\n\n')
                 for note in lines["NOTES"].split(NOTES_DELIMITER):

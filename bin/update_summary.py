@@ -21,6 +21,7 @@ owner_views_commit_path = os.path.join(projects_tree_project_folders, "owner_vie
 weekly_owner_views_active_path = os.path.join(projects_tree_project_folders, "weekly_owner_views_active.md")
 owner_views_completed_path = os.path.join(projects_tree_project_folders, "owner_views_completed.md")
 stakeholders_views_active_path = os.path.join(projects_tree_project_folders, "stakeholders_views_active.md")
+title_phase_views_path = os.path.join(projects_tree_project_folders, "phase_views.md")
 
 DATE_FMT = "%Y-%m-%d"
 NOTES_DELIMITER = "; "
@@ -202,6 +203,28 @@ def create_stakeholders_views(project_records_list):
             outfile.write(synthesize_owner_block(owner, project_owner_key="BUSINESS_SPONSOR"))
 
 
+def create_title_phase_views(project_records_list):
+    """
+    Create output units by phase for throughput and backlog overview
+    """
+    with open(title_phase_views_path, "w") as outfile:
+        outfile.write("# Data Accerator Projects by Phase\n\n")
+        counts = defaultdict(lambda: 0)
+        for _phase, index in project_phases.items():
+            if index in [0,9]:
+                continue
+            outfile.write(f'### {_phase.split("-")[1]}\n\n')
+            outfile.write('| <div style="width:450px">Projects</div> |\n')
+            outfile.write("|---|\n")
+            for lines in project_records_list:
+                if _phase == lines["Phases"]:
+                    counts[index] += 1
+                    outfile.write(f'|{lines["Project"]} (👕:{size_repr(lines["T-SHIRT_SIZE"])})|\n')
+        if len(counts) > 0:
+            # Only include this block if 1 or more projects found
+            outfile.write(summarize_phase_counts(counts))
+
+
 def create_weekly_owners_views(project_records_list):
     """
     Create output units by owner for weekly meeting update table
@@ -209,9 +232,9 @@ def create_weekly_owners_views(project_records_list):
     # find unique owners
     owners = set([lines["ANALYTICS_DS_OWNER"] for lines in project_records_list])
     with open(weekly_owner_views_active_path, "w") as outfile:
-        outfile.write("# Data Accelerator Weekly - Project Owner Views - ACTIVE\n\n")
-        outfile.write("| Projects | Info | Notes |\n")
-        outfile.write("|---|---|---|\n")
+        outfile.write("# DA Weekly - Project Owner Views - ACTIVE\n\n")
+        outfile.write("| Projects | Info |\n")
+        outfile.write("|---|---|\n")
         for owner in owners:
             outfile.write(f"| **{owner:}** | | |\n")
             counts = defaultdict(lambda: 0)
@@ -221,7 +244,8 @@ def create_weekly_owners_views(project_records_list):
                     if lines["ANALYTICS_DS_OWNER"] == owner and _phase == next_phase:
                         counts[_phase] += 1
                         outfile.write(f'|{lines["Project"]}|[{_phase}] active {lines["COMPUTED_AGE_DAYS"]} days &'
-                                      f' In-progress {lines["COMPUTED_IN_PROGRESS_AGE_DAYS"]} days|\n')
+                                      f' In-progress {lines["COMPUTED_IN_PROGRESS_AGE_DAYS"]} days '
+                                      f' (👕:{size_repr(lines["T-SHIRT_SIZE"])})|\n')
                         for c, note in enumerate(lines["NOTES"].split(NOTES_DELIMITER)):
                             if c < 3:
                                 outfile.write(f'| |{note.strip()[6:]}| |\n')
@@ -238,6 +262,7 @@ def size_repr(size_string):
     elif size_string.startswith("x"):
         res = "XL"
     return res
+
 
 def synthesize_owner_block(owner, phase_filter='active', project_owner_key='ANALYTICS_DS_OWNER',
                            justification_block=False):
@@ -444,3 +469,4 @@ if __name__ == "__main__":
     create_owners_commit_views(project_records_list)
     create_weekly_owners_views(project_records_list)
     create_stakeholders_views(project_records_list)
+    create_title_phase_views(project_records_list)

@@ -180,13 +180,28 @@ def synthesize_sharepoint_url(project_phase, project_name):
     return base_sharepoint_url + suffix
 
 
-def summarize_phase_counts(count_dict):
-    res = "\n| Phase| # Projects|\n"
-    res += "|----------------|----------|\n"
-    for k, v in count_dict.items():
-        res += f"|{index_project_phases[k]:10}| {v:5d}|\n"
-    res += "\n\n"
-    return res
+def summarize_phase_counts(phase_counts):
+    """
+    Generate a markdown formatted summary table of project phases and their counts.
+
+    Parameters:
+    phase_counts (dict): A dictionary where keys are phase identifiers (ints) and 
+                         values are the counts of projects in each phase.
+
+    Returns:
+    str: A string representing a markdown formatted table summarizing the phase counts.
+    """
+    # Initialize the markdown table header
+    markdown_table = "\n| Phase | # Projects |\n"
+    markdown_table += "|----|----|\n"
+
+    # Iterate over each phase and its count, adding rows to the table
+    for phase_id, project_count in phase_counts.items():
+        phase_name = index_project_phases[phase_id]  # Retrieve phase name from the global variable
+        markdown_table += f"| {phase_name:10} | {project_count:5d} |\n"
+
+    markdown_table += "\n\n"  # Add extra newlines for readability
+    return markdown_table
 
 
 def create_stakeholders_views(project_records_list):
@@ -250,18 +265,34 @@ def create_weekly_owners_views(project_records_list):
                             if c < 3:
                                 outfile.write(f'| |{note.strip()[6:]}| |\n')
 
+
 def size_repr(size_string):
-    res = "Unsized"
-    size_string = size_string.strip().lower()
-    if size_string.startswith("s"):
-        res = "S"
-    elif size_string.startswith("m"):
-        res = "M"
-    elif size_string.startswith("l"):
-        res = "L"
-    elif size_string.startswith("x"):
-        res = "XL"
-    return res
+    """
+    Convert a size string to a standardized size representation.
+
+    Parameters:
+    size_string (str): A string representing the size, which can be "small", "medium", 
+                       "large", "extra large", etc., or their abbreviations.
+
+    Returns:
+    str: A standardized one-letter size representation ("S", "M", "L", "XL"). 
+         Returns "Unsized" if the input does not match any recognized size.
+    """
+    # Trim and convert the input to lower case for standardization
+    standardized_size = size_string.strip().lower()
+
+    # Determine the size representation based on the first character
+    if standardized_size.startswith("s"):
+        return "S"
+    elif standardized_size.startswith("m"):
+        return "M"
+    elif standardized_size.startswith("l"):
+        return "L"
+    elif standardized_size.startswith("x") or standardized_size.startswith("e"):
+        return "XL"
+    
+    # Default return value for unrecognized sizes
+    return "Unsized"
 
 
 def synthesize_owner_block(owner, phase_filter='active', project_owner_key='ANALYTICS_DS_OWNER',
@@ -343,21 +374,33 @@ def create_owners_views(project_records_list):
             outfile.write(synthesize_owner_block(owner, phase_filter=["6-Completed", "7-Maintenance"]))
 
 
-def create_data_product_links(project_records_list):
+def create_data_product_links(project_records):
     """
-    Markdown data project links page
+    Writes markdown links for data products to a file, based on provided project records.
+
+    Each project record in the input list should be a dictionary containing keys:
+    'Project', 'DATA_PRODUCT_LINK', and 'Phases'. The markdown links are created only 
+    for records with valid 'DATA_PRODUCT_LINK'.
+
+    Parameters:
+    project_records (list of dict): A list of dictionaries, each representing a project record.
     """
-    prototype = "- [{}]({}) {}\n"
-    links = []
-    for line_dict in project_records_list:
-        if line_dict["DATA_PRODUCT_LINK"] is not None and not line_dict["DATA_PRODUCT_LINK"].startswith("None") and \
-                line_dict["DATA_PRODUCT_LINK"].strip() != "":
-            links.append(prototype.format(line_dict["Project"], line_dict["DATA_PRODUCT_LINK"], line_dict["Phases"]))
-    if len(links) > 0:
+    markdown_link_template = "- [{}]({}) {}\n"
+    markdown_links = []
+
+    # Filtering and formatting links
+    for record in project_records:
+        data_product_link = record["DATA_PRODUCT_LINK"]
+        if data_product_link and not data_product_link.lower().startswith("none") and data_product_link.strip():
+            formatted_link = markdown_link_template.format(record["Project"], data_product_link, record["Phases"])
+            markdown_links.append(formatted_link)
+
+    # Writing to file if there are links to write
+    if markdown_links:
         with open(data_product_links_path, "w") as outfile:
             outfile.write("### Dashboard Links:\n\n")
-            for link in links:
-                outfile.write(link)
+            outfile.writelines(markdown_links)
+
 
 
 def create_summary_csv(project_records_list):

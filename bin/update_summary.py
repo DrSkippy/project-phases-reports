@@ -226,7 +226,7 @@ def create_title_phase_views(project_records_list):
         outfile.write("# Data Accerator Projects by Phase\n\n")
         counts = defaultdict(lambda: 0)
         for _phase, index in project_phases.items():
-            if index in [0,9]:
+            if index in [0, 9]:
                 continue
             outfile.write(f'### {_phase.split("-")[1]}\n\n')
             outfile.write('| <div style="width:450px">Projects</div> |\n')
@@ -290,7 +290,7 @@ def size_repr(size_string):
         return "L"
     elif standardized_size.startswith("x") or standardized_size.startswith("e"):
         return "XL"
-    
+
     # Default return value for unrecognized sizes
     return "Unsized"
 
@@ -345,16 +345,33 @@ def synthesize_owner_block(owner, phase_filter='active', project_owner_key='ANAL
     return ret
 
 
-def create_owners_commit_views(project_records_list):
-    # find unique owners
-    owners = set([lines["ANALYTICS_DS_OWNER"] for lines in project_records_list])
+def create_owners_commit_views(project_records):
+    """
+    Creates a file with synthesized owner blocks for each unique project owner.
 
+    This function finds unique owners in the provided project records and writes
+    synthesized information for each owner to a file. The information includes
+    project phases and justifications.
+
+    Parameters:
+    project_records (list of dict): A list of dictionaries, each representing a project record.
+    """
+    # Extracting unique owners
+    unique_owners = {record["ANALYTICS_DS_OWNER"] for record in project_records}
+
+    # Open the file for writing
     with open(owner_views_commit_path, "w") as outfile:
+        # Write the header
         outfile.write("# Data Accelerator - Project Owner Views - COMMIT\n\n")
-        outfile.write(f"({str(datetime.datetime.now())[:19]})\n\n")
-        for owner in owners:
-            outfile.write(
-                synthesize_owner_block(owner, phase_filter=["2-Committed", "1-Chartering"], justification_block=True))
+        # Timestamp
+        current_timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        outfile.write(f"({current_timestamp})\n\n")
+
+        # Write synthesized owner blocks
+        for owner in unique_owners:
+            owner_block = synthesize_owner_block(owner, phase_filter=["2-Committed", "1-Chartering"],
+                                                 justification_block=True)
+            outfile.write(owner_block)
 
 
 def create_owners_views(project_records_list):
@@ -402,18 +419,27 @@ def create_data_product_links(project_records):
             outfile.writelines(markdown_links)
 
 
+def create_summary_csv(project_records):
+    """
+    Writes a summary CSV file containing data for each project.
 
-def create_summary_csv(project_records_list):
+    The CSV file includes headers as specified by 'project_params_dict.keys()' and
+    maps field names using 'field_name_map'. Each project record in 'project_records'
+    is written as a row in the CSV file.
+
+    Parameters:
+    project_records (list of dict): A list of dictionaries, each representing a project record.
     """
-    Create the summary csv file of all the projects in the tree
-    """
-    with open(summary_path, "w") as outfile:
-        # Table header
-        w = csv.DictWriter(outfile, project_params_dict.keys(), dialect='excel')
-        w.writerow(field_name_map)
-        # Write the project data, 1 project per line
-        for line in project_records_list:
-            w.writerow(line)
+    # Open the file for writing
+    with open(summary_path, "w", newline='') as outfile:
+        # Initialize a CSV DictWriter with the specified field names and dialect
+        csv_writer = csv.DictWriter(outfile, fieldnames=project_params_dict.keys(), dialect='excel')
+
+        # Write the header row based on field_name_map
+        csv_writer.writeheader()
+
+        # Write each project record as a row in the CSV file
+        csv_writer.writerows(project_records)
 
 
 if __name__ == "__main__":

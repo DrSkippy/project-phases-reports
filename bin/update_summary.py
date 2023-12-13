@@ -499,6 +499,8 @@ if __name__ == "__main__":
                         params["COMPUTED_PROJECT_IN_PROGRESS_DATE"][:10],
                         DATE_FMT)
                     dt_delta = project_end_date - project_in_progress_date
+                    if dt_delta < 0:
+                        dt_delta = datetime.timedelta(0)
                     params["COMPUTED_IN_PROGRESS_AGE_DAYS"] = dt_delta.days
 
             if project_phases[phase] >= 1:

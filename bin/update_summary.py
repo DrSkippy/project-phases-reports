@@ -22,6 +22,7 @@ weekly_owner_views_active_path = os.path.join(projects_tree_project_folders, "we
 owner_views_completed_path = os.path.join(projects_tree_project_folders, "owner_views_completed.md")
 stakeholders_views_active_path = os.path.join(projects_tree_project_folders, "stakeholders_views_active.md")
 title_phase_views_path = os.path.join(projects_tree_project_folders, "phase_views.md")
+stakeholder_list_path = os.path.join(projects_tree_project_folders, "stakeholder_list.txt")
 
 DATE_FMT = "%Y-%m-%d"
 NOTES_DELIMITER = "; "
@@ -441,6 +442,27 @@ def create_summary_csv(project_records):
         # Write each project record as a row in the CSV file
         csv_writer.writerows(project_records)
 
+def create_complete_stakeholder_list(project_records):
+    """
+    Creates a list of stakeholders from the provided project records.
+
+    Parameters:
+    project_records (list of dict): A list of dictionaries, each representing a project record.
+
+    Returns:
+    list of str: A list of unique stakeholders.
+    """
+    stakeholders = set()
+
+    # Iterate over each project record and extract the stakeholders
+    for record in project_records:
+        stakeholders.update(extract_stakeholders(record["BUSINESS_SPONSOR"]))
+
+    # Return the list of unique stakeholders
+    with open(stakeholder_list_path, "w") as outfile:
+        wrt = csv.writer(outfile)
+        wrt.writerows(stakeholders)
+
 
 if __name__ == "__main__":
     os.chdir(projects_tree_root)
@@ -499,8 +521,8 @@ if __name__ == "__main__":
                         params["COMPUTED_PROJECT_IN_PROGRESS_DATE"][:10],
                         DATE_FMT)
                     dt_delta = project_end_date - project_in_progress_date
-                    if dt_delta < 0:
-                        dt_delta = datetime.timedelta(0)
+                    if dt_delta.days < 0:
+                        dt_delta = datetime.timedelta(days=0)
                     params["COMPUTED_IN_PROGRESS_AGE_DAYS"] = dt_delta.days
 
             if project_phases[phase] >= 1:

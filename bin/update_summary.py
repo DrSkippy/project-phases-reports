@@ -442,6 +442,18 @@ def create_summary_csv(project_records):
         # Write each project record as a row in the CSV file
         csv_writer.writerows(project_records)
 
+def synthesize_email(name_set):
+    result = []
+    for x in name_set:
+        v = x.strip().replace("- V", "")
+        try:
+            a, b = v.split(" ")
+            result.append([f"{v}", f"{a[0].lower()}.{b.lower()}@f5.com"])
+        except ValueError:
+            pass
+    return result
+
+
 def create_complete_stakeholder_list(project_records):
     """
     Creates a list of stakeholders from the provided project records.
@@ -458,7 +470,7 @@ def create_complete_stakeholder_list(project_records):
     for record in project_records:
         stakeholders.update(extract_stakeholders(record["BUSINESS_SPONSOR"]))
 
-    stakeholderlist = [[x] for x in stakeholders]
+    stakeholderlist = synthesize_email(stakeholders)
     
     # Return the list of unique stakeholders
     with open(stakeholder_list_path, "w") as outfile:

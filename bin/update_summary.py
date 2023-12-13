@@ -458,10 +458,12 @@ def create_complete_stakeholder_list(project_records):
     for record in project_records:
         stakeholders.update(extract_stakeholders(record["BUSINESS_SPONSOR"]))
 
+    stakeholderlist = [[x] for x in stakeholders]
+    
     # Return the list of unique stakeholders
     with open(stakeholder_list_path, "w") as outfile:
         wrt = csv.writer(outfile)
-        wrt.writerows(stakeholders)
+        wrt.writerows(stakeholderlist)
 
 
 if __name__ == "__main__":

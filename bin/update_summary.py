@@ -563,3 +563,4 @@ if __name__ == "__main__":
     create_weekly_owners_views(project_records_list)
     create_stakeholders_views(project_records_list)
     create_title_phase_views(project_records_list)
+    create_complete_stakeholder_list(project_records_list)

@@ -224,7 +224,7 @@ def create_title_phase_views(project_records_list):
     Create output units by phase for throughput and backlog overview
     """
     with open(title_phase_views_path, "w") as outfile:
-        outfile.write("# Data Accerator Projects by Phase\n\n")
+        outfile.write("# Data Accelerator Projects by Phase\n\n")
         counts = defaultdict(lambda: 0)
         for _phase, index in project_phases.items():
             if index in [0, 9]:

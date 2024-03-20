@@ -6,6 +6,7 @@
 #
 from reports.configurations import *
 from reports.summary import *
+from reports.parser import *
 
 if __name__ == "__main__":
     os.chdir(projects_tree_root)

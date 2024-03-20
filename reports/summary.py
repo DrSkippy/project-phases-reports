@@ -1,6 +1,7 @@
 import csv
 import datetime
 from collections import defaultdict
+from reports.configurations import *
 
 
 def synthesize_sharepoint_url(project_phase, project_name):

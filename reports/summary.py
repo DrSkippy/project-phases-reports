@@ -1,6 +1,6 @@
 import csv
 import datetime
-from collections import defaultd
+from collections import defaultdict
 
 
 def synthesize_sharepoint_url(project_phase, project_name):

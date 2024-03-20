@@ -1,6 +1,7 @@
 import csv
 import datetime
 from collections import defaultdict
+
 from reports.configurations import *
 
 
@@ -58,7 +59,7 @@ def create_stakeholders_views(project_records_list):
         outfile.write("# Data Accelerator - Project Stakeholders Views - ACTIVE\n\n")
         outfile.write(f"({str(datetime.datetime.now())[:19]})\n\n")
         for owner in owners:
-            outfile.write(synthesize_owner_block(owner, project_owner_key="BUSINESS_SPONSOR"))
+            outfile.write(synthesize_owner_block(project_records_list, owner, project_owner_key="BUSINESS_SPONSOR"))
 
 
 def create_title_phase_views(project_records_list):
@@ -138,7 +139,7 @@ def size_repr(size_string):
     return "Unsized"
 
 
-def synthesize_owner_block(owner, phase_filter='active', project_owner_key='ANALYTICS_DS_OWNER',
+def synthesize_owner_block(project_records_list, owner, phase_filter='active', project_owner_key='ANALYTICS_DS_OWNER',
                            justification_block=False):
     """
     Create output units by owner
@@ -188,7 +189,7 @@ def synthesize_owner_block(owner, phase_filter='active', project_owner_key='ANAL
     return ret
 
 
-def create_owners_commit_views(project_records):
+def create_owners_commit_views(project_records_list):
     """
     Creates a file with synthesized owner blocks for each unique project owner.
 
@@ -200,7 +201,7 @@ def create_owners_commit_views(project_records):
     project_records (list of dict): A list of dictionaries, each representing a project record.
     """
     # Extracting unique owners
-    unique_owners = {record["ANALYTICS_DS_OWNER"] for record in project_records}
+    unique_owners = {record["ANALYTICS_DS_OWNER"] for record in project_records_list}
 
     # Open the file for writing
     with open(owner_views_commit_path, "w") as outfile:
@@ -212,7 +213,7 @@ def create_owners_commit_views(project_records):
 
         # Write synthesized owner blocks
         for owner in unique_owners:
-            owner_block = synthesize_owner_block(owner, phase_filter=["2-Committed", "1-Chartering"],
+            owner_block = synthesize_owner_block(project_records_list, owner, phase_filter=["2-Committed", "1-Chartering"],
                                                  justification_block=True)
             outfile.write(owner_block)
 
@@ -225,13 +226,13 @@ def create_owners_views(project_records_list):
         outfile.write("# Data Accelerator - Project Owner Views - ACTIVE\n\n")
         outfile.write(f"({str(datetime.datetime.now())[:19]})\n\n")
         for owner in owners:
-            outfile.write(synthesize_owner_block(owner))
+            outfile.write(synthesize_owner_block(project_records_list, owner))
 
     with open(owner_views_completed_path, "w") as outfile:
         outfile.write("# Data Accelerator - Project Owner Views - COMPLETED & MAINTENANCE\n\n")
         outfile.write(f"({str(datetime.datetime.now())[:19]})\n\n")
         for owner in owners:
-            outfile.write(synthesize_owner_block(owner, phase_filter=["6-Completed", "7-Maintenance"]))
+            outfile.write(synthesize_owner_block(project_records_list, owner, phase_filter=["6-Completed", "7-Maintenance"]))
 
 
 def create_data_product_links(project_records):

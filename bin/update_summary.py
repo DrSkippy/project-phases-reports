@@ -4,9 +4,8 @@
 #   python ~/Working/2023-08-23_project_visibility/bin/update_summary.py
 #   cat "./Project Folders/summary.csv"
 #
-from reports.configurations import *
-from reports.summary import *
 from reports.parser import *
+from reports.summary import *
 
 if __name__ == "__main__":
     os.chdir(projects_tree_root)

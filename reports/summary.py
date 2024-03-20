@@ -5,6 +5,16 @@ from collections import defaultdict
 from reports.configurations import *
 
 
+def extract_stakeholders(stake_str):
+    """
+    Stakeholders are comma-separated in the project_info_file
+    Extract and return a list of stakeholders
+    """
+    sh_list = stake_str.split(",")
+    sh_list = [x.strip() for x in sh_list]
+    return sh_list
+
+
 def synthesize_sharepoint_url(project_phase, project_name):
     """
     Example URL:
@@ -213,7 +223,8 @@ def create_owners_commit_views(project_records_list):
 
         # Write synthesized owner blocks
         for owner in unique_owners:
-            owner_block = synthesize_owner_block(project_records_list, owner, phase_filter=["2-Committed", "1-Chartering"],
+            owner_block = synthesize_owner_block(project_records_list, owner,
+                                                 phase_filter=["2-Committed", "1-Chartering"],
                                                  justification_block=True)
             outfile.write(owner_block)
 
@@ -232,7 +243,8 @@ def create_owners_views(project_records_list):
         outfile.write("# Data Accelerator - Project Owner Views - COMPLETED & MAINTENANCE\n\n")
         outfile.write(f"({str(datetime.datetime.now())[:19]})\n\n")
         for owner in owners:
-            outfile.write(synthesize_owner_block(project_records_list, owner, phase_filter=["6-Completed", "7-Maintenance"]))
+            outfile.write(
+                synthesize_owner_block(project_records_list, owner, phase_filter=["6-Completed", "7-Maintenance"]))
 
 
 def create_data_product_links(project_records):

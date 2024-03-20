@@ -1,16 +1,6 @@
 from reports.configurations import *
 
 
-def extract_stakeholders(stake_str):
-    """
-    Stakeholders are comma-separated in the project_info_file
-    Extract and return a list of stakeholders
-    """
-    sh_list = stake_str.split(",")
-    sh_list = [x.strip() for x in sh_list]
-    return sh_list
-
-
 def parse_project_info(project_info_file):
     """
     Parse the project information file for required elements.

@@ -4,6 +4,9 @@ from collections import defaultdict
 
 from reports.configurations import *
 
+########################################################################################
+# Utilities
+########################################################################################
 
 def extract_stakeholders(stake_str):
     """
@@ -33,7 +36,21 @@ def synthesize_sharepoint_url(project_phase, project_name):
                                                          ).replace(".", "%2E").replace("-", "%2D")
     return base_sharepoint_url + suffix
 
+def synthesize_email(name_set):
+    result = []
+    for x in name_set:
+        v = x.strip().replace("- V", "")
+        try:
+            a, b = v.split(" ")
+            result.append([f"{v}", f"{a[0].lower()}.{b.lower()}@f5.com"])
+        except ValueError:
+            pass
+    return result
 
+
+########################################################################################
+# Reusable report components
+########################################################################################
 def summarize_phase_counts(phase_counts):
     """
     Generate a markdown formatted summary table of project phases and their counts.
@@ -57,79 +74,16 @@ def summarize_phase_counts(phase_counts):
     markdown_table += "\n\n"  # Add extra newlines for readability
     return markdown_table
 
-
-def create_stakeholders_views(project_records_list):
-    # find unique stakeholders
-    owners = []
-    for lines in project_records_list:
-        owners.extend(extract_stakeholders(lines["BUSINESS_SPONSOR"]))
-    owners = set(owners)
-
-    with open(stakeholders_views_active_path, "w") as outfile:
-        outfile.write("# Data Accelerator - Project Stakeholders Views - ACTIVE\n\n")
-        outfile.write(f"({str(datetime.datetime.now())[:19]})\n\n")
-        for owner in owners:
-            outfile.write(synthesize_owner_block(project_records_list, owner, project_owner_key="BUSINESS_SPONSOR"))
-
-
-def create_title_phase_views(project_records_list):
-    """
-    Create output units by phase for throughput and backlog overview
-    """
-    with open(title_phase_views_path, "w") as outfile:
-        outfile.write("# Data Accelerator Projects by Phase\n\n")
-        counts = defaultdict(lambda: 0)
-        for _phase, index in project_phases.items():
-            if index in [0, 9]:
-                continue
-            outfile.write(f'### {_phase.split("-")[1]}\n\n')
-            outfile.write('| <div style="width:450px">Projects</div> |\n')
-            outfile.write("|---|\n")
-            for lines in project_records_list:
-                if _phase == lines["Phases"]:
-                    counts[index] += 1
-                    outfile.write(f'|{lines["Project"]} (👕:{size_repr(lines["T-SHIRT_SIZE"])})|\n')
-        if len(counts) > 0:
-            # Only include this block if 1 or more projects found
-            outfile.write(summarize_phase_counts(counts))
-
-
-def create_weekly_owners_views(project_records_list):
-    """
-    Create output units by owner for weekly meeting update table
-    """
-    # find unique owners
-    owners = set([lines["ANALYTICS_DS_OWNER"] for lines in project_records_list])
-    with open(weekly_owner_views_active_path, "w") as outfile:
-        outfile.write("# DA Weekly - Project Owner Views - ACTIVE\n\n")
-        outfile.write("| Projects | Info |\n")
-        outfile.write("|---|---|\n")
-        for owner in owners:
-            outfile.write(f"| **{owner:}** | | |\n")
-            counts = defaultdict(lambda: 0)
-            for next_phase in active_projects_order:
-                for lines in project_records_list:
-                    _phase = lines["Phases"]
-                    if lines["ANALYTICS_DS_OWNER"] == owner and _phase == next_phase:
-                        counts[_phase] += 1
-                        outfile.write(f'|{lines["Project"]}|[{_phase}] active {lines["COMPUTED_AGE_DAYS"]} days &'
-                                      f' In-progress {lines["COMPUTED_IN_PROGRESS_AGE_DAYS"]} days '
-                                      f' (👕:{size_repr(lines["T-SHIRT_SIZE"])})|\n')
-                        for c, note in enumerate(lines["NOTES"].split(NOTES_DELIMITER)):
-                            if c < 3:
-                                outfile.write(f'| |{note.strip()[6:]}| |\n')
-
-
 def size_repr(size_string):
     """
     Convert a size string to a standardized size representation.
 
     Parameters:
-    size_string (str): A string representing the size, which can be "small", "medium", 
+    size_string (str): A string representing the size, which can be "small", "medium",
                        "large", "extra large", etc., or their abbreviations.
 
     Returns:
-    str: A standardized one-letter size representation ("S", "M", "L", "XL"). 
+    str: A standardized one-letter size representation ("S", "M", "L", "XL").
          Returns "Unsized" if the input does not match any recognized size.
     """
     # Trim and convert the input to lower case for standardization
@@ -197,6 +151,72 @@ def synthesize_owner_block(project_records_list, owner, phase_filter='active', p
         result.append(summarize_phase_counts(counts))
         ret = "".join(result)
     return ret
+
+########################################################################################
+# Reports
+########################################################################################
+def create_stakeholders_views(project_records_list):
+    # find unique stakeholders
+    owners = []
+    for lines in project_records_list:
+        owners.extend(extract_stakeholders(lines["BUSINESS_SPONSOR"]))
+    owners = set(owners)
+
+    with open(stakeholders_views_active_path, "w") as outfile:
+        outfile.write("# Data Accelerator - Project Stakeholders Views - ACTIVE\n\n")
+        outfile.write(f"({str(datetime.datetime.now())[:19]})\n\n")
+        for owner in owners:
+            outfile.write(synthesize_owner_block(project_records_list, owner, project_owner_key="BUSINESS_SPONSOR"))
+
+
+def create_title_phase_views(project_records_list):
+    """
+    Create output units by phase for throughput and backlog overview
+    """
+    with open(title_phase_views_path, "w") as outfile:
+        outfile.write("# Data Accelerator Projects by Phase\n\n")
+        counts = defaultdict(lambda: 0)
+        for _phase, index in project_phases.items():
+            if index in [0, 9]:
+                continue
+            outfile.write(f'### {_phase.split("-")[1]}\n\n')
+            outfile.write('| <div style="width:450px">Projects</div> |\n')
+            outfile.write("|---|\n")
+            for lines in project_records_list:
+                if _phase == lines["Phases"]:
+                    counts[index] += 1
+                    outfile.write(f'|{lines["Project"]} (👕:{size_repr(lines["T-SHIRT_SIZE"])})|\n')
+        if len(counts) > 0:
+            # Only include this block if 1 or more projects found
+            outfile.write(summarize_phase_counts(counts))
+
+
+def create_weekly_owners_views(project_records_list):
+    """
+    Create output units by owner for weekly meeting update table
+    """
+    # find unique owners
+    owners = set([lines["ANALYTICS_DS_OWNER"] for lines in project_records_list])
+    with open(weekly_owner_views_active_path, "w") as outfile:
+        outfile.write("# DA Weekly - Project Owner Views - ACTIVE\n\n")
+        outfile.write("| Projects | Info |\n")
+        outfile.write("|---|---|\n")
+        for owner in owners:
+            outfile.write(f"| **{owner:}** | | |\n")
+            counts = defaultdict(lambda: 0)
+            for next_phase in active_projects_order:
+                for lines in project_records_list:
+                    _phase = lines["Phases"]
+                    if lines["ANALYTICS_DS_OWNER"] == owner and _phase == next_phase:
+                        counts[_phase] += 1
+                        outfile.write(f'|{lines["Project"]}|[{_phase}] active {lines["COMPUTED_AGE_DAYS"]} days &'
+                                      f' In-progress {lines["COMPUTED_IN_PROGRESS_AGE_DAYS"]} days '
+                                      f' (👕:{size_repr(lines["T-SHIRT_SIZE"])})|\n')
+                        for c, note in enumerate(lines["NOTES"].split(NOTES_DELIMITER)):
+                            if c < 3:
+                                outfile.write(f'| |{note.strip()[6:]}| |\n')
+
+
 
 
 def create_owners_commit_views(project_records_list):
@@ -298,17 +318,6 @@ def create_summary_csv(project_records):
         csv_writer.writerows(project_records)
 
 
-def synthesize_email(name_set):
-    result = []
-    for x in name_set:
-        v = x.strip().replace("- V", "")
-        try:
-            a, b = v.split(" ")
-            result.append([f"{v}", f"{a[0].lower()}.{b.lower()}@f5.com"])
-        except ValueError:
-            pass
-    return result
-
 
 def create_complete_stakeholder_list(project_records):
     """
@@ -333,9 +342,8 @@ def create_complete_stakeholder_list(project_records):
         wrt = csv.writer(outfile)
         wrt.writerows(stakeholderlist)
 
-
 def create_reports(project_records_list):
-    # Create reports
+    # Create all the standard reports
     create_summary_csv(project_records_list)
     create_data_product_links(project_records_list)
     create_owners_views(project_records_list)

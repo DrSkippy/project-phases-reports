@@ -14,7 +14,7 @@ if __name__ == "__main__":
 
     # Walk the file system from the root directory
     for root, dirs, files in os.walk(".", topdown=False):
-        if project_info_filename not in files or "1-Chartering" not in dirs:
+        if project_info_filename not in files or project_folders_root not in root:
             print(root, dirs)
             continue
         new_project_start_date = None

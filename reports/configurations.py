@@ -9,7 +9,8 @@ import os
 # Locations
 project_info_filename = "PROJECT_INFO.txt"
 projects_tree_root = "/Users/s.hendrickson/Documents/OneDrive - F5, Inc"
-projects_tree_project_folders = os.path.join(projects_tree_root, "Projects Folders")
+project_folders_root = "Project Folders"
+projects_tree_project_folders = os.path.join(projects_tree_root, project_folders_root)
 # Files
 summary_path = os.path.join(projects_tree_project_folders, "summary.csv")
 data_product_links_path = os.path.join(projects_tree_project_folders, "data_product_links.md")

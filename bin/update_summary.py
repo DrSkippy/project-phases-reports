@@ -4,25 +4,32 @@
 #   python ~/Working/2023-08-23_project_visibility/bin/update_summary.py
 #   cat "./Projects Folders/summary.csv"
 #
+import logging
 from reports.parser import *
 from reports.summary import *
 
 if __name__ == "__main__":
+    logging.basicConfig(level=logging.INFO)
+    logging.info("Starting update_summary.py")
     os.chdir(projects_tree_root)
+    logging.info(f"Current directory: {os.getcwd()}")
     project_records_list = []
     projects_processed_counter = 0
 
     # Walk the file system from the root directory
     for root, dirs, files in os.walk(".", topdown=False):
         if project_info_filename not in files or project_folders_root not in root:
+            logging.warning(f"Skipping {root}")
             continue
         new_project_start_date = None
         new_project_end_date = None
         new_project_in_progress_date = None
         # Process Project Info file
         with open(os.path.join(root, project_info_filename), "r") as project_info_file:
+            logging.info(f"Processing file {projects_processed_counter} ({root})")
             projects_processed_counter += 1
             phase, project = extract_params(root)  # harvest parameters from path
+            logging.info(f"Phase: {phase}, Project: {project}")
             params = parse_project_info(project_info_file)
             params["Phases"] = phase
             params["Project"] = project

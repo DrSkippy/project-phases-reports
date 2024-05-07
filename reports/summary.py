@@ -144,8 +144,8 @@ def synthesize_owner_block(project_records_list, owner, phase_filter='active', p
                 for note in lines["NOTES"].split(NOTES_DELIMITER):
                     result.append(f'  - {note.strip()[6:]}\n')
                 result.append("\n\n")
-                if justification_block and lines["COMMIT_JUSTIFICATION"] is not None:
-                    result.append(f'#### Case for Commit \n{lines["COMMIT_JUSTIFICATION"]}\n\n')
+                if justification_block and lines["COMMIT_JUSTIFICATIONS"] is not None:
+                    result.append(f'#### Case for Commit \n{lines["COMMIT_JUSTIFICATIONS"]}\n\n')
     if len(counts) > 0:
         # Only include this block if 1 or more projects found
         result.append(summarize_phase_counts(counts))

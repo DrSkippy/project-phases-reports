@@ -45,7 +45,7 @@ project_params_dict = {
     "COMPUTED_PROJECT_START_DATE": None,
     "COMPUTED_PROJECT_IN_PROGRESS_DATE": None,
     "COMPUTED_PROJECT_END_DATE": None,
-    "COMMIT_JUSTIFICATION": None
+    "COMMIT_JUSTIFICATIONS": None
 }
 
 """
@@ -69,7 +69,7 @@ name_field_map = {
     "Project Start Date": "COMPUTED_PROJECT_START_DATE",
     "Project In-Progress Date": "COMPUTED_PROJECT_IN_PROGRESS_DATE",
     "Project End Date": "COMPUTED_PROJECT_END_DATE",
-    "Commit Justification": "COMMIT_JUSTIFICATION"
+    "Commit Justification": "COMMIT_JUSTIFICATIONS"
 }
 # keep a reverse map for lookup
 field_name_map = {v: k for k, v in name_field_map.items()}

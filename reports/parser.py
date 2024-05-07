@@ -14,8 +14,8 @@ def parse_project_info(project_info_file):
             # comment lines
             continue
         logging.info(f"Processing line: {line.strip()}")
-        fields = line.split(":")
-        if fields[0].strip() in params_dict:
+        fields = [x.strip() for x in line.split(":")]
+        if fields[0] in params_dict:
             # In Split on ":", so reassemble the rest of the line in case there were colons in it
             params_dict[fields[0].strip()] = ":".join(fields[1:]).strip().strip('"')
             logging.info(f"Found {fields[0].strip()} in project info file")
@@ -25,10 +25,9 @@ def parse_project_info(project_info_file):
             params_dict["NOTES"].append(line.strip())  # records include date field and colon
             logging.info(f"Found NOTE in project info file")
         elif fields[0].startswith("COMMIT_JUSTIFICATION"):
-            if params_dict["COMMIT_JUSTIFICATION"] is None:
-                params_dict["COMMIT_JUSTIFICATION"] = []
-            params_dict["COMMIT_JUSTIFICATION"].append(
-                line.split(":")[1].strip())  # lines will be concatenated in order they appear
+            if params_dict["COMMIT_JUSTIFICATIONS"] is None:
+                params_dict["COMMIT_JUSTIFICATIONS"] = []
+            params_dict["COMMIT_JUSTIFICATIONS"].append(fields[1])
             logging.info(f"Found COMMIT_JUSTIFICATION in project info file")
     # order the notes by date
     if params_dict["NOTES"] is not None:

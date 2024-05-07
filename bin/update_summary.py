@@ -38,11 +38,11 @@ if __name__ == "__main__":
 
             params["Project Folder"] = synthesize_sharepoint_url(phase, project)
             params["NOTES"] = NOTES_DELIMITER.join(params["NOTES"]) + "\n\n"
-            if isinstance(params["COMMIT_JUSTIFICATION"], list) and len(params["COMMIT_JUSTIFICATION"]) > 0:
+            if isinstance(params["COMMIT_JUSTIFICATIONS"], list) and len(params["COMMIT_JUSTIFICATIONS"]) > 0:
                 # Concatenated in order they appear
-                params["COMMIT_JUSTIFICATION"] = " ".join(params["COMMIT_JUSTIFICATION"]) + "\n\n"
+                params["COMMIT_JUSTIFICATIONS"] = " ".join(params["COMMIT_JUSTIFICATIONS"]) + "\n\n"
             else:
-                params["COMMIT_JUSTIFICATION"] = "Commit justification required!\n\n"
+                params["COMMIT_JUSTIFICATIONS"] = "Commit justification required!\n\n"
 
             # Compute derived values for timing of phases
             project_end_date = datetime.datetime.now()  # current last day of unfinished projects

@@ -10,7 +10,7 @@ def parse_project_info(project_info_file):
     """
     params_dict = project_params_dict.copy()
     for line in project_info_file:
-        if line.startswith("#") or len(line.stip()) == 0:
+        if line.startswith("#") or len(line.strip()) == 0:
             # comment lines
             continue
         logging.info(f"Processing line: {line.strip()}")

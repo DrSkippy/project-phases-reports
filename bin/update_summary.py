@@ -9,7 +9,7 @@ from reports.parser import *
 from reports.summary import *
 
 if __name__ == "__main__":
-    logging.basicConfig(level=logging.INFO)
+    logging.basicConfig(level=logging.INFO, filename="update_summary.log", filemode="w")
     logging.info("Starting update_summary.py")
     os.chdir(projects_tree_root)
     logging.info(f"Current directory: {os.getcwd()}")

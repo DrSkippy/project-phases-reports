@@ -10,10 +10,10 @@ def parse_project_info(project_info_file):
     """
     params_dict = project_params_dict.copy()
     for line in project_info_file:
-        if line.startswith("#"):
+        if line.startswith("#") or len(line.stip()) == 0:
             # comment lines
             continue
-        logging.info(f"Processing line: {line}")
+        logging.info(f"Processing line: {line.strip()}")
         fields = line.split(":")
         if fields[0].strip() in params_dict:
             # In Split on ":", so reassemble the rest of the line in case there were colons in it

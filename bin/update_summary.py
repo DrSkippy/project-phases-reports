@@ -11,8 +11,10 @@ from reports.summary import *
 if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO, filename="update_summary.log", filemode="w")
     logging.info("Starting update_summary.py")
+
     os.chdir(projects_tree_root)
     logging.info(f"Current directory: {os.getcwd()}")
+
     project_records_list = []
     projects_processed_counter = 0
 
@@ -24,6 +26,7 @@ if __name__ == "__main__":
         new_project_start_date = None
         new_project_end_date = None
         new_project_in_progress_date = None
+
         # Process Project Info file
         with open(os.path.join(root, project_info_filename), "r") as project_info_file:
             logging.info(f"Processing file {projects_processed_counter} ({root})")

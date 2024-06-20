@@ -166,7 +166,9 @@ def create_stakeholders_views(project_records_list):
         outfile.write("# Data Accelerator - Project Stakeholders Views - ACTIVE\n\n")
         outfile.write(f"({str(datetime.datetime.now())[:19]})\n\n")
         for owner in owners:
-            outfile.write(synthesize_owner_block(project_records_list, owner, project_owner_key="BUSINESS_SPONSOR"))
+            block_string = synthesize_owner_block(project_records_list, owner, project_owner_key="BUSINESS_SPONSOR"))
+            if block_string:
+                outfile.write(block_string)
 
 
 def create_title_phase_views(project_records_list):
@@ -202,12 +204,15 @@ def create_weekly_owners_views(project_records_list):
         outfile.write("| Projects | Info |\n")
         outfile.write("|---|---|\n")
         for owner in owners:
-            outfile.write(f"| **{owner:}** | | |\n")
+            owner_header = False;
             counts = defaultdict(lambda: 0)
             for next_phase in active_projects_order:
                 for lines in project_records_list:
                     _phase = lines["Phases"]
                     if lines["ANALYTICS_DS_OWNER"] == owner and _phase == next_phase:
+                        if not owner_header:
+                            owner_header = True
+                            outfile.write(f"| **{owner:}** | | |\n")
                         counts[_phase] += 1
                         outfile.write(f'|{lines["Project"]}|[{_phase}] active {lines["COMPUTED_AGE_DAYS"]} days &'
                                       f' In-progress {lines["COMPUTED_IN_PROGRESS_AGE_DAYS"]} days '

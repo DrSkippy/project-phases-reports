@@ -12,19 +12,19 @@ dictConfig({
         'format': '[%(asctime)s] %(levelname)s in %(module)s: %(message)s',
     }},
     'handlers': {
-        "file": {
-            "class": "logging.handlers.RotatingFileHandler",
-            "formatter": "standard",
-            "level": "DEBUG",
-            "filename": "update_summary.log",
-            "mode": "a",
-            "encoding": "utf-8",
-            "maxBytes": 500000,
-            "backupCount": 3
+        'file': {
+            'class': 'logging.handlers.RotatingFileHandler',
+            'formatter': 'default',
+            'level': 'DEBUG',
+            'filename': 'update_summary.log',
+            'mode': 'a',
+            'encoding': 'utf-8',
+            'maxBytes': 500000,
+            'backupCount': 3
     }},
     'root': {
         'level': 'DEBUG',
-        'handlers': ['wsgi']
+        'handlers': ['file']
     }
 })
 

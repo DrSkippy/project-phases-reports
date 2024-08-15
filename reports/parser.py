@@ -1,16 +1,21 @@
 import logging
+import datetime
 from reports.configurations import *
 
 def normalize_note_date(note):
     """
     Extract the date from the note string and return it in a sortable format.
     """
-    head, tail = note.strip().split(":", 1)
+    try:
+        head, tail = note.strip().split(":", 1)
+    except ValueError:
+        logging.error(f"ERROR: Note is poorly formed ({note})")
+        return note.strip()
     head = head.upper()  # eg note or Note to NOTE
     head = head.replace("_", "-")
-    head = head.replace("NOTE-","NOTE_")
-    if not head.startswith("NOTE_"):
-        logging.error(f"ERROR: Note does not start with 'NOTE': {head}")
+    head = head.replace("NOTES-","NOTES_")
+    if not head.startswith("NOTES_"):
+        logging.error(f"ERROR: Note does not start with 'NOTES': {head}")
     else:
         hdate = head.split("_")[1]
         try:

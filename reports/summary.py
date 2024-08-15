@@ -184,7 +184,7 @@ def synthesize_owner_maintenance_block(project_records_list, owner, project_owne
         if _current_project_phase == 7 and owner in lines[project_owner_key]:
             recent = recent_notes(lines["NOTES"])
             if len(recent) > 0:
-                logging.info(f"Processing recent notes for {lines['Project']} in Phase {next_phase} for {owner}")
+                logging.info(f"Processing recent notes for {lines['Project']} in Phase 7 for {owner}")
                 counts[_current_project_phase] += 1
                 result.append(f'### {lines["Project"]}\n\n')
                 result.append(f'<u>Project sponsor(s)</u>: {lines["BUSINESS_SPONSOR"]}\n\n')

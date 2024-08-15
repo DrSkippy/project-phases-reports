@@ -1,6 +1,7 @@
 import csv
 import datetime
 from collections import defaultdict
+from importlib.resources import read_text
 
 from reports.configurations import *
 
@@ -146,6 +147,46 @@ def synthesize_owner_block(project_records_list, owner, phase_filter='active', p
                 result.append("\n\n")
                 if justification_block and lines["COMMIT_JUSTIFICATIONS"] is not None:
                     result.append(f'#### Case for Commit \n{lines["COMMIT_JUSTIFICATIONS"]}\n\n')
+    if len(counts) > 0:
+        # Only include this block if 1 or more projects found
+        result.append(summarize_phase_counts(counts))
+        ret = "".join(result)
+    return ret
+
+
+def recent_notes(notes_text):
+    """
+    Return a list of notes with the most recent first
+    """
+    notes_list = [x.strip()[6:] for x in notes_text.split(NOTES_DELIMITER)]
+    # check for recent notes
+    recent = datetime.datetime.now().date() - datetime.timedelta(days=14)
+    notes_list = [x for x in notes_list if datetime.datetime.strptime(x[:10], DATE_FMT).date() >= recent]
+    return notes_list
+
+
+def synthesize_owner_maintenance_block(project_records_list, owner, project_owner_key='ANALYTICS_DS_OWNER'):
+    """
+    Create output units by owner
+        Include items with only recent notes or triggers for maintenance
+    """
+    ret = ""
+    result = [f"### Maintenance Projects\n\n"]
+    counts = defaultdict(lambda: 0)
+    for lines in project_records_list:
+        # step through the project list to find owners and active projects of the ordered type
+        _current_project_phase = project_phases[lines["Phases"]]  # convert phase name to sequence number
+        if _current_project_phase == 7 and owner in lines[project_owner_key]:
+            recent = recent_notes(lines["NOTES"])
+            if len(recent) > 0:
+                counts[_current_project_phase] += 1
+                result.append(f'### {lines["Project"]}\n\n')
+                result.append(f'<u>Project sponsor(s)</u>: {lines["BUSINESS_SPONSOR"]} ')
+                if project_owner_key != "ANALYTICS_DS_OWNER":
+                    result.append(f'<u>Data Analyst</u>: {lines["ANALYTICS_DS_OWNER"]}\n\n')
+                for note in recent:
+                    result.append(f'  - {note}\n')
+            result.append("\n\n")
     if len(counts) > 0:
         # Only include this block if 1 or more projects found
         result.append(summarize_phase_counts(counts))

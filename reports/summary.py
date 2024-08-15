@@ -134,7 +134,7 @@ def synthesize_owner_block(project_records_list, owner, phase_filter='active', p
             # step through the project list to find owners and active projects of the ordered type
             _current_project_phase = project_phases[lines["Phases"]]  # convert phase name to sequence number
             if owner in lines[project_owner_key] and _current_project_phase == next_phase:
-                logging.info(f"Processing {lines['Project']} in phase {next_phase} for {owner}")
+                logging.info(f"Processing {lines['Project']} in Phase {next_phase} for {owner}")
                 counts[_current_project_phase] += 1
                 result.append(f'### {lines["Project"]}<br>*Mission: {lines["MISSION_ALIGNMENT"]}*\n\n')
                 result.append(f'<u>Project phase</u>: _{lines["Phases"]}_ ')
@@ -165,7 +165,7 @@ def recent_notes(notes_text):
     recent = datetime.datetime.now() - datetime.timedelta(days=14)
     notes_list = []
     for note in notes:
-        if datetime.datetime.strptime(note[:10], DATE_FMT) >= recent:
+        if datetime.datetime.strptime(note[:10].replace("_","-"), DATE_FMT) >= recent:
             notes_list.append(note)
     return notes_list
 
@@ -184,6 +184,7 @@ def synthesize_owner_maintenance_block(project_records_list, owner, project_owne
         if _current_project_phase == 7 and owner in lines[project_owner_key]:
             recent = recent_notes(lines["NOTES"])
             if len(recent) > 0:
+                logging.info(f"Processing recent notes for {lines['Project']} in Phase {next_phase} for {owner}")
                 counts[_current_project_phase] += 1
                 result.append(f'### {lines["Project"]}\n\n')
                 result.append(f'<u>Project sponsor(s)</u>: {lines["BUSINESS_SPONSOR"]}\n\n')

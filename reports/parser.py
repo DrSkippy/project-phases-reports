@@ -1,6 +1,23 @@
 import logging
 from reports.configurations import *
 
+def normalize_note_date(note):
+    """
+    Extract the date from the note string and return it in a sortable format.
+    """
+    head, tail = note.strip().split(":", 1)
+    head = head.upper()  # eg note or Note to NOTE
+    head = head.replace("_", "-")
+    head = head.replace("NOTE-","NOTE_")
+    if not head.startswith("NOTE_"):
+        logging.error(f"ERROR: Note does not start with 'NOTE': {head}")
+    else:
+        hdate = head.split("_")[1]
+        try:
+            d = datetime.datetime.strptime(hdate, "%Y-%m-%d")
+        except ValueError:
+            logging.error(f"ERROR: Note date is not in yyyy-mm-dd format: {hdate}")
+    return ":".join([head, tail.strip()])
 
 def parse_project_info(project_info_file):
     """
@@ -22,7 +39,7 @@ def parse_project_info(project_info_file):
         elif fields[0].startswith("NOTE"):
             if params_dict["NOTES"] is None:
                 params_dict["NOTES"] = []
-            params_dict["NOTES"].append(line.strip())  # records include date field and colon
+            params_dict["NOTES"].append(normalize_note_date(line))  # records include date field and colon
             logging.info(f"Found NOTE in project info file")
         elif fields[0].startswith("COMMIT_JUSTIFICATION"):
             if params_dict["COMMIT_JUSTIFICATIONS"] is None:

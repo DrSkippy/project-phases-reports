@@ -158,10 +158,13 @@ def recent_notes(notes_text):
     """
     Return a list of notes with the most recent first
     """
-    notes_list = [x.strip()[6:] for x in notes_text.split(NOTES_DELIMITER)]
+    notes = [x.strip()[6:] for x in notes_text.split(NOTES_DELIMITER)]
     # check for recent notes
-    recent = datetime.datetime.now().date() - datetime.timedelta(days=14)
-    notes_list = [x for x in notes_list if datetime.datetime.strptime(x[:10], DATE_FMT).date() >= recent]
+    recent = datetime.datetime.now() - datetime.timedelta(days=14)
+    notes_list = []
+    for note in notes:
+        if datetime.datetime.strptime(note[:10], DATE_FMT) >= recent:
+            notes_list.append(note)
     return notes_list
 
 
@@ -181,7 +184,7 @@ def synthesize_owner_maintenance_block(project_records_list, owner, project_owne
             if len(recent) > 0:
                 counts[_current_project_phase] += 1
                 result.append(f'### {lines["Project"]}\n\n')
-                result.append(f'<u>Project sponsor(s)</u>: {lines["BUSINESS_SPONSOR"]} ')
+                result.append(f'<u>Project sponsor(s)</u>: {lines["BUSINESS_SPONSOR"]}\n\n')
                 if project_owner_key != "ANALYTICS_DS_OWNER":
                     result.append(f'<u>Data Analyst</u>: {lines["ANALYTICS_DS_OWNER"]}\n\n')
                 for note in recent:
@@ -304,6 +307,7 @@ def create_owners_views(project_records_list):
         outfile.write(f"({str(datetime.datetime.now())[:19]})\n\n")
         for owner in owners:
             outfile.write(synthesize_owner_block(project_records_list, owner))
+            outfile.write(synthesize_owner_maintenance_block(project_records_list, owner))
 
     with open(owner_views_completed_path, "w") as outfile:
         outfile.write("# Data Accelerator - Project Owner Views - COMPLETED & MAINTENANCE\n\n")

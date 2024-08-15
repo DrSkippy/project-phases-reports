@@ -2,6 +2,7 @@ import csv
 import datetime
 from collections import defaultdict
 from importlib.resources import read_text
+import logging
 
 from reports.configurations import *
 
@@ -133,6 +134,7 @@ def synthesize_owner_block(project_records_list, owner, phase_filter='active', p
             # step through the project list to find owners and active projects of the ordered type
             _current_project_phase = project_phases[lines["Phases"]]  # convert phase name to sequence number
             if owner in lines[project_owner_key] and _current_project_phase == next_phase:
+                logging.info(f"Processing {lines['Project']} in phase {next_phase} for {owner}")
                 counts[_current_project_phase] += 1
                 result.append(f'### {lines["Project"]}<br>*Mission: {lines["MISSION_ALIGNMENT"]}*\n\n')
                 result.append(f'<u>Project phase</u>: _{lines["Phases"]}_ ')

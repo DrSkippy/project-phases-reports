@@ -5,11 +5,27 @@
 #   cat "./Projects Folders/summary.csv"
 #
 import logging
+from logging.config import dictConfig
+dictConfig({
+    'version': 1,
+    'formatters': {'default': {
+        'format': '[%(asctime)s] %(levelname)s in %(module)s: %(message)s',
+    }},
+    'handlers': {'wsgi': {
+        'class': 'logging.StreamHandler',
+        'formatter': 'default'
+    }},
+    'root': {
+        'level': 'DEBUG',
+        'handlers': ['wsgi']
+    }
+})
+
+
 from reports.parser import *
 from reports.summary import *
 
 if __name__ == "__main__":
-    logging.basicConfig(level=logging.INFO, filename="update_summary.log", filemode="w")
     logging.info("Starting update_summary.py")
 
     os.chdir(projects_tree_root)

@@ -166,7 +166,7 @@ def create_stakeholders_views(project_records_list):
         outfile.write("# Data Accelerator - Project Stakeholders Views - ACTIVE\n\n")
         outfile.write(f"({str(datetime.datetime.now())[:19]})\n\n")
         for owner in owners:
-            block_string = synthesize_owner_block(project_records_list, owner, project_owner_key="BUSINESS_SPONSOR"))
+            block_string = synthesize_owner_block(project_records_list, owner, project_owner_key="BUSINESS_SPONSOR")
             if block_string:
                 outfile.write(block_string)
 

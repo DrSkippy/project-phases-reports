@@ -1,28 +1,39 @@
 import logging
 import datetime
+import re
 from reports.configurations import *
 
 def normalize_note_date(note):
     """
     Extract the date from the note string and return it in a sortable format.
+
+    Expected format is "NOTES_yyyy-mm-dd: note text".
+    Occasionally there are types or lapses from the pattern. Deal with these:
+        notes, Notes, or note --> NOTES
+        missing : after date --> add it
+        date string not in yyyy-mm-dd format --> correct it when possible
     """
+    date_re =  re.compile(r"\d{4}-\d{1,2}-\d{1,2}")
     try:
         head, tail = note.strip().split(":", 1)
     except ValueError:
-        logging.error(f"ERROR: Note is poorly formed ({note})")
-        return note.strip()
-    head = head.upper()  # eg note or Note to NOTE
-    head = head.replace("_", "-")
-    head = head.replace("NOTES-","NOTES_")
-    if not head.startswith("NOTES_"):
-        logging.error(f"ERROR: Note does not start with 'NOTES': {head}")
-    else:
-        hdate = head.split("_")[1]
-        try:
-            d = datetime.datetime.strptime(hdate, "%Y-%m-%d")
-        except ValueError:
-            logging.error(f"ERROR: Note date is not in yyyy-mm-dd format: {hdate}")
-    return ":".join([head, tail.strip()])
+        logging.warning(f"WARN: Note is poorly formed ({note})")
+        # assume first space is between head and tail
+        head, tail = note.strip().split(" ", 1)
+    head = head.replace("_","-")
+    try:
+        head_date = date_re.search(head).group(0)
+        y, m, d = head_date.split("-")
+        conforming_head_date = f"{y}-{m.zfill(2)}-{d.zfill(2)}"
+    except ValueError:
+        logging.error(f"ERROR: Note date is not in yyyy-mm-dd format: {head}")
+
+    try:
+        d = datetime.datetime.strptime(conforming_head_date, "%Y-%m-%d")
+    except ValueError:
+        logging.error(f"ERROR: Invalid date ({conforming_head_date})")
+
+    return ":".join(["NOTES_"+conforming_head_date, " "+tail.strip()])
 
 def parse_project_info(project_info_file):
     """

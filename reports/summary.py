@@ -127,6 +127,7 @@ def synthesize_owner_block(project_records_list, owner, phase_filter='active', p
         # convert phase names to sequence numbers
         phases_order = [project_phases[x] for x in active_projects_order]
     else:
+        logging.error("ERROR: Invalid phase_filter")
         return "ERROR: Invalid phase_filter"
 
     for next_phase in phases_order:

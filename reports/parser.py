@@ -66,6 +66,9 @@ def parse_project_info(project_info_file):
     if params_dict["NOTES"] is not None:
         params_dict["NOTES"] = order_strings_by_date(params_dict["NOTES"])
 
+    if params_dict["ANALYTICS_DS_OWNER"] is None:
+        logging.error("ERROR: No owner specified. This is required! (Check of typos in file tags!)")
+    
     return params_dict
 
 

@@ -19,7 +19,7 @@ dictConfig({
             'filename': 'update_summary.log',
             'mode': 'a',
             'encoding': 'utf-8',
-            'maxBytes': 500000,
+            'maxBytes': 900000,
             'backupCount': 3
     }},
     'root': {

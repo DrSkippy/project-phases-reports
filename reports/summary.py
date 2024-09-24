@@ -3,6 +3,7 @@ import datetime
 from collections import defaultdict
 from importlib.resources import read_text
 import logging
+import textwrap
 
 from reports.configurations import *
 
@@ -260,16 +261,14 @@ def create_weekly_owners_views(project_records_list):
                     if lines["ANALYTICS_DS_OWNER"] == owner and _phase == next_phase:
                         if not owner_header:
                             owner_header = True
-                            outfile.write(f"| **{owner:}** | | |\n")
+                            outfile.write(f"| **{owner:}** | |\n")
                         counts[_phase] += 1
                         outfile.write(f'|{lines["Project"]}|[{_phase}] active {lines["COMPUTED_AGE_DAYS"]} days &'
                                       f' In-progress {lines["COMPUTED_IN_PROGRESS_AGE_DAYS"]} days '
                                       f' (👕:{size_repr(lines["T-SHIRT_SIZE"])})|\n')
                         for c, note in enumerate(lines["NOTES"].split(NOTES_DELIMITER)):
                             if c < 3:
-                                outfile.write(f'| |{note.strip()[6:]}| |\n')
-
-
+                                outfile.write(f'| |{note.strip()[6:]}|\n')
 
 
 def create_owners_commit_views(project_records_list):

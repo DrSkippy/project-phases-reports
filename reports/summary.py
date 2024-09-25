@@ -1,11 +1,10 @@
 import csv
 import datetime
-from collections import defaultdict
-from importlib.resources import read_text
 import logging
-import textwrap
+from collections import defaultdict
 
 from reports.configurations import *
+
 
 ########################################################################################
 # Utilities
@@ -38,6 +37,7 @@ def synthesize_sharepoint_url(project_phase, project_name):
     suffix = f"{project_phase}%2F{project_name}".replace(" ", "%20"
                                                          ).replace(".", "%2E").replace("-", "%2D")
     return base_sharepoint_url + suffix
+
 
 def synthesize_email(name_set):
     result = []
@@ -76,34 +76,6 @@ def summarize_phase_counts(phase_counts):
 
     markdown_table += "\n\n"  # Add extra newlines for readability
     return markdown_table
-
-def size_repr(size_string):
-    """
-    Convert a size string to a standardized size representation.
-
-    Parameters:
-    size_string (str): A string representing the size, which can be "small", "medium",
-                       "large", "extra large", etc., or their abbreviations.
-
-    Returns:
-    str: A standardized one-letter size representation ("S", "M", "L", "XL").
-         Returns "Unsized" if the input does not match any recognized size.
-    """
-    # Trim and convert the input to lower case for standardization
-    standardized_size = size_string.strip().lower()
-
-    # Determine the size representation based on the first character
-    if standardized_size.startswith("s"):
-        return "S"
-    elif standardized_size.startswith("m"):
-        return "M"
-    elif standardized_size.startswith("l"):
-        return "L"
-    elif standardized_size.startswith("x") or standardized_size.startswith("e"):
-        return "XL"
-
-    # Default return value for unrecognized sizes
-    return "Unsized"
 
 
 def synthesize_owner_block(project_records_list, owner, phase_filter='active', project_owner_key='ANALYTICS_DS_OWNER',
@@ -167,7 +139,7 @@ def recent_notes(notes_text):
     recent = datetime.datetime.now() - datetime.timedelta(days=14)
     notes_list = []
     for note in notes:
-        if datetime.datetime.strptime(note[:10].replace("_","-"), DATE_FMT) >= recent:
+        if datetime.datetime.strptime(note[:10].replace("_", "-"), DATE_FMT) >= recent:
             notes_list.append(note)
     return notes_list
 
@@ -200,6 +172,7 @@ def synthesize_owner_maintenance_block(project_records_list, owner, project_owne
         result.append(summarize_phase_counts(counts))
         ret = "".join(result)
     return ret
+
 
 ########################################################################################
 # Reports
@@ -371,7 +344,6 @@ def create_summary_csv(project_records):
         csv_writer.writerows(project_records)
 
 
-
 def create_complete_stakeholder_list(project_records):
     """
     Creates a list of stakeholders from the provided project records.
@@ -394,6 +366,7 @@ def create_complete_stakeholder_list(project_records):
     with open(stakeholder_list_path, "w") as outfile:
         wrt = csv.writer(outfile)
         wrt.writerows(stakeholderlist)
+
 
 def create_reports(project_records_list):
     # Create all the standard reports

@@ -100,6 +100,35 @@ active_projects_order = [
 ]
 
 
+def size_repr(size_string):
+    """
+    Convert a size string to a standardized size representation.
+
+    Parameters:
+    size_string (str): A string representing the size, which can be "small", "medium",
+                       "large", "extra large", etc., or their abbreviations.
+
+    Returns:
+    str: A standardized one-letter size representation ("S", "M", "L", "XL").
+         Returns "Unsized" if the input does not match any recognized size.
+    """
+    # Trim and convert the input to lower case for standardization
+    standardized_size = size_string.strip().lower()
+
+    # Determine the size representation based on the first character
+    if standardized_size.startswith("s"):
+        return "S"
+    elif standardized_size.startswith("m"):
+        return "M"
+    elif standardized_size.startswith("l"):
+        return "L"
+    elif standardized_size.startswith("x") or standardized_size.startswith("e"):
+        return "XL"
+
+    # Default return value for unrecognized sizes
+    return "Unsized"
+
+
 def order_strings_by_date(string_list):
     """
     Used for notes ordering in reports

@@ -3,6 +3,8 @@ import datetime
 import logging
 from collections import defaultdict
 
+from setuptools.dist import sequence
+
 from reports.configurations import *
 
 
@@ -77,7 +79,6 @@ def summarize_phase_counts(phase_counts):
     markdown_table += "\n\n"  # Add extra newlines for readability
     return markdown_table
 
-
 def synthesize_owner_block(project_records_list, owner, phase_filter='active', project_owner_key='ANALYTICS_DS_OWNER',
                            justification_block=False):
     """
@@ -118,8 +119,10 @@ def synthesize_owner_block(project_records_list, owner, phase_filter='active', p
                 result.append(f'&nbsp; &nbsp; &nbsp;  👕 <u>Size</u>: {size_repr(lines["T-SHIRT_SIZE"])} \n\n')
                 if project_owner_key != "ANALYTICS_DS_OWNER":
                     result.append(f'<u>Data Analyst</u>: {lines["ANALYTICS_DS_OWNER"]}\n\n')
-                for note in lines["NOTES"].split(NOTES_DELIMITER):
-                    result.append(f'  - {note.strip()[6:]}\n')
+                notes_block = recent_notes(lines["NOTES"])
+                #for note in lines["NOTES"].split(NOTES_DELIMITER):
+                #    result.append(f'  - {note.strip()[6:]}\n')
+                result.append(notes_block)
                 result.append("\n\n")
                 if justification_block and lines["COMMIT_JUSTIFICATIONS"] is not None:
                     result.append(f'#### Case for Commit \n{lines["COMMIT_JUSTIFICATIONS"]}\n\n')
@@ -130,15 +133,19 @@ def synthesize_owner_block(project_records_list, owner, phase_filter='active', p
     return ret
 
 
-def recent_notes(notes_text):
+def recent_notes(notes_text, recent_days=400):
     """
     Return a list of notes with the most recent first
     """
     notes = [x.strip()[6:] for x in notes_text.split(NOTES_DELIMITER)]
     # check for recent notes
-    recent = datetime.datetime.now() - datetime.timedelta(days=14)
+    recent = datetime.datetime.now() - datetime.timedelta(days=recent_days)
     notes_list = []
     for note in notes:
+        if note.endswith("::"):
+            # notes with sequence within a date. Make bulleted list.
+            pre, sequence_number, post = note.split("::")
+            note = f"  {int(sequence_number)}. {pre}\n"
         if datetime.datetime.strptime(note[:10].replace("_", "-"), DATE_FMT) >= recent:
             notes_list.append(note)
     return notes_list
@@ -156,7 +163,7 @@ def synthesize_owner_maintenance_block(project_records_list, owner, project_owne
         # step through the project list to find owners and active projects of the ordered type
         _current_project_phase = project_phases[lines["Phases"]]  # convert phase name to sequence number
         if _current_project_phase == 7 and owner in lines[project_owner_key]:
-            recent = recent_notes(lines["NOTES"])
+            recent = recent_notes(lines["NOTES"], 14)
             if len(recent) > 0:
                 logging.info(f"Processing recent notes for {lines['Project']} in Phase 7 for {owner}")
                 counts[_current_project_phase] += 1
@@ -165,7 +172,7 @@ def synthesize_owner_maintenance_block(project_records_list, owner, project_owne
                 if project_owner_key != "ANALYTICS_DS_OWNER":
                     result.append(f'<u>Data Analyst</u>: {lines["ANALYTICS_DS_OWNER"]}\n\n')
                 for note in recent:
-                    result.append(f'  - {note}\n')
+                    result.append(f'{note}\n')
             result.append("\n\n")
     if len(counts) > 0:
         # Only include this block if 1 or more projects found

@@ -3,7 +3,7 @@ import datetime
 import re
 from reports.configurations import *
 
-def normalize_note_date(note):
+def normalize_note_date(note_line):
     """
     Extract the date from the note string and return it in a sortable format.
 
@@ -11,22 +11,33 @@ def normalize_note_date(note):
     Occasionally there are types or lapses from the pattern. Deal with these:
         notes, Notes, or note --> NOTES
         missing : after date --> add it
+        transposed _ and - in dates --> use - in dates
         date string not in yyyy-mm-dd format --> correct it when possible
     """
     date_re =  re.compile(r"\d{4}-\d{1,2}-\d{1,2}")
+    date_seq_re =  re.compile(r"\d{4}-\d{1,2}-\d{1,2}-\d{1,2}")   # date with sequence number
+    conforming_head_date = None
     try:
-        head, tail = note.strip().split(":", 1)
+        head, tail = note_line.strip().split(":", 1)
     except ValueError:
-        logging.warning(f"WARN: Note is poorly formed ({note})")
+        logging.warning(f"WARN: Note is poorly formed ({note_line})")
         # assume first space is between head and tail
-        head, tail = note.strip().split(" ", 1)
-    head = head.replace("_","-")
+        head, tail = note_line.strip().split(" ", 1)
+    head = head.replace("_","-")   # in case someone transposed in typing
+
     try:
-        head_date = date_re.search(head).group(0)
-        y, m, d = head_date.split("-")
+        head_date = date_seq_re.search(head).group(0)
+        y, m, d, sequence_number = head_date.split("-")
         conforming_head_date = f"{y}-{m.zfill(2)}-{d.zfill(2)}"
+        logging.info(f"Sequence number {sequence_number} found")
+        tail += f"::{sequence_number}::"  # append a sequence number to build bulleted list
     except ValueError:
-        logging.error(f"ERROR: Note date is not in yyyy-mm-dd format: {head}")
+        try:
+            head_date = date_re.search(head).group(0)
+            y, m, d = head_date.split("-")
+            conforming_head_date = f"{y}-{m.zfill(2)}-{d.zfill(2)}"
+        except ValueError:
+            logging.error(f"ERROR: Note date is not in yyyy-mm-dd format: {head}")
 
     try:
         d = datetime.datetime.strptime(conforming_head_date, "%Y-%m-%d")

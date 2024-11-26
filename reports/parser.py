@@ -31,7 +31,7 @@ def normalize_note_date(note_line):
         conforming_head_date = f"{y}-{m.zfill(2)}-{d.zfill(2)}"
         logging.info(f"Sequence number {sequence_number} found")
         tail += f"::{sequence_number}::"  # append a sequence number to build bulleted list
-    except ValueError, AttributeError:
+    except (ValueError, AttributeError):
         try:
             head_date = date_re.search(head).group(0)
             y, m, d = head_date.split("-")

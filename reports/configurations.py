@@ -134,5 +134,5 @@ def order_strings_by_date(string_list):
     Used for notes ordering in reports
         This works as desired if dates are yyyy-mm-dd format
     """
-    res = sorted(string_list, reverse=True)
+    res = sorted(string_list, reverse=True, key = lambda x: x[:16].replace("_","-"))
     return res

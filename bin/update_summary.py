@@ -4,6 +4,7 @@
 #   python ~/Working/2023-08-23_project_visibility/bin/update_summary.py
 #   cat "./Projects Folders/summary.csv"
 #
+import fileinput
 import logging
 from logging.config import dictConfig
 dictConfig({
@@ -123,7 +124,6 @@ if __name__ == "__main__":
             project_records_list.append(params)
 
         # Update the project info file with the previous phase
-        import fileinput
 
         previous_phase_updated = False
         for line in fileinput.input(os.path.join(root, project_info_filename), inplace=True):
@@ -155,6 +155,6 @@ if __name__ == "__main__":
         # if the phase changed, append a generic phase change record to end of the file
         if params["COMPUTED_PREVIOUS_PHASE"] != phase:
             with open(os.path.join(root, project_info_filename), "a") as project_info_file:
-                project_info_file.write(f'PHASE_CHANGE: {params["COMPUTED_PREVIOUS_PHASE"]} -> {phase} DATE:{datetime.datetime.now().strftime(DATE_FMT)}\n')
+                project_info_file.write(f'PHASE_CHANGE: {params["COMPUTED_PREVIOUS_PHASE"]} -> {phase} DATE: {datetime.datetime.now().strftime(DATE_FMT)}\n')
 
     create_reports(project_records_list)

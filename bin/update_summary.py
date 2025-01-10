@@ -70,17 +70,23 @@ if __name__ == "__main__":
             else:
                 params["COMMIT_JUSTIFICATIONS"] = "Commit justification required!\n\n"
 
+            # #############################################################################################
             # Compute derived values for timing of phases
-            project_end_date = datetime.datetime.now()  # current last day of unfinished projects
+            # Phase changed?
+            if params["COMPUTED_PREVIOUS_PHASE"] is None:
+                params["COMPUTED_PREVIOUS_PHASE"] = phase
+
+            project_phase_end_date = datetime.datetime.now()  # current last day of unfinished projects
+
             if project_phases[phase] >= 6:
                 # Completed projects
                 if params["COMPUTED_PROJECT_END_DATE"] is None:
                     # First time we processed file since project phase changed to completed
-                    project_end_date = datetime.datetime.now()
-                    params["COMPUTED_PROJECT_END_DATE"] = project_end_date.strftime(DATE_FMT)
-                    new_project_end_date = project_end_date
+                    project_phase_end_date = datetime.datetime.now()
+                    params["COMPUTED_PROJECT_END_DATE"] = project_phase_end_date.strftime(DATE_FMT)
+                    new_project_end_date = project_phase_end_date
                 else:
-                    project_end_date = datetime.datetime.strptime(
+                    project_phase_end_date = datetime.datetime.strptime(
                         params["COMPUTED_PROJECT_END_DATE"][:10],
                         DATE_FMT)
 
@@ -95,7 +101,7 @@ if __name__ == "__main__":
                     project_in_progress_date = datetime.datetime.strptime(
                         params["COMPUTED_PROJECT_IN_PROGRESS_DATE"][:10],
                         DATE_FMT)
-                    dt_delta = project_end_date - project_in_progress_date
+                    dt_delta = project_phase_end_date - project_in_progress_date
                     if dt_delta.days < 0:
                         dt_delta = datetime.timedelta(days=0)
                     params["COMPUTED_IN_PROGRESS_AGE_DAYS"] = dt_delta.days
@@ -111,10 +117,26 @@ if __name__ == "__main__":
                     project_start_date = datetime.datetime.strptime(
                         params["COMPUTED_PROJECT_START_DATE"][:10],
                         DATE_FMT)
-                    dt_delta = project_end_date - project_start_date
+                    dt_delta = project_phase_end_date - project_start_date
                     params["COMPUTED_AGE_DAYS"] = dt_delta.days
 
             project_records_list.append(params)
+
+        # Update the project info file with the previous phase
+        import fileinput
+
+        previous_phase_updated = False
+        for line in fileinput.input(os.path.join(root, project_info_filename), inplace=True):
+            if line.startswith("COMPUTED_PREVIOUS_PHASE:"):
+                print(f'COMPUTED_PREVIOUS_PHASE: {phase}')
+                previous_phase_updated = True
+            else:
+                print(line, end='')
+
+        # If the previous phase was not updated, it didn't exist. So, append it to the end of the file
+        if not previous_phase_updated:
+            with open(os.path.join(root, project_info_filename), "a") as project_info_file:
+                project_info_file.write(f'COMPUTED_PREVIOUS_PHASE: {phase}\n')
 
         # Update the project info file with time values for phase transitions
         if new_project_start_date is not None:
@@ -129,5 +151,10 @@ if __name__ == "__main__":
         if new_project_end_date is not None:
             with open(os.path.join(root, project_info_filename), "a") as project_info_file:
                 project_info_file.write(f'COMPUTED_PROJECT_END_DATE: {new_project_end_date.strftime(DATE_FMT)}\n')
+
+        # if the phase changed, append a generic phase change record to end of the file
+        if params["COMPUTED_PREVIOUS_PHASE"] != phase:
+            with open(os.path.join(root, project_info_filename), "a") as project_info_file:
+                project_info_file.write(f'PHASE_CHANGE: {params["COMPUTED_PREVIOUS_PHASE"]} -> {phase} DATE:{datetime.datetime.now().strftime(DATE_FMT)}\n')
 
     create_reports(project_records_list)

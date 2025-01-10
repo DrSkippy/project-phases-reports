@@ -44,7 +44,10 @@ project_params_dict = {
     "COMPUTED_IN_PROGRESS_AGE_DAYS": 0,
     "COMPUTED_PROJECT_START_DATE": None,
     "COMPUTED_PROJECT_IN_PROGRESS_DATE": None,
+    "COMPUTED_PROJECT_ON_HOLD_DATE": None,
+    "COMPUTED_PROJECT_ROLLOUT_DATE": None,
     "COMPUTED_PROJECT_END_DATE": None,
+    "COMPUTED_PREVIOUS_PHASE": None,
     "COMMIT_JUSTIFICATIONS": None
 }
 
@@ -68,6 +71,9 @@ name_field_map = {
     "In Progress Age": "COMPUTED_IN_PROGRESS_AGE_DAYS",
     "Project Start Date": "COMPUTED_PROJECT_START_DATE",
     "Project In-Progress Date": "COMPUTED_PROJECT_IN_PROGRESS_DATE",
+    "Project On-Hold Date": "COMPUTED_PROJECT_ON_HOLD_DATE",
+    "Project Rollout Date": "COMPUTED_PROJECT_ROLLOUT_DATE",
+    "Project Previous Phase": "COMPUTED_PROJECT_PREVIOUS_PHASE_DATE",
     "Project End Date": "COMPUTED_PROJECT_END_DATE",
     "Commit Justification": "COMMIT_JUSTIFICATIONS"
 }

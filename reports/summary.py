@@ -249,7 +249,8 @@ def create_weekly_owners_views(project_records_list):
                                       f' (👕:{size_repr(lines["T-SHIRT_SIZE"])})|\n')
                         notes_block = recent_notes(lines["NOTES"], limit=3)
                         for note in notes_block:
-                            outfile.write(f'| |{note.strip()}|\n')
+                            note = note.strip().replace("|", ":")
+                            outfile.write(f'| |{note}|\n')
 
 
 def create_owners_commit_views(project_records_list):

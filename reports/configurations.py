@@ -105,7 +105,7 @@ active_projects_order = [
     "5-Rollout"
 ]
 
-
+# colors https://coolors.co/eef0f2-c6c7c4-a2999e-846a6a-353b3c
 CSS_STYLE="""
 <!DOCTYPE html>
 <html>

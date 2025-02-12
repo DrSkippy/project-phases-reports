@@ -6,19 +6,39 @@ FILENAME = "/MetricsDefinition.csv"
 TABLE_ALL = ['Base:Team', 'Metric Information:Component', 'Metric Information:Priority', 'Metric Information:Owner', 'Metric Information:Name', 'Metric Information:Description', 'Metric Information:Update Frequency', 'Metric Information:Historical Data', 'Metric Information:Calculation Formula', 'Metric Information:Availability', 'Metric Information:Units', 'Metric Information:Version', 'Range:Minimum Value', 'Range:Maximum Value', 'Range:Goal Value', 'Threshold 1:Threshold', 'Threshold 1:Action', 'Threshold 2:Threshold', 'Threshold 2:Action', 'Threshold 3:Threshold', 'Threshold 3:Action', 'Data 1:Name', 'Data 1:Source of Truth', 'Data 1:Update Frequency', 'Data 1:Minimum', 'Data 1:Maximum', 'Data 1:Units', 'Data 1:Availability', 'Data 1:Automation', 'Data 1:Granularity', 'Data 2:Name', 'Data 2:Source of Truth', 'Data 2:Update Frequency', 'Data 2:Minimum', 'Data 2:Maximum', 'Data 2:Units', 'Data 2:Availability', 'Data 2:Automation', 'Data 2:Granularity', 'Data 3:Name', 'Data 3:Source of Truth', 'Data 3:Update Frequency', 'Data 3:Minimum', 'Data 3:Maximum', 'Data 3:Units', 'Data 3:Availability', 'Data 3:Automation', 'Data 3:Granularity', 'Data 4:Name', 'Data 4:Source of Truth', 'Data 4:Update Frequency', 'Data 4:Minimum', 'Data 4:Maximum', 'Data 4:Units', 'Data 4:Availability', 'Data 4:Granularity', 'Data 5:Name', 'Data 5:Source of Truth', 'Data 5:Update Frequency', 'Data 5:Minimum', 'Data 5:Maximum', 'Data 5:Units', 'Data 5:Availability', 'Data 5:Granularity']
 TABLE1 = [
 'Metric Information:Component',
-'Metric Information:Owner',
 'Metric Information:Name',
 'Metric Information:Description',
 'Metric Information:Calculation Formula',
-'Metric Information:Units',
 'Data 1:Name',
 'Data 1:Source of Truth',
 'Data 2:Name',
 'Data 2:Source of Truth'
 ] 
 
+CSS_STYLE="""
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+body {background-color: #fdf0d5; font-family: Arial, Helvetica, sans-serif;}
+h1   {color: #780000;}
+p    {color: #003049;}
+table, th, td {
+  border: 1px solid #fdf0d5;
+  border-collapse: collapse;
+}
+th, td {
+  background-color: #669bbc;
+}
+</style>
+</head>
+<body>
+
+"""
+
 def metric_html_tables(mdict, keys):
     res = []
+    res.append(CSS_STYLE)
     m = mdict[0]
     template_row = ('<tr>'
                     f'<td colspan=1 rowspan=1>{m["Base:Team"]}</td>'
@@ -35,7 +55,7 @@ def metric_html_tables(mdict, keys):
         n_data = sum([x in keys for x in data_name_cols if m[x] != ""])
         # new table for each metric
         res.append(f'<h2> Metric Name: {m["Metric Information:Name"]}</h2>')
-        res.append('<table padding=2 border=1>')
+        res.append('<table padding=3 cellpadding=3 border=0.1>')
         res.append(('<tr>'
                    f'<td colspan=1>Name:</td>'
                    f'<td colspan=3>{m["Metric Information:Name"]}</td>'
@@ -80,22 +100,22 @@ def metric_html_tables(mdict, keys):
             automation_key = ":".join([key, "Automation"])
             #
             res.append(('<tr>'
-                    f'<td colspan=1 rowspan=1></td>'
+                    f'<td colspan=1 rowspan=1>Required Data</td>'
                     f'<td colspan=1 rowspan=1>{m[name_key]}</td>'
                     f'<td colspan=4 rowspan=3>{m[sot_key]}</td>'
                     '</tr>'))
             res.append(('<tr>'
                     f'<td colspan=1 rowspan=1></td>'
-                    f'<td colspan=1 rowspan=1>{m[availability_key]}</td>'
+                        f'<td colspan=1 rowspan=1>Available: {m[availability_key]}</td>'
                     '</tr>'))
             res.append(('<tr>'
                     f'<td colspan=1 rowspan=1></td>'
-                    f'<td colspan=1 rowspan=1>{m[units_key]}</td>'
+                    f'<td colspan=1 rowspan=1>Units: {m[units_key]}</td>'
                     '</tr>'))
             res.append(('<tr>'
                     f'<td colspan=1 rowspan=1></td>'
-                    f'<td colspan=2 rowspan=1>{m[automation_key]}</td>'
                     f'<td colspan=1 rowspan=1></td>'
+                    f'<td colspan=2 rowspan=1>Data Range:</td>'
                     f'<td colspan=1 rowspan=1>{m[min_key]}</td>'
                     f'<td colspan=1 rowspan=1>{m[max_key]}</td>'
                     '</tr>'))
@@ -123,26 +143,6 @@ def fetch_csv(path):
             metric_dicts.append({keys[j]: metrics[i][j] for j in range(len(keys))})
     return metric_dicts, keys
 
-def simple_html_table(mdict, keys):
-    res = ["<h2> Metrics Table </h2>"]
-    res.append("<table>")
-    row = "<tr><th> " + " </th><th> ".join(keys) + " </th><tr>"
-    res.append(row)
-    for m in mdict:
-        row = "<tr><td> " + " </td><td> ".join([f"{m[k]}" for k in keys]) + " </td><tr>"
-
-        for i in range(n_data):
-            res.append(('<tr>'
-                    f'<td colspan=1 rowspan=1></td>'
-                    f'<td colspan=1 rowspan=1>{m["Metric Information:Owner"]}</td>'
-                    f'<td colspan=4 rowspan=4>{m["Metric Information:Description"]}</td>'
-                    '</tr>'))
-
-
-
-        res.append('</table>')
-    return "\n".join(res)
-
 def fetch_csv(path):
     with open(path, mode='r', encoding='utf-8-sig') as infile:
         metrics = []
@@ -165,7 +165,9 @@ def fetch_csv(path):
     return metric_dicts, keys
 
 def simple_html_table(mdict, keys):
-    res = ["<h2> Metrics Table </h2>"]
+    res = [] 
+    res.append(CSS_STYLE)
+    res.append("<h2> Metrics Table </h2>")
     res.append("<table>")
     row = "<tr><th> " + " </th><th> ".join(keys) + " </th><tr>"
     res.append(row)
@@ -182,9 +184,9 @@ def make_key_list(keys):
 if __name__ == "__main__":
     mdefs, keys = fetch_csv(PROJECT_PATH + FILENAME)
     # make_key_list(keys)
-    mdt = simple_html_table(mdefs, TABLE1)
-    with open(PROJECT_PATH + "/simple_table.html", "w") as ofile:
-        ofile.write(mdt)
+    mdts = simple_html_table(mdefs, TABLE1)
+    with open(PROJECT_PATH + "/simple_table.html", "w") as ofile1:
+        ofile1.write(mdts)
     mdt = metric_html_tables(mdefs, keys)
-    with open(PROJECT_PATH + "/metric_table.html", "w") as ofile:
-        ofile.write(mdt)
+    with open(PROJECT_PATH + "/metric_table.html", "w") as ofile2:
+        ofile2.write(mdt)

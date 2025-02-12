@@ -230,7 +230,8 @@ def create_weekly_owners_views(project_records_list):
     # find unique owners
     owners = set([lines["ANALYTICS_DS_OWNER"] for lines in project_records_list])
     with open(weekly_owner_views_active_path, "w") as outfile:
-        outfile.write("# DA Weekly - Project Owner Views - ACTIVE\n\n")
+        #outfile.write("# DA Weekly - Project Owner Views - ACTIVE\n\n")
+        outfile.write("<h2>DA Weekly - Project Owner Views - ACTIVE</h2>\n\n")
         outfile.write('<table>')
         #outfile.write("|Projects|Info|\n")
         outfile.write("<tr><th>Projects</th><th>Info</th></tr>\n")
@@ -257,7 +258,7 @@ def create_weekly_owners_views(project_records_list):
                         for note in notes_block:
                             note = note.strip().replace("|", ":")
                             #outfile.write(f'| |{note}|\n')
-                            outfile.write(f'<tr><td> >/td><td>{note}</td></tr>\n')
+                            outfile.write(f'<tr><td> </td><td>{note}</td></tr>\n')
         outfile.write('</table>')
 
 

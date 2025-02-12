@@ -111,15 +111,19 @@ CSS_STYLE="""
 <html>
 <head>
 <style>
-body {background-color: #fdf0d5; font-family: Arial, Helvetica, sans-serif;}
-h1   {color: #780000;}
-p    {color: #003049;}
+body {background-color: #eef0f2; font-family: Arial, Helvetica, sans-serif;}
+h1   {color: #846a6a;}
+p    {color: #eef0f2;}
 table, th, td {
-  border: 1px solid #fdf0d5;
+  border: 1px solid #a2999e;
   border-collapse: collapse;
+  padding: 3px;
 }
 th, td {
-  background-color: #669bbc;
+  background-color: #c6c7c4;
+  border-spacing: 5px;
+  font-size: medium;
+  font-color: #353b3c;
 }
 </style>
 </head>

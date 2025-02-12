@@ -1,7 +1,7 @@
 import csv
 import datetime
 
-from reports import configurations.CSS_STYLE as CSS_STYLE
+from reports.configurations import CSS_STYLE
 
 PROJECT_PATH = "/Users/s.hendrickson/Documents/OneDrive - F5, Inc/Projects Folders/3-In Progress/Data Team KPIs Dashboard"
 FILENAME = "/MetricsDefinition.csv"

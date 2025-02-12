@@ -232,8 +232,8 @@ def create_weekly_owners_views(project_records_list):
     with open(weekly_owner_views_active_path, "w") as outfile:
         #outfile.write("# DA Weekly - Project Owner Views - ACTIVE\n\n")
         outfile.write(CSS_STYLE)
-        outfile.write("<h2>DA Weekly - Project Owner Views - ACTIVE</h2>\n\n")
-        outfile.write('<'<table padding=3 cellpadding=3 border=0.1>')
+        outfile.write("<h1>DA Weekly - Project Owner Views - ACTIVE</h1>\n\n")
+        outfile.write('<table border=0.1>')
         #outfile.write("|Projects|Info|\n")
         outfile.write("<tr><th>Projects</th><th>Info</th></tr>\n")
         #outfile.write("|---|---|\n")
@@ -247,7 +247,7 @@ def create_weekly_owners_views(project_records_list):
                         if not owner_header:
                             owner_header = True
                             #outfile.write(f"| **{owner:}** | |\n")
-                            outfile.write(f"<tr><td>**{owner:}**</td><td> </td></tr>\n")
+                            outfile.write(f"<tr><td><b>{owner:}</b></td><td> </td></tr>\n")
                         counts[_phase] += 1
                         #outfile.write(f'|{lines["Project"]}|[{_phase}] active {lines["COMPUTED_AGE_DAYS"]} days &'
                         #              f' In-progress {lines["COMPUTED_IN_PROGRESS_AGE_DAYS"]} days '
@@ -255,7 +255,7 @@ def create_weekly_owners_views(project_records_list):
                         outfile.write(f'<tr><td>{lines["Project"]}</td><td>[{_phase}] active {lines["COMPUTED_AGE_DAYS"]} days &'
                                       f' In-progress {lines["COMPUTED_IN_PROGRESS_AGE_DAYS"]} days '
                                       f' (👕:{size_repr(lines["T-SHIRT_SIZE"])})</td></tr>\n')
-                        notes_block = recent_notes(lines["NOTES"], limit=3)
+                        notes_block = recent_notes(lines["NOTES"], limit=4)
                         for note in notes_block:
                             note = note.strip().replace("|", ":")
                             #outfile.write(f'| |{note}|\n')

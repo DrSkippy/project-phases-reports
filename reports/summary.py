@@ -231,8 +231,10 @@ def create_weekly_owners_views(project_records_list):
     owners = set([lines["ANALYTICS_DS_OWNER"] for lines in project_records_list])
     with open(weekly_owner_views_active_path, "w") as outfile:
         outfile.write("# DA Weekly - Project Owner Views - ACTIVE\n\n")
-        outfile.write("| Projects | Info |\n")
-        outfile.write("|---|---|\n")
+        outfile.write('<table>')
+        #outfile.write("|Projects|Info|\n")
+        outfile.write("<tr><th>Projects</th><th>Info</th></tr>\n")
+        #outfile.write("|---|---|\n")
         for owner in owners:
             owner_header = False;
             counts = defaultdict(lambda: 0)
@@ -242,15 +244,21 @@ def create_weekly_owners_views(project_records_list):
                     if lines["ANALYTICS_DS_OWNER"] == owner and _phase == next_phase:
                         if not owner_header:
                             owner_header = True
-                            outfile.write(f"| **{owner:}** | |\n")
+                            #outfile.write(f"| **{owner:}** | |\n")
+                            outfile.write(f"<tr><td>**{owner:}**</td><td> </td></tr>\n")
                         counts[_phase] += 1
-                        outfile.write(f'|{lines["Project"]}|[{_phase}] active {lines["COMPUTED_AGE_DAYS"]} days &'
+                        #outfile.write(f'|{lines["Project"]}|[{_phase}] active {lines["COMPUTED_AGE_DAYS"]} days &'
+                        #              f' In-progress {lines["COMPUTED_IN_PROGRESS_AGE_DAYS"]} days '
+                        #              f' (👕:{size_repr(lines["T-SHIRT_SIZE"])})|\n')
+                        outfile.write(f'<tr><td>{lines["Project"]}</td><td>[{_phase}] active {lines["COMPUTED_AGE_DAYS"]} days &'
                                       f' In-progress {lines["COMPUTED_IN_PROGRESS_AGE_DAYS"]} days '
-                                      f' (👕:{size_repr(lines["T-SHIRT_SIZE"])})|\n')
+                                      f' (👕:{size_repr(lines["T-SHIRT_SIZE"])})</td></tr>\n')
                         notes_block = recent_notes(lines["NOTES"], limit=3)
                         for note in notes_block:
                             note = note.strip().replace("|", ":")
-                            outfile.write(f'| |{note}|\n')
+                            #outfile.write(f'| |{note}|\n')
+                            outfile.write(f'<tr><td> >/td><td>{note}</td></tr>\n')
+        outfile.write('</table>')
 
 
 def create_owners_commit_views(project_records_list):

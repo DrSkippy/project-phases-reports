@@ -16,7 +16,7 @@ summary_path = os.path.join(projects_tree_project_folders, "summary.csv")
 data_product_links_path = os.path.join(projects_tree_project_folders, "data_product_links.md")
 owner_views_active_path = os.path.join(projects_tree_project_folders, "owner_views_active.md")
 owner_views_commit_path = os.path.join(projects_tree_project_folders, "owner_views_commit.md")
-weekly_owner_views_active_path = os.path.join(projects_tree_project_folders, "weekly_owner_views_active.md")
+weekly_owner_views_active_path = os.path.join(projects_tree_project_folders, "weekly_owner_views_active.html")
 owner_views_completed_path = os.path.join(projects_tree_project_folders, "owner_views_completed.md")
 stakeholders_views_active_path = os.path.join(projects_tree_project_folders, "stakeholders_views_active.md")
 title_phase_views_path = os.path.join(projects_tree_project_folders, "phase_views.md")
@@ -105,6 +105,27 @@ active_projects_order = [
     "5-Rollout"
 ]
 
+
+CSS_STYLE="""
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+body {background-color: #fdf0d5; font-family: Arial, Helvetica, sans-serif;}
+h1   {color: #780000;}
+p    {color: #003049;}
+table, th, td {
+  border: 1px solid #fdf0d5;
+  border-collapse: collapse;
+}
+th, td {
+  background-color: #669bbc;
+}
+</style>
+</head>
+<body>
+
+"""
 
 def size_repr(size_string):
     """

@@ -1,6 +1,8 @@
 import csv
 import datetime
 
+from reports import configurations.CSS_STYLE as CSS_STYLE
+
 PROJECT_PATH = "/Users/s.hendrickson/Documents/OneDrive - F5, Inc/Projects Folders/3-In Progress/Data Team KPIs Dashboard"
 FILENAME = "/MetricsDefinition.csv"
 TABLE_ALL = ['Base:Team', 'Metric Information:Component', 'Metric Information:Priority', 'Metric Information:Owner', 'Metric Information:Name', 'Metric Information:Description', 'Metric Information:Update Frequency', 'Metric Information:Historical Data', 'Metric Information:Calculation Formula', 'Metric Information:Availability', 'Metric Information:Units', 'Metric Information:Version', 'Range:Minimum Value', 'Range:Maximum Value', 'Range:Goal Value', 'Threshold 1:Threshold', 'Threshold 1:Action', 'Threshold 2:Threshold', 'Threshold 2:Action', 'Threshold 3:Threshold', 'Threshold 3:Action', 'Data 1:Name', 'Data 1:Source of Truth', 'Data 1:Update Frequency', 'Data 1:Minimum', 'Data 1:Maximum', 'Data 1:Units', 'Data 1:Availability', 'Data 1:Automation', 'Data 1:Granularity', 'Data 2:Name', 'Data 2:Source of Truth', 'Data 2:Update Frequency', 'Data 2:Minimum', 'Data 2:Maximum', 'Data 2:Units', 'Data 2:Availability', 'Data 2:Automation', 'Data 2:Granularity', 'Data 3:Name', 'Data 3:Source of Truth', 'Data 3:Update Frequency', 'Data 3:Minimum', 'Data 3:Maximum', 'Data 3:Units', 'Data 3:Availability', 'Data 3:Automation', 'Data 3:Granularity', 'Data 4:Name', 'Data 4:Source of Truth', 'Data 4:Update Frequency', 'Data 4:Minimum', 'Data 4:Maximum', 'Data 4:Units', 'Data 4:Availability', 'Data 4:Granularity', 'Data 5:Name', 'Data 5:Source of Truth', 'Data 5:Update Frequency', 'Data 5:Minimum', 'Data 5:Maximum', 'Data 5:Units', 'Data 5:Availability', 'Data 5:Granularity']
@@ -15,26 +17,6 @@ TABLE1 = [
 'Data 2:Source of Truth'
 ] 
 
-CSS_STYLE="""
-<!DOCTYPE html>
-<html>
-<head>
-<style>
-body {background-color: #fdf0d5; font-family: Arial, Helvetica, sans-serif;}
-h1   {color: #780000;}
-p    {color: #003049;}
-table, th, td {
-  border: 1px solid #fdf0d5;
-  border-collapse: collapse;
-}
-th, td {
-  background-color: #669bbc;
-}
-</style>
-</head>
-<body>
-
-"""
 
 def metric_html_tables(mdict, keys):
     res = []

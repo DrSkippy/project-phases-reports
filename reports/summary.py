@@ -3,8 +3,6 @@ import datetime
 import logging
 from collections import defaultdict
 
-from setuptools.dist import sequence
-
 from reports.configurations import *
 
 
@@ -79,6 +77,7 @@ def summarize_phase_counts(phase_counts):
     markdown_table += "\n\n"  # Add extra newlines for readability
     return markdown_table
 
+
 def recent_notes(notes_text, recent_days=400, limit=200):
     """
     Return a list of notes with the most recent first
@@ -89,7 +88,7 @@ def recent_notes(notes_text, recent_days=400, limit=200):
     notes_list = []
     for count, note in enumerate(notes):
         if count < limit:
-            update_note = note 
+            update_note = note
             if note.endswith("::"):
                 # notes with sequence within a date. Make bulleted list.
                 pre, sequence_number, post = note.split("::")
@@ -149,7 +148,6 @@ def synthesize_owner_block(project_records_list, owner, phase_filter='active', p
         result.append(summarize_phase_counts(counts))
         ret = "".join(result)
     return ret
-
 
 
 def synthesize_owner_maintenance_block(project_records_list, owner, project_owner_key='ANALYTICS_DS_OWNER'):
@@ -230,13 +228,13 @@ def create_weekly_owners_views(project_records_list):
     # find unique owners
     owners = set([lines["ANALYTICS_DS_OWNER"] for lines in project_records_list])
     with open(weekly_owner_views_active_path, "w") as outfile:
-        #outfile.write("# DA Weekly - Project Owner Views - ACTIVE\n\n")
+        # outfile.write("# DA Weekly - Project Owner Views - ACTIVE\n\n")
         outfile.write(CSS_STYLE)
         outfile.write("<h1>DA Weekly - Project Owner Views - ACTIVE</h1>\n\n")
         outfile.write('<table border=0.1>')
-        #outfile.write("|Projects|Info|\n")
+        # outfile.write("|Projects|Info|\n")
         outfile.write("<tr><th>Projects</th><th>Info</th></tr>\n")
-        #outfile.write("|---|---|\n")
+        # outfile.write("|---|---|\n")
         for owner in owners:
             owner_header = False;
             counts = defaultdict(lambda: 0)
@@ -246,19 +244,20 @@ def create_weekly_owners_views(project_records_list):
                     if lines["ANALYTICS_DS_OWNER"] == owner and _phase == next_phase:
                         if not owner_header:
                             owner_header = True
-                            #outfile.write(f"| **{owner:}** | |\n")
+                            # outfile.write(f"| **{owner:}** | |\n")
                             outfile.write(f"<tr><td><b>{owner:}</b></td><td> </td></tr>\n")
                         counts[_phase] += 1
-                        #outfile.write(f'|{lines["Project"]}|[{_phase}] active {lines["COMPUTED_AGE_DAYS"]} days &'
+                        # outfile.write(f'|{lines["Project"]}|[{_phase}] active {lines["COMPUTED_AGE_DAYS"]} days &'
                         #              f' In-progress {lines["COMPUTED_IN_PROGRESS_AGE_DAYS"]} days '
                         #              f' (👕:{size_repr(lines["T-SHIRT_SIZE"])})|\n')
-                        outfile.write(f'<tr><td>{lines["Project"]}</td><td>[{_phase}] active {lines["COMPUTED_AGE_DAYS"]} days &'
-                                      f' In-progress {lines["COMPUTED_IN_PROGRESS_AGE_DAYS"]} days '
-                                      f' (👕:{size_repr(lines["T-SHIRT_SIZE"])})</td></tr>\n')
+                        outfile.write(
+                            f'<tr><td>{lines["Project"]}</td><td>[{_phase}] active {lines["COMPUTED_AGE_DAYS"]} days &'
+                            f' In-progress {lines["COMPUTED_IN_PROGRESS_AGE_DAYS"]} days '
+                            f' (👕:{size_repr(lines["T-SHIRT_SIZE"])})</td></tr>\n')
                         notes_block = recent_notes(lines["NOTES"], limit=4)
                         for note in notes_block:
                             note = note.strip().replace("|", ":")
-                            #outfile.write(f'| |{note}|\n')
+                            # outfile.write(f'| |{note}|\n')
                             outfile.write(f'<tr><td> </td><td>{note}</td></tr>\n')
         outfile.write('</table>')
 

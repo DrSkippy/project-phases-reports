@@ -111,24 +111,46 @@ CSS_STYLE="""
 <html>
 <head>
 <style>
-body {background-color: #eef0f2; font-family: Arial, Helvetica, sans-serif;}
+body {
+    background-color: #eef0f2; 
+    margin: 20px 20px;
+    font-family: Arial, Helvetica, sans-serif;
+}
 h1   {color: #846a6a;}
 p    {color: #eef0f2;}
-table, th, td {
+table {
   border: 1px solid #a2999e;
   border-collapse: collapse;
-  padding: 3px;
+  padding: 8px;
 }
-th, td {
+th {
+  height: 50px;
   background-color: #c6c7c4;
-  border-spacing: 5px;
+  font-size: large;
+  font-color: #353b3c;
+}
+td {
+  padding: 8px;
   font-size: medium;
   font-color: #353b3c;
+}
+.tr-owner {
+    height: 50px;
+    background-color:#846a6a;
+    font-size: large;
+}
+.tr-project {
+    background-color:#a2999e;
 }
 </style>
 </head>
 <body>
 
+"""
+
+HTML_FOOTER="""
+</body>
+</html>
 """
 
 def size_repr(size_string):

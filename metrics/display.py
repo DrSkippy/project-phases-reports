@@ -37,11 +37,11 @@ def metric_html_tables(mdict, keys):
         n_data = sum([x in keys for x in data_name_cols if m[x] != ""])
         # new table for each metric
         res.append(f'<h2> Metric Name: {m["Metric Information:Name"]}</h2>')
-        res.append('<table padding=3 cellpadding=3 border=0.1>')
-        res.append(('<tr>'
+        res.append('<table border=0.1>')
+        res.append(('<tr class="tr-owner">'
                    f'<td colspan=1>Name:</td>'
                    f'<td colspan=3>{m["Metric Information:Name"]}</td>'
-                   f'<td colspan=1>Date (ver):</td>'
+                   f'<td colspan=1>Date:</td>'
                    f'<td colspan=1>{str(datetime.datetime.now())[:11]} (Ver. {m["Metric Information:Version"]}) </td>'
                     '</tr>'))
         res.append(('<tr>'
@@ -81,7 +81,7 @@ def metric_html_tables(mdict, keys):
             sot_key = ":".join([key, "Source of Truth"])
             automation_key = ":".join([key, "Automation"])
             #
-            res.append(('<tr>'
+            res.append(('<tr class="tr-project">'
                     f'<td colspan=1 rowspan=1>Required Data</td>'
                     f'<td colspan=1 rowspan=1>{m[name_key]}</td>'
                     f'<td colspan=4 rowspan=3>{m[sot_key]}</td>'
@@ -125,39 +125,20 @@ def fetch_csv(path):
             metric_dicts.append({keys[j]: metrics[i][j] for j in range(len(keys))})
     return metric_dicts, keys
 
-def fetch_csv(path):
-    with open(path, mode='r', encoding='utf-8-sig') as infile:
-        metrics = []
-        reader = csv.reader(infile)
-        for row in reader:
-            metrics.append(row)
-
-    # make keys from first two rows
-    keys = []
-    prefix = "Base"
-    for i, m1 in enumerate(metrics[0]):
-        if m1 is not None and m1 != "":
-            prefix = m1
-        keys.append(prefix+":"+metrics[1][i])
-    # make dict
-    metric_dicts = []
-    for i in range(2,len(metrics)):
-        if metrics[i][4] != "":
-            metric_dicts.append({keys[j]: metrics[i][j] for j in range(len(keys))})
-    return metric_dicts, keys
 
 def simple_html_table(mdict, keys):
     res = [] 
     res.append(CSS_STYLE)
     res.append("<h2> Metrics Table </h2>")
     res.append("<table>")
-    row = "<tr><th> " + " </th><th> ".join(keys) + " </th><tr>"
+    row = '<tr class="tr-owner"><th> ' + ' </th><th> '.join(keys) + ' </th><tr>'
     res.append(row)
     for m in mdict:
-        row = "<tr><td> " + " </td><td> ".join([f"{m[k]}" for k in keys]) + " </td><tr>"
+        row = '<tr><td> ' + ' </td><td> '.join([f'{m[k]}' for k in keys]) + ' </td><tr>'
         res.append(row)
     res.append("</table>")
     return "\n".join(res)
+
 
 def make_key_list(keys):
     print(keys)

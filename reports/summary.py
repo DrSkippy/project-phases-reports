@@ -227,13 +227,15 @@ def create_weekly_owners_views(project_records_list):
 
     This is an HTML document to take advantage of full table formatting control.
     """
+    # Timestamp
+    current_timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     # find unique owners
     owners = set([lines["ANALYTICS_DS_OWNER"] for lines in project_records_list])
     with open(weekly_owner_views_active_path, "w") as outfile:
         outfile.write(CSS_STYLE)
         outfile.write("<h1>DA Weekly - Project Owner Views - ACTIVE</h1>\n\n")
         outfile.write('<table border=0.1>')
-        outfile.write("<tr><th>Projects</th><th>Info</th></tr>\n")
+        outfile.write(f"<tr><th>Projects</th><th>Info <span>(updated: {current_timestamp})</span></th></tr>\n")
         for owner in owners:
             owner_header = False;
             counts = defaultdict(lambda: 0)

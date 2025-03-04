@@ -142,6 +142,10 @@ td {
 .tr-project {
     background-color:#a2999e;
 }
+span {
+    font-size: small;
+    font-weight: normal;
+}
 </style>
 </head>
 <body>

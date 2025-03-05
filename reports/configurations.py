@@ -6,6 +6,7 @@
 #
 import os
 
+# TODO: convert path variables to relative/dynamic paths
 # Locations
 project_info_filename = "PROJECT_INFO.txt"
 projects_tree_root = "/Users/s.hendrickson/Documents/OneDrive - F5, Inc"

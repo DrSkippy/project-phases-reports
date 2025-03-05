@@ -153,6 +153,7 @@ span {
 """
 
 HTML_FOOTER="""
+
 </body>
 </html>
 """

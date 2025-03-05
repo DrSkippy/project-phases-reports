@@ -234,7 +234,7 @@ def create_weekly_owners_views(project_records_list):
     with open(weekly_owner_views_active_path, "w") as outfile:
         outfile.write(CSS_STYLE)
         outfile.write("<h1>DA Weekly - Project Owner Views - ACTIVE</h1>\n\n")
-        outfile.write('<table border=0.1>')
+        outfile.write('<table border=0.1>\n')
         outfile.write(f"<tr><th>Projects</th><th>Info <span>(updated: {current_timestamp})</span></th></tr>\n")
         for owner in owners:
             owner_header = False;
@@ -247,13 +247,14 @@ def create_weekly_owners_views(project_records_list):
                             owner_header = True
                             outfile.write(f'<tr class="tr-owner"><td colspan=2><b>{owner:}</b></td></tr>\n')
                         counts[_phase] += 1
-                        outfile.write(f'<tr class="tr-project"><td>{lines["Project"]}</td><td>[{_phase}] active {lines["COMPUTED_AGE_DAYS"]} days &'
+                        outfile.write(f'<tr class="tr-project"><td>{lines["Project"]}</td>'
+                                      f'<td>[{_phase}] active {lines["COMPUTED_AGE_DAYS"]} days &'
                                       f' In-progress {lines["COMPUTED_IN_PROGRESS_AGE_DAYS"]} days '
                                       f' (👕:{size_repr(lines["T-SHIRT_SIZE"])})</td></tr>\n')
                         notes_block = recent_notes(lines["NOTES"], limit=4)
                         for note in notes_block:
                             note = note.strip().replace("|", ":")
-                            outfile.write(f'<tr><td> </td><td>{note}</td></tr>\n')
+                            outfile.write(f'<tr><td></td><td>{note}</td></tr>\n')
         outfile.write('</table>')
         outfile.write(HTML_FOOTER)
 

@@ -8,8 +8,10 @@ import os
 
 # TODO: convert path variables to relative/dynamic paths
 # Locations
+# SH Local Path: /Users/s.hendrickson/Documents/OneDrive - F5, Inc
+# KW Local Path: /Users/ke.wilson/Desktop/test_data_accel
 project_info_filename = "PROJECT_INFO.txt"
-projects_tree_root = "/Users/s.hendrickson/Documents/OneDrive - F5, Inc"
+projects_tree_root = "/Users/ke.wilson/Desktop/test_data_accel"
 project_folders_root = "Projects Folders"
 projects_tree_project_folders = os.path.join(projects_tree_root, project_folders_root)
 # Files
@@ -30,6 +32,9 @@ NOTES_DELIMITER = "**;**"
 These are the data elements to populate columns of the output csv for the status spreadsheet
   All-caps items are read from the project_info_file while normal case items are derived or computed.
 """
+
+#TODO: add columns from MetricsDefinition.csv
+
 project_params_dict = {
     "Phases": None,
     "Project": None,
@@ -49,7 +54,37 @@ project_params_dict = {
     "COMPUTED_PROJECT_ROLLOUT_DATE": None,
     "COMPUTED_PROJECT_END_DATE": None,
     "COMPUTED_PREVIOUS_PHASE": None,
-    "COMMIT_JUSTIFICATIONS": None
+    "COMMIT_JUSTIFICATIONS": None,
+# New Columns
+    # MIN Date in Stage
+    "COMPUTED_DATE_IN_STAGE_0_IDEAS": None,
+    "COMPUTED_DATE_IN_STAGE_1_CHARTERING": None,
+    "COMPUTED_DATE_IN_STAGE_2_COMMITTED": None,
+    "COMPUTED_DATE_IN_STAGE_3_IN_PROGRESS": None,
+    "COMPUTED_DATE_IN_STAGE_4_ON_HOLD": None,
+    "COMPUTED_DATE_IN_STAGE_5_ROLLOUT": None,
+    "COMPUTED_DATE_IN_STAGE_6_COMPLETED": None,
+    "COMPUTED_DATE_IN_STAGE_7_MAINTENANCE": None,
+    "COMPUTED_DATE_IN_STAGE_9_AD_HOC": None,
+    # Days In Stage
+    "COMPUTED_DAYS_IN_STAGE_0_IDEAS": 0,
+    "COMPUTED_DAYS_IN_STAGE_1_CHARTERING": 0,
+    "COMPUTED_DAYS_IN_STAGE_2_COMMITTED": 0,
+    "COMPUTED_DAYS_IN_STAGE_3_IN_PROGRESS": 0,
+    "COMPUTED_DAYS_IN_STAGE_4_ON_HOLD": 0,
+    "COMPUTED_DAYS_IN_STAGE_5_ROLLOUT": 0,
+    "COMPUTED_DAYS_IN_STAGE_6_COMPLETED": 0,
+    "COMPUTED_DAYS_IN_STAGE_7_MAINTENANCE": 0,
+    "COMPUTED_DAYS_IN_STAGE_9_AD_HOC": 0,
+    # Days Between Stages
+    "COMPUTED_COMPLETION_TIME_DAYS": 0,
+    "COMPUTED_TIME_ON_HOLD_DAYS": 0,
+    "COMPUTED_IN_PROGRESS_TO_COMPLETION_DAYS": 0,
+    "COMPUTED_COMPLETION_TIME_MINUS_HOLD_DAYS": 0,
+    "COMPUTED_COMMIT_TO_COMPLETION_DAYS": 0,
+# Metadata
+    "Project_ID": None,
+    "Report_Date": None,
 }
 
 """
@@ -76,8 +111,39 @@ name_field_map = {
     "Project Rollout Date": "COMPUTED_PROJECT_ROLLOUT_DATE",
     "Project Previous Phase": "COMPUTED_PROJECT_PREVIOUS_PHASE_DATE",
     "Project End Date": "COMPUTED_PROJECT_END_DATE",
-    "Commit Justification": "COMMIT_JUSTIFICATIONS"
+    "Commit Justification": "COMMIT_JUSTIFICATIONS",
+#New Columns
+    # MIN Date in Stage
+    "Stage 0 Ideas Date": "COMPUTED_DATE_IN_STAGE_0_IDEAS",
+    "Stage 1 Chartering Date": "COMPUTED_DATE_IN_STAGE_1_CHARTERING",
+    "Stage 2 Committed Date": "COMPUTED_DATE_IN_STAGE_2_COMMITTED",
+    "Stage 3 In Progress Date": "COMPUTED_DATE_IN_STAGE_3_IN_PROGRESS",
+    "Stage 4 On Hold Date": "COMPUTED_DATE_IN_STAGE_4_ON_HOLD",
+    "Stage 5 Rollout Date": "COMPUTED_DATE_IN_STAGE_5_ROLLOUT",
+    "Stage 6 Completed Date": "COMPUTED_DATE_IN_STAGE_6_COMPLETED",
+    "Stage 7 Maintenance Date": "COMPUTED_DATE_IN_STAGE_7_MAINTENANCE",
+    "Stage 9 Ad Hoc Date": "COMPUTED_DATE_IN_STAGE_9_AD_HOC",
+    # Days In Stage
+    "Stage 0 Ideas Age": "COMPUTED_DAYS_IN_STAGE_0_IDEAS",
+    "Stage 1 Chartering Age": "COMPUTED_DAYS_IN_STAGE_1_CHARTERING",
+    "Stage 2 Committed Age": "COMPUTED_DAYS_IN_STAGE_2_COMMITTED",
+    "Stage 3 In Progress Age": "COMPUTED_DAYS_IN_STAGE_3_IN_PROGRESS",
+    "Stage 4 On Hold Age": "COMPUTED_DAYS_IN_STAGE_4_ON_HOLD",
+    "Stage 5 Rollout Age": "COMPUTED_DAYS_IN_STAGE_5_ROLLOUT",
+    "Stage 6 Completed Age": "COMPUTED_DAYS_IN_STAGE_6_COMPLETED",
+    "Stage 7 Maintenance Age": "COMPUTED_DAYS_IN_STAGE_7_MAINTENANCE",
+    "Stage 9 Ad Hoc Age": "COMPUTED_DAYS_IN_STAGE_9_AD_HOC",
+    # Days Between Stages
+    "Days to Completion": "COMPUTED_COMPLETION_TIME_DAYS",
+    "Days on Hold": "COMPUTED_TIME_ON_HOLD_DAYS",
+    "Days In Progress to Complete": "COMPUTED_IN_PROGRESS_TO_COMPLETION_DAYS",
+    "Days to Completion less On Hold": "COMPUTED_COMPLETION_TIME_MINUS_HOLD_DAYS", #TODO: rename
+    "Days Commit to Completion": "COMPUTED_COMMIT_TO_COMPLETION_DAYS",
+    # Metadata
+    "Project ID": "Project_ID",
+    "Report Date": "Report_Date"
 }
+
 # keep a reverse map for lookup
 field_name_map = {v: k for k, v in name_field_map.items()}
 

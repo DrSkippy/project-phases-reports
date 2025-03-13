@@ -1,5 +1,4 @@
 import csv
-import datetime
 import logging
 from collections import defaultdict
 
@@ -84,7 +83,7 @@ def recent_notes(notes_text, recent_days=400, limit=200):
     """
     notes = [x.strip()[6:] for x in notes_text.split(NOTES_DELIMITER)]
     # check for recent notes
-    recent = datetime.datetime.now() - datetime.timedelta(days=recent_days)
+    recent = datetime.now() - timedelta(days=recent_days)
     notes_list = []
     for count, note in enumerate(notes):
         if count < limit:
@@ -93,7 +92,7 @@ def recent_notes(notes_text, recent_days=400, limit=200):
                 # notes with sequence within a date. Make bulleted list.
                 pre, sequence_number, post = note.split("::")
                 update_note = f"  {int(sequence_number)}. {pre[11:]}"
-            if datetime.datetime.strptime(note[:10].replace("_", "-"), DATE_FMT) >= recent:
+            if datetime.strptime(note[:10].replace("_", "-"), DATE_FMT) >= recent:
                 notes_list.append(update_note)
     return notes_list
 
@@ -192,7 +191,7 @@ def create_stakeholders_views(project_records_list):
 
     with open(stakeholders_views_active_path, "w") as outfile:
         outfile.write("# Data Accelerator - Project Stakeholders Views - ACTIVE\n\n")
-        outfile.write(f"({str(datetime.datetime.now())[:19]})\n\n")
+        outfile.write(f"({str(datetime.now())[:19]})\n\n")
         for owner in owners:
             block_string = synthesize_owner_block(project_records_list, owner, project_owner_key="BUSINESS_SPONSOR")
             if block_string:
@@ -347,9 +346,11 @@ def create_summary_csv(project_records):
     Parameters:
     project_records (list of dict): A list of dictionaries, each representing a project record.
     """
+
     # Open the file for writing
     with open(summary_path, "w", newline='') as outfile:
         # Initialize a CSV DictWriter with the specified field names and dialect
+        logging.info(f'project_params_dict.keys(): {project_params_dict.keys()}')
         csv_writer = csv.DictWriter(outfile, fieldnames=project_params_dict.keys(), dialect='excel')
 
         # Write the header row based on field_name_map
@@ -357,7 +358,7 @@ def create_summary_csv(project_records):
 
         # Write each project record as a row in the CSV file
         csv_writer.writerows(project_records)
-
+# There’s a warning in PyCharm stating “Expected type 'SupportsWrite[str]', got 'TextIO' instead”
 
 def create_complete_stakeholder_list(project_records):
     """
@@ -384,7 +385,7 @@ def create_complete_stakeholder_list(project_records):
 
 
 def create_reports(project_records_list):
-    # Create all the standard reports
+#    Create all the standard reports
     create_summary_csv(project_records_list)
     create_data_product_links(project_records_list)
     create_owners_views(project_records_list)

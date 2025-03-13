@@ -26,6 +26,7 @@ title_phase_views_path = os.path.join(projects_tree_project_folders, "phase_view
 stakeholder_list_path = os.path.join(projects_tree_project_folders, "stakeholder_list.txt")
 
 DATE_FMT = "%Y-%m-%d"
+DATETIME_FMT = "%Y-%m-%dT%H:%M:%S"
 NOTES_DELIMITER = "**;**"
 
 """
@@ -67,21 +68,22 @@ project_params_dict = {
     "COMPUTED_DATE_IN_STAGE_7_MAINTENANCE": None,
     "COMPUTED_DATE_IN_STAGE_9_AD_HOC": None,
     # Days In Stage
-    "COMPUTED_DAYS_IN_STAGE_0_IDEAS": 0,
-    "COMPUTED_DAYS_IN_STAGE_1_CHARTERING": 0,
-    "COMPUTED_DAYS_IN_STAGE_2_COMMITTED": 0,
-    "COMPUTED_DAYS_IN_STAGE_3_IN_PROGRESS": 0,
-    "COMPUTED_DAYS_IN_STAGE_4_ON_HOLD": 0,
-    "COMPUTED_DAYS_IN_STAGE_5_ROLLOUT": 0,
-    "COMPUTED_DAYS_IN_STAGE_6_COMPLETED": 0,
-    "COMPUTED_DAYS_IN_STAGE_7_MAINTENANCE": 0,
-    "COMPUTED_DAYS_IN_STAGE_9_AD_HOC": 0,
+    "COMPUTED_DAYS_IN_STAGE_0_IDEAS": None,
+    "COMPUTED_DAYS_IN_STAGE_1_CHARTERING": None,
+    "COMPUTED_DAYS_IN_STAGE_2_COMMITTED": None,
+    "COMPUTED_DAYS_IN_STAGE_3_IN_PROGRESS": None,
+    "COMPUTED_DAYS_IN_STAGE_4_ON_HOLD": None,
+    "COMPUTED_DAYS_IN_STAGE_5_ROLLOUT": None,
+    "COMPUTED_DAYS_IN_STAGE_6_COMPLETED": None,
+    "COMPUTED_DAYS_IN_STAGE_7_MAINTENANCE": None,
+    "COMPUTED_DAYS_IN_STAGE_9_AD_HOC": None,
     # Days Between Stages
-    "COMPUTED_COMPLETION_TIME_DAYS": 0,
-    "COMPUTED_TIME_ON_HOLD_DAYS": 0,
-    "COMPUTED_IN_PROGRESS_TO_COMPLETION_DAYS": 0,
-    "COMPUTED_COMPLETION_TIME_MINUS_HOLD_DAYS": 0,
-    "COMPUTED_COMMIT_TO_COMPLETION_DAYS": 0,
+    "COMPUTED_COMPLETION_TIME_DAYS": None,
+    "COMPUTED_TIME_ON_HOLD_DAYS": None,
+    "COMPUTED_IN_PROGRESS_TO_COMPLETION_DAYS": None,
+    "COMPUTED_COMPLETION_TIME_MINUS_HOLD_DAYS": None,
+    "COMPUTED_COMMIT_TO_COMPLETION_DAYS": None,
+    "COMPUTED_CHARTER_TO_COMPLETION_DAYS": None,
 # Metadata
     "Project_ID": None,
     "Report_Date": None,
@@ -161,6 +163,18 @@ project_phases = {
 }
 # keep a reverse map for lookup
 index_project_phases = {v: k for k, v in project_phases.items()}
+
+phase_date_dict = {
+    "STAGE_0_IDEAS": None,
+    "STAGE_1_CHARTERING": None,
+    "STAGE_2_COMMITTED": None,
+    "STAGE_3_IN_PROGRESS": None,
+    "STAGE_4_ON_HOLD": None,
+    "STAGE_5_ROLLOUT": None,
+    "STAGE_6_COMPLETED": None,
+    "STAGE_7_MAINTENANCE": None,
+    "STAGE_9_AD_HOC": None
+}
 
 # Ordering determined by Data Accelerator Analysts for Owners Reports etc.
 active_projects_order = [

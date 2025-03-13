@@ -1,7 +1,15 @@
 import logging
-import datetime
+import dateutil.utils
+from datetime import datetime, time
 import re
 from reports.configurations import *
+from resources.date_utils import parse_date
+
+dt_today = dateutil.utils.today()
+
+print(f'date_today: {repr(dt_today)}')
+print(type({dt_today}))
+
 
 def normalize_note_date(note_line):
     """
@@ -41,7 +49,7 @@ def normalize_note_date(note_line):
             logging.error(f"ERROR: Note date is not in yyyy-mm-dd format: {head}")
 
     try:
-        d = datetime.datetime.strptime(conforming_head_date, "%Y-%m-%d")
+        d = datetime.strptime(conforming_head_date, "%Y-%m-%d")
     except ValueError:
         logging.error(f"ERROR: Invalid date ({conforming_head_date})")
 
@@ -83,13 +91,76 @@ def parse_project_info(project_info_file):
     
     return params_dict
 
+# TODO: Integrate this write/overwrite pattern into update_summary.compute_stage_age()
+def record_timestamp(root, project_info_txt):
+    timestamp_key = "Report_Date"
+    timestamp_value = datetime.now().strftime(DATE_FMT)
 
+    file_path = os.path.join(root, project_info_txt)
+    updated_lines = []
+    key_found = False
+
+    with open(file_path, "r") as project_info_file:
+        for line in project_info_file:
+            if line.startswith(f"{timestamp_key}:"):
+                # Overwrite existing timestamp key in updated_line list
+                updated_lines.append(f"{timestamp_key}: {timestamp_value}\n")
+                key_found = True
+            else:
+                updated_lines.append(line)
+
+        # If key not found, append to file
+        if not key_found:
+            updated_lines.append(f"{timestamp_key}: {timestamp_value}\n")
+
+        # Write updated lines from list back to the file
+        with open(file_path, "w") as project_info_file:
+            project_info_file.writelines(updated_lines)
+
+
+def compute_phase_dwell(root, project_info_txt, param_key, phase_date, today=dt_today):
+    print(f'parser_112 phase_date: {repr(phase_date)}')
+    print(f'parser_112 phase_date: {type(phase_date)}')
+    print(f'parser_112 today: {repr(dt_today)}')
+    print(f'parser_112 today: {type(dt_today)}')
+    file_path = os.path.join(root, project_info_txt)
+    updated_lines = []
+    key_found = False
+
+    phase_datetime = datetime.combine(phase_date, time.min)     # parse_date(phase_date, datetime)
+    time_in_phase = dt_today - phase_datetime
+    with open(file_path, "r") as project_info_file:
+        for line in project_info_file:
+            if line.startswith(f"{param_key}:"):
+                updated_lines.append(f"{param_key}: {time_in_phase}\n")
+                key_found = True
+            else:
+                updated_lines.append(line)
+
+        if not key_found:
+            updated_lines.append(f"{param_key}: {time_in_phase}\n")
+
+        with open(file_path, "w") as project_info_file:
+            project_info_file.writelines(updated_lines)
+
+
+
+#TODO: Change back to "Projects Folders"
 def extract_params(root):
     """
     Extract phase and project names for the file path.
         Assume start one directory above "Projects Folders"
     """
-    names = root.split("/")  # phase, project
-    assert (len(names) == 4 and names[1] == "Projects Folders")
+    # Debugging input root
+#    print(f"Raw root: {repr(root)}")
+
+    names = root.split("/")  # Split the path into components
+#    print(f"Split path: {names}")
+
+    # Ensure names[1] matches expected values
+    assert len(names) == 4, f"Unexpected path length: {len(names)} (expected 4)"
+    assert names[1] == "Projects Folders", f"Unexpected value for names[1]: {repr(names[1])}"
+
+    # Log extracted phase and project
     logging.info(f"Extracted phase: {names[2]}, project: {names[3]}")
     return names[2], names[3]

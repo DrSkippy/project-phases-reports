@@ -32,6 +32,7 @@ def normalize_note_date(note_line):
         logging.info(f"Sequence number {sequence_number} found")
         tail += f"::{sequence_number}::"  # append a sequence number to build bulleted list
     except (ValueError, AttributeError):
+        logging.warn(f"WARNING:  Note date is not in yyyy-mm-dd format: {head}")
         try:
             head_date = date_re.search(head).group(0)
             y, m, d = head_date.split("-")

@@ -1,6 +1,7 @@
 import csv
 import logging
 from collections import defaultdict
+from datetime import datetime, timedelta
 
 from reports.configurations import *
 
@@ -227,7 +228,7 @@ def create_weekly_owners_views(project_records_list):
     This is an HTML document to take advantage of full table formatting control.
     """
     # Timestamp
-    current_timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    current_timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     # find unique owners
     owners = set([lines["ANALYTICS_DS_OWNER"] for lines in project_records_list])
     with open(weekly_owner_views_active_path, "w") as outfile:
@@ -277,7 +278,7 @@ def create_owners_commit_views(project_records_list):
         # Write the header
         outfile.write("# Data Accelerator - Project Owner Views - COMMIT\n\n")
         # Timestamp
-        current_timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        current_timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         outfile.write(f"({current_timestamp})\n\n")
 
         # Write synthesized owner blocks
@@ -294,14 +295,14 @@ def create_owners_views(project_records_list):
 
     with open(owner_views_active_path, "w") as outfile:
         outfile.write("# Data Accelerator - Project Owner Views - ACTIVE\n\n")
-        outfile.write(f"({str(datetime.datetime.now())[:19]})\n\n")
+        outfile.write(f"({str(datetime.now())[:19]})\n\n")
         for owner in owners:
             outfile.write(synthesize_owner_block(project_records_list, owner))
             outfile.write(synthesize_owner_maintenance_block(project_records_list, owner))
 
     with open(owner_views_completed_path, "w") as outfile:
         outfile.write("# Data Accelerator - Project Owner Views - COMPLETED & MAINTENANCE\n\n")
-        outfile.write(f"({str(datetime.datetime.now())[:19]})\n\n")
+        outfile.write(f"({str(datetime.now())[:19]})\n\n")
         for owner in owners:
             outfile.write(
                 synthesize_owner_block(project_records_list, owner, phase_filter=["6-Completed", "7-Maintenance"]))

@@ -25,9 +25,9 @@ stakeholders_views_active_path = os.path.join(projects_tree_project_folders, "st
 title_phase_views_path = os.path.join(projects_tree_project_folders, "phase_views.md")
 stakeholder_list_path = os.path.join(projects_tree_project_folders, "stakeholder_list.txt")
 
-DATE_FMT = "%Y-%m-%d"
-DATETIME_FMT = "%Y-%m-%dT%H:%M:%S"
+
 NOTES_DELIMITER = "**;**"
+DATE_FMT = "%Y-%m-%d"
 
 """
 These are the data elements to populate columns of the output csv for the status spreadsheet

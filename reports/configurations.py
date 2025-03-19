@@ -133,6 +133,7 @@ td {
   padding: 8px;
   font-size: medium;
   font-color: #353b3c;
+  overflow-wrap: anywhere;
 }
 .tr-owner {
     height: 50px;

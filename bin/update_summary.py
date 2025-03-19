@@ -38,7 +38,7 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 project_root = os.environ['PYTHONPATH']
 datetime_today = dateutil.utils.today()
 
-# TODO: Document current outputs and compare against MetricsDefinition.csv to identify needs
+
 if __name__ == "__main__":
     logging.info("Starting update_summary.py")
 
@@ -350,94 +350,12 @@ if __name__ == "__main__":
         # Update the project info file with the previous phase
         if project_phases[phase] == 0:
             parameter_date_key = "COMPUTED_DATE_IN_STAGE_0_IDEAS"
+            parameter_date_key_verbose = params["COMPUTED_DATE_IN_STAGE_0_IDEAS"]
+            parameter_date_key_datetime = parse_date(parameter_date_key_verbose, 'datetime')
+
             parameter_age_key = "COMPUTED_DAYS_IN_STAGE_0_IDEAS"
             stage_0_date = compute_stage_date(params, root, project_info_filename, parameter_date_key)
 
-            if params[f'{parameter_date_key}'] is not None:
-                initial_phase_date = params[f'{parameter_date_key}']
-                if initial_phase_date <= date_today.date():
-
-                    compute_phase_dwell(root, project_info_filename, parameter_age_key, initial_phase_date, date_today)
-                else:
-                    logging.warning(f"Negative Delta: {initial_phase_date} is in the future")
-
-        if project_phases[phase] == 1:
-            parameter_date_key = "COMPUTED_DATE_IN_STAGE_1_CHARTERING"
-            parameter_age_key = "COMPUTED_DAYS_IN_STAGE_1_CHARTERING"
-            stage_1_date = compute_stage_date(params, root, project_info_filename, parameter_date_key)
-
-            if params[f'{parameter_date_key}'] is not None:
-                initial_phase_date = params[f'{parameter_date_key}']
-                if initial_phase_date <= date_today.date():
-                    print(f'376 initial_phase_date: {repr(date_today)}')
-                    print(f'376 initial_phase_date: {type(date_today)}')
-                    print(f'376 date_today: {repr(date_today)}')
-                    print(f'376 date_today: {type(date_today)}')
-                    compute_phase_dwell(root, project_info_filename, parameter_age_key, initial_phase_date, date_today)
-                else:
-                    logging.warning(f"Negative Delta: {initial_phase_date} is in the future")
-
-        if project_phases[phase] == 2:
-            parameter_date_key = "COMPUTED_DATE_IN_STAGE_2_COMMITTED"
-            parameter_age_key = "COMPUTED_DAYS_IN_STAGE_2_COMMITTED"
-            stage_2_date = compute_stage_date(params, root, project_info_filename, parameter_date_key)
-
-            if params[f'{parameter_date_key}'] is not None:
-                initial_phase_date = params[f'{parameter_date_key}']
-                if initial_phase_date <= date_today.date():
-                    compute_phase_dwell(root, project_info_filename, parameter_age_key, initial_phase_date, date_today)
-                else:
-                    logging.warning(f"Negative Delta: {initial_phase_date} is in the future")
-
-        if project_phases[phase] == 2:
-            parameter_date_key = "COMPUTED_DATE_IN_STAGE_2_COMMITTED"
-            parameter_age_key = "COMPUTED_DAYS_IN_STAGE_2_COMMITTED"
-            stage_2_date = compute_stage_date(params, root, project_info_filename, parameter_date_key)
-
-            if params[f'{parameter_date_key}'] is not None:
-                initial_phase_date = params[f'{parameter_date_key}']
-                if initial_phase_date <= date_today.date():
-                    compute_phase_dwell(root, project_info_filename, parameter_age_key, initial_phase_date, date_today)
-                else:
-                    logging.warning(f"Negative Delta: {initial_phase_date} is in the future")
-
-        if project_phases[phase] == 3:
-            parameter_date_key = "COMPUTED_DATE_IN_STAGE_3_IN_PROGRESS"
-            parameter_age_key = "COMPUTED_DAYS_IN_STAGE_3_IN_PROGRESS"
-            stage_2_date = compute_stage_date(params, root, project_info_filename, parameter_date_key)
-
-            if params[f'{parameter_date_key}'] is not None:
-                initial_phase_date = params[f'{parameter_date_key}']
-                if initial_phase_date <= date_today.date():
-                    compute_phase_dwell(root, project_info_filename, parameter_age_key, initial_phase_date, date_today)
-                else:
-                    logging.warning(f"Negative Delta: {initial_phase_date} is in the future")
-
-        if project_phases[phase] == 4:
-            parameter_date_key = "COMPUTED_DATE_IN_STAGE_4_ON_HOLD"
-            parameter_age_key = "COMPUTED_DAYS_IN_STAGE_4_ON_HOLD"
-            stage_2_date = compute_stage_date(params, root, project_info_filename, parameter_date_key)
-
-            if params[f'{parameter_date_key}'] is not None:
-                initial_phase_date = params[f'{parameter_date_key}']
-                if initial_phase_date <= date_today.date():
-                    compute_phase_dwell(root, project_info_filename, parameter_age_key, initial_phase_date, date_today)
-                else:
-                    logging.warning(f"Negative Delta: {initial_phase_date} is in the future")
-
-        if project_phases[phase] == 5:
-            parameter_date_key = "COMPUTED_DATE_IN_STAGE_5_ROLLOUT"
-            parameter_date_key_verbose = params["COMPUTED_DATE_IN_STAGE_5_ROLLOUT"]
-            parameter_date_key_date = parse_date(parameter_date_key_verbose, 'date')
-            parameter_date_key_datetime = parse_date(parameter_date_key_verbose, 'datetime')
-            # print(f'428 parameter_date_key_date: {repr(parameter_date_key_date)}')
-            # print(f'428 parameter_date_key_date type: {type(parameter_date_key_date)}')
-            # print(f'428 parameter_date_key_datetime: {repr(parameter_date_key_datetime)}')
-            # print(f'428 parameter_date_key_datetime type: {type(parameter_date_key_datetime)}')
-            parameter_age_key = "COMPUTED_DAYS_IN_STAGE_5_ROLLOUT"
-            stage_2_date = compute_stage_date(params, root, project_info_filename, parameter_date_key)
-
-            # if params[f'{parameter_date_key}'] is not None:
             if parameter_date_key_datetime is not None:
                 initial_phase_date = parameter_date_key_datetime
                 try:
@@ -447,48 +365,141 @@ if __name__ == "__main__":
                     print(f'compute_phase_dwell(initial_phase_date) type: {type(initial_phase_date)}')
                     logging.error(f"Error parsing date")
 
-                # if initial_phase_date <= datetime_today:
-                #     compute_phase_dwell(root, project_info_filename, parameter_age_key, initial_phase_date)
-                # else:
-                #     logging.warning(f"Negative Delta: {initial_phase_date} is in the future")
+        if project_phases[phase] == 1:
+            parameter_date_key = "COMPUTED_DATE_IN_STAGE_1_CHARTERING"
+            parameter_date_key_verbose = params["COMPUTED_DATE_IN_STAGE_1_CHARTERING"]
+            parameter_date_key_datetime = parse_date(parameter_date_key_verbose, 'datetime')
+
+            parameter_age_key = "COMPUTED_DAYS_IN_STAGE_1_CHARTERING"
+            stage_1_date = compute_stage_date(params, root, project_info_filename, parameter_date_key)
+
+            if parameter_date_key_datetime is not None:
+                initial_phase_date = parameter_date_key_datetime
+                try:
+                    compute_phase_dwell(root, project_info_filename, parameter_age_key, initial_phase_date)
+                except ValueError as e:
+                    print(f'compute_phase_dwell(initial_phase_date): {repr(initial_phase_date)}')
+                    print(f'compute_phase_dwell(initial_phase_date) type: {type(initial_phase_date)}')
+                    logging.error(f"Error parsing date")
+
+        if project_phases[phase] == 2:
+            parameter_date_key = "COMPUTED_DATE_IN_STAGE_2_COMMITTED"
+            parameter_date_key_verbose = params["COMPUTED_DATE_IN_STAGE_2_COMMITTED"]
+            parameter_date_key_datetime = parse_date(parameter_date_key_verbose, 'datetime')
+
+            parameter_age_key = "COMPUTED_DAYS_IN_STAGE_2_COMMITTED"
+            stage_2_date = compute_stage_date(params, root, project_info_filename, parameter_date_key)
+
+            if parameter_date_key_datetime is not None:
+                initial_phase_date = parameter_date_key_datetime
+                try:
+                    compute_phase_dwell(root, project_info_filename, parameter_age_key, initial_phase_date)
+                except ValueError as e:
+                    print(f'compute_phase_dwell(initial_phase_date): {repr(initial_phase_date)}')
+                    print(f'compute_phase_dwell(initial_phase_date) type: {type(initial_phase_date)}')
+                    logging.error(f"Error parsing date")
+
+        if project_phases[phase] == 3:
+            parameter_date_key = "COMPUTED_DATE_IN_STAGE_3_IN_PROGRESS"
+            parameter_date_key_verbose = params["COMPUTED_DATE_IN_STAGE_3_IN_PROGRESS"]
+            parameter_date_key_datetime = parse_date(parameter_date_key_verbose, 'datetime')
+
+            parameter_age_key = "COMPUTED_DAYS_IN_STAGE_3_IN_PROGRESS"
+            stage_3_date = compute_stage_date(params, root, project_info_filename, parameter_date_key)
+
+            if parameter_date_key_datetime is not None:
+                initial_phase_date = parameter_date_key_datetime
+                try:
+                    compute_phase_dwell(root, project_info_filename, parameter_age_key, initial_phase_date)
+                except ValueError as e:
+                    print(f'compute_phase_dwell(initial_phase_date): {repr(initial_phase_date)}')
+                    print(f'compute_phase_dwell(initial_phase_date) type: {type(initial_phase_date)}')
+                    logging.error(f"Error parsing date")
+
+        if project_phases[phase] == 4:
+            parameter_date_key = "COMPUTED_DATE_IN_STAGE_4_ON_HOLD"
+            parameter_date_key_verbose = params["COMPUTED_DATE_IN_STAGE_4_ON_HOLD"]
+            parameter_date_key_datetime = parse_date(parameter_date_key_verbose, 'datetime')
+
+            parameter_age_key = "COMPUTED_DAYS_IN_STAGE_4_ON_HOLD"
+            stage_4_date = compute_stage_date(params, root, project_info_filename, parameter_date_key)
+
+            if parameter_date_key_datetime is not None:
+                initial_phase_date = parameter_date_key_datetime
+                try:
+                    compute_phase_dwell(root, project_info_filename, parameter_age_key, initial_phase_date)
+                except ValueError as e:
+                    print(f'compute_phase_dwell(initial_phase_date): {repr(initial_phase_date)}')
+                    print(f'compute_phase_dwell(initial_phase_date) type: {type(initial_phase_date)}')
+                    logging.error(f"Error parsing date")
+
+        if project_phases[phase] == 5:
+            parameter_date_key = "COMPUTED_DATE_IN_STAGE_5_ROLLOUT"
+            parameter_date_key_verbose = params["COMPUTED_DATE_IN_STAGE_5_ROLLOUT"]
+            parameter_date_key_datetime = parse_date(parameter_date_key_verbose, 'datetime')
+
+            parameter_age_key = "COMPUTED_DAYS_IN_STAGE_5_ROLLOUT"
+            stage_2_date = compute_stage_date(params, root, project_info_filename, parameter_date_key)
+
+            if parameter_date_key_datetime is not None:
+                initial_phase_date = parameter_date_key_datetime
+                try:
+                    compute_phase_dwell(root, project_info_filename, parameter_age_key, initial_phase_date)
+                except ValueError as e:
+                    print(f'compute_phase_dwell(initial_phase_date): {repr(initial_phase_date)}')
+                    print(f'compute_phase_dwell(initial_phase_date) type: {type(initial_phase_date)}')
+                    logging.error(f"Error parsing date")
 
         if project_phases[phase] == 6:
             parameter_date_key = "COMPUTED_DATE_IN_STAGE_6_COMPLETED"
-            parameter_age_key = "COMPUTED_DAYS_IN_STAGE_6_COMPLETED"
-            stage_2_date = compute_stage_date(params, root, project_info_filename, parameter_date_key)
+            parameter_date_key_verbose = params["COMPUTED_DATE_IN_STAGE_6_COMPLETED"]
+            parameter_date_key_datetime = parse_date(parameter_date_key_verbose, 'datetime')
 
-            if params[f'{parameter_date_key}'] is not None:
-                initial_phase_date = datetime.strptime(params[f'{parameter_date_key}'], '%Y-%m-%d').date()
-                datetime_today = datetime.now()
-                if initial_phase_date <= datetime_today.date():
-                    compute_phase_dwell(root, project_info_filename, parameter_age_key, initial_phase_date, date_today)
-                else:
-                    logging.warning(f"Negative Delta: {initial_phase_date} is in the future")
+            parameter_age_key = "COMPUTED_DAYS_IN_STAGE_6_COMPLETED"
+            stage_6_date = compute_stage_date(params, root, project_info_filename, parameter_date_key)
+
+            if parameter_date_key_datetime is not None:
+                initial_phase_date = parameter_date_key_datetime
+                try:
+                    compute_phase_dwell(root, project_info_filename, parameter_age_key, initial_phase_date)
+                except ValueError as e:
+                    print(f'compute_phase_dwell(initial_phase_date): {repr(initial_phase_date)}')
+                    print(f'compute_phase_dwell(initial_phase_date) type: {type(initial_phase_date)}')
+                    logging.error(f"Error parsing date")
 
         if project_phases[phase] == 7:
             parameter_date_key = "COMPUTED_DATE_IN_STAGE_7_MAINTENANCE"
-            parameter_age_key = "COMPUTED_DAYS_IN_STAGE_7_MAINTENANCE"
-            stage_2_date = compute_stage_date(params, root, project_info_filename, parameter_date_key)
+            parameter_date_key_verbose = params["COMPUTED_DATE_IN_STAGE_7_MAINTENANCE"]
+            parameter_date_key_datetime = parse_date(parameter_date_key_verbose, 'datetime')
 
-            if params[f'{parameter_date_key}'] is not None:
-                initial_phase_date = params[f'{parameter_date_key}']
-                print(f'line 451: {repr(initial_phase_date)}')
-                if initial_phase_date <= date_today.date():
-                    compute_phase_dwell(root, project_info_filename, parameter_age_key, initial_phase_date, date_today)
-                else:
-                    logging.warning(f"Negative Delta: {initial_phase_date} is in the future")
+            parameter_age_key = "COMPUTED_DAYS_IN_STAGE_7_MAINTENANCE"
+            stage_7_date = compute_stage_date(params, root, project_info_filename, parameter_date_key)
+
+            if parameter_date_key_datetime is not None:
+                initial_phase_date = parameter_date_key_datetime
+                try:
+                    compute_phase_dwell(root, project_info_filename, parameter_age_key, initial_phase_date)
+                except ValueError as e:
+                    print(f'compute_phase_dwell(initial_phase_date): {repr(initial_phase_date)}')
+                    print(f'compute_phase_dwell(initial_phase_date) type: {type(initial_phase_date)}')
+                    logging.error(f"Error parsing date")
 
         if project_phases[phase] == 9:
             parameter_date_key = "COMPUTED_DATE_IN_STAGE_9_AD_HOC"
-            parameter_age_key = "COMPUTED_DAYS_IN_STAGE_9_AD_HOC"
-            stage_2_date = compute_stage_date(params, root, project_info_filename, parameter_date_key)
+            parameter_date_key_verbose = params["COMPUTED_DATE_IN_STAGE_9_AD_HOC"]
+            parameter_date_key_datetime = parse_date(parameter_date_key_verbose, 'datetime')
 
-            if params[f'{parameter_date_key}'] is not None:
-                initial_phase_date = params[f'{parameter_date_key}']
-                if initial_phase_date <= date_today.date():
-                    compute_phase_dwell(root, project_info_filename, parameter_age_key, initial_phase_date, date_today)
-                else:
-                    logging.warning(f"Negative Delta: {initial_phase_date} is in the future")
+            parameter_age_key = "COMPUTED_DAYS_IN_STAGE_9_AD_HOC"
+            stage_9_date = compute_stage_date(params, root, project_info_filename, parameter_date_key)
+
+            if parameter_date_key_datetime is not None:
+                initial_phase_date = parameter_date_key_datetime
+                try:
+                    compute_phase_dwell(root, project_info_filename, parameter_age_key, initial_phase_date)
+                except ValueError as e:
+                    print(f'compute_phase_dwell(initial_phase_date): {repr(initial_phase_date)}')
+                    print(f'compute_phase_dwell(initial_phase_date) type: {type(initial_phase_date)}')
+                    logging.error(f"Error parsing date")
 
         # Old Method of calling funciton that calculates time in stage
         # if project_phases[phase] == 3:
@@ -560,4 +571,4 @@ if __name__ == "__main__":
                     f'COMPUTED_CHARTER_TO_COMPLETION_DAYS: {new_charter_to_completion_days}\n')
 
         project_records_list.append(params)
-    create_reports(project_records_list)
+        create_reports(project_records_list)

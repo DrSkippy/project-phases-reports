@@ -3,6 +3,10 @@ __pycache__/
 *.py[cod]
 *$py.class
 
+# Unwanted .py Files
+bin/update_summary_backup.py
+bin/update_summary_trunc.py
+
 # C extensions
 *.so
 

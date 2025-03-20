@@ -4,51 +4,6 @@ import sys
 from pathlib import Path
 
 
-"""
-# in case Scott's
-from pathlib import Path
-
-def get_second_path_element_if_users(path):
-    # Convert the path to a Path object
-    path_obj = Path(path)
-    # Access the parts of the path
-    parts = path_obj.parts
-
-    # Check if the first element is "Users"
-    if len(parts) > 1 and parts[1] == "Users":
-        # Return the second element after "Users"
-        return parts[2] if len(parts) > 2 else None
-    return None
-
-# Example usage
-path = "/Users/s.hendrickson/project_directory"
-user = get_second_path_element_if_users(path)
-print(user)  # Output: "s.hendrickson"
-
-# For other paths
-path2 = "/some/other/directory"
-user2 = get_second_path_element_if_users(path2)
-print(user2)  # Output: None
-"""
-
-
-# # Locations
-# # SH Local Path: /Users/s.hendrickson/Documents/OneDrive - F5, Inc
-# # KW Local Path: /Users/ke.wilson/Desktop/test_data_accel
-# project_info_filename = "PROJECT_INFO.txt"
-# projects_tree_root = "/Users/ke.wilson/Desktop/test_data_accel"
-# project_folders_root = "Projects Folders"
-# projects_tree_project_folders = os.path.join(projects_tree_root, project_folders_root)
-
-
-# current_dir = os.getcwd()
-
-
-
-# def user_check():
-#     user = os.environ['USER']
-#     return user
-
 class SystemInfo:
     def __init__(self):
         self.current_dir = os.getcwd()

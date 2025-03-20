@@ -145,18 +145,12 @@ def compute_phase_dwell(root, project_info_txt, param_key, phase_date, today=dt_
             project_info_file.writelines(updated_lines)
 
 
-
-#TODO: Change back to "Projects Folders"
 def extract_params(root):
     """
     Extract phase and project names for the file path.
         Assume start one directory above "Projects Folders"
     """
-    # Debugging input root
-#    print(f"Raw root: {repr(root)}")
-
     names = root.split("/")  # Split the path into components
-#    print(f"Split path: {names}")
 
     # Ensure names[1] matches expected values
     assert len(names) == 4, f"Unexpected path length: {len(names)} (expected 4)"

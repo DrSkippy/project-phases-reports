@@ -305,7 +305,8 @@ def create_owners_views(project_records_list):
         outfile.write(f"({str(datetime.now())[:19]})\n\n")
         for owner in owners:
             outfile.write(
-                synthesize_owner_block(project_records_list, owner, phase_filter=["6-Completed", "7-Maintenance"]))
+                synthesize_owner_block(project_records_list, owner,
+                                       phase_filter=["6-Completed", "7-Maintenance"]))
 
 
 def create_data_product_links(project_records):

@@ -111,10 +111,10 @@ if __name__ == "__main__":
                 if params["COMPUTED_PROJECT_IN_PROGRESS_DATE"] is None:
                     # First time we processed file since project phase changed to In Progress
                     project_in_progress_date = datetime.now()
-                    print(f'121 in_progress: {repr(project_in_progress_date)}')
-                    print(f'121 in_progress type: {type(project_in_progress_date)}')
-                    print(f'121 date_today: {repr(date_today)}')
-                    print(f'121 date_today type: {type(date_today)}')
+                    # print(f'121 in_progress: {repr(project_in_progress_date)}')
+                    # print(f'121 in_progress type: {type(project_in_progress_date)}')
+                    # print(f'121 date_today: {repr(date_today)}')
+                    # print(f'121 date_today type: {type(date_today)}')
                     params["COMPUTED_PROJECT_IN_PROGRESS_DATE"] = project_in_progress_date.strftime(DATE_FMT)
                     new_project_in_progress_date = project_in_progress_date
                 else:
@@ -122,14 +122,14 @@ if __name__ == "__main__":
                     project_in_progress_date = datetime.strptime(
                         params["COMPUTED_PROJECT_IN_PROGRESS_DATE"], '%Y-%m-%d'
                     )
-                    print(f'121 in_progress: {repr(project_in_progress_date)}')
-                    print(f'121 in_progress type: {type(project_in_progress_date)}')
-                    print(f'121 date_today: {repr(date_today)}')
-                    print(f'121 date_today type: {type(date_today)}')
+                    # print(f'121 in_progress: {repr(project_in_progress_date)}')
+                    # print(f'121 in_progress type: {type(project_in_progress_date)}')
+                    # print(f'121 date_today: {repr(date_today)}')
+                    # print(f'121 date_today type: {type(date_today)}')
 
                     dt_delta = datetime.now() - project_in_progress_date
-                    print(f'131 dt_delta: {repr(dt_delta)}')
-                    print(f'131 dt_delta type: {type(dt_delta)}')
+                    # print(f'131 dt_delta: {repr(dt_delta)}')
+                    # print(f'131 dt_delta type: {type(dt_delta)}')
                     if dt_delta.days < 0:
                         dt_delta = timedelta(days=0)
                     params["COMPUTED_IN_PROGRESS_AGE_DAYS"] = dt_delta.days
@@ -346,6 +346,8 @@ if __name__ == "__main__":
         #   e.g.: stage_3_date = datetime.datetime.strptime(
         #                         params["COMPUTED_PROJECT_IN_PROGRESS_DATE"][:10],
         #                         DATE_FMT)
+
+        # TODO: [FUTURE] build the `if project_phases[phase] == [int]:` into a class
 
         # Update the project info file with the previous phase
         if project_phases[phase] == 0:

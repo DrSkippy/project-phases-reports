@@ -11,10 +11,21 @@ USAGE:
 """
 
 import os
+
+# Import Project Module(s) Below
 from resources.path_utils import SystemInfo
 
 
-system_info = SystemInfo() # If Scott, then Scott's path. If Keelor, then options. Else, path from user input()
+# Path from SystemInfo() class is based on `os.environ['USER']` and the username following '/Users/' in system path.
+# If `os.environ['USER']` & `/Users/[username]` match, AND the user is...
+# ...Scott, then Scott's path: "/Users/s.hendrickson/Documents/OneDrive - F5, Inc"
+# ...Keelor, then record option from user input:
+#       ...test: "/Users/ke.wilson/Desktop/test_data_accel"
+#       ...OneDrive: "/Users/ke.wilson/Library/CloudStorage/OneDrive-F5,Inc/Documents - Data Accelerator - Enterprise Analytics"
+#       ...other: path from user input()
+# ...anyone else: path from user input()
+
+system_info = SystemInfo()
 projects_tree_root = system_info.return_system_info()
 
 project_folders_root = "Projects Folders"
@@ -144,7 +155,7 @@ name_field_map = {
     "Days to Completion": "COMPUTED_COMPLETION_TIME_DAYS",
     "Days on Hold": "COMPUTED_TIME_ON_HOLD_DAYS",
     "Days In Progress to Complete": "COMPUTED_IN_PROGRESS_TO_COMPLETION_DAYS",
-    "Days to Completion less On Hold": "COMPUTED_COMPLETION_TIME_MINUS_HOLD_DAYS", #TODO: rename
+    "Days to Completion less On Hold": "COMPUTED_COMPLETION_TIME_MINUS_HOLD_DAYS",
     "Days Commit to Completion": "COMPUTED_COMMIT_TO_COMPLETION_DAYS",
     # Metadata
     "Project ID": "Project_ID",
@@ -168,19 +179,6 @@ project_phases = {
 }
 # keep a reverse map for lookup
 index_project_phases = {v: k for k, v in project_phases.items()}
-
-# TODO: run with phase_date_dict commented out and see if it breaks. If no, remove.
-# phase_date_dict = {
-#     "STAGE_0_IDEAS": None,
-#     "STAGE_1_CHARTERING": None,
-#     "STAGE_2_COMMITTED": None,
-#     "STAGE_3_IN_PROGRESS": None,
-#     "STAGE_4_ON_HOLD": None,
-#     "STAGE_5_ROLLOUT": None,
-#     "STAGE_6_COMPLETED": None,
-#     "STAGE_7_MAINTENANCE": None,
-#     "STAGE_9_AD_HOC": None
-# }
 
 # Ordering determined by Data Accelerator Analysts for Owners Reports etc.
 active_projects_order = [

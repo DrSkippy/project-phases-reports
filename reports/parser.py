@@ -2,14 +2,12 @@ import logging
 import dateutil.utils
 from datetime import datetime, time
 import re
+
+# Import Project Module(s) Below
 from reports.configurations import *
-from resources.date_utils import parse_date
+
 
 dt_today = dateutil.utils.today()
-
-print(f'date_today: {repr(dt_today)}')
-print(type({dt_today}))
-
 
 def normalize_note_date(note_line):
     """
@@ -91,7 +89,7 @@ def parse_project_info(project_info_file):
     
     return params_dict
 
-# TODO: Integrate this write/overwrite pattern into update_summary.compute_stage_age()
+
 def record_timestamp(root, project_info_txt):
     timestamp_key = "Report_Date"
     timestamp_value = datetime.now().strftime(DATE_FMT)
@@ -119,11 +117,6 @@ def record_timestamp(root, project_info_txt):
 
 
 def compute_phase_dwell(root, project_info_txt, param_key, phase_date, today=dt_today):
-    # TODO: Run with lines 122-125, (print(...)) commented out and remove if not broken.
-    # print(f'parser_112 phase_date: {repr(phase_date)}')
-    # print(f'parser_112 phase_date: {type(phase_date)}')
-    # print(f'parser_112 today: {repr(dt_today)}')
-    # print(f'parser_112 today: {type(dt_today)}')
     file_path = os.path.join(root, project_info_txt)
     updated_lines = []
     key_found = False

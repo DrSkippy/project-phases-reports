@@ -1,13 +1,14 @@
-import sys
-import os
 import uuid
-import dateutil.utils
-from resources import date_utils
-sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 import fileinput
-import logging
 from logging.config import dictConfig
+# Can't remember why I included the sys.path.append(...) line below. Leaving as comment in case it's important
+# sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
+# Import Project Module(s) Below
 from resources.date_utils import parse_date
+from reports.parser import *
+from reports.summary import *
+
 
 dictConfig({
     'version': 1,
@@ -31,11 +32,6 @@ dictConfig({
     }
 })
 
-from reports.parser import *
-from reports.summary import *
-
-# sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-# project_root = os.environ['PYTHONPATH']
 datetime_today = dateutil.utils.today()
 
 
@@ -111,10 +107,6 @@ if __name__ == "__main__":
                 if params["COMPUTED_PROJECT_IN_PROGRESS_DATE"] is None:
                     # First time we processed file since project phase changed to In Progress
                     project_in_progress_date = datetime.now()
-                    # print(f'121 in_progress: {repr(project_in_progress_date)}')
-                    # print(f'121 in_progress type: {type(project_in_progress_date)}')
-                    # print(f'121 date_today: {repr(date_today)}')
-                    # print(f'121 date_today type: {type(date_today)}')
                     params["COMPUTED_PROJECT_IN_PROGRESS_DATE"] = project_in_progress_date.strftime(DATE_FMT)
                     new_project_in_progress_date = project_in_progress_date
                 else:
@@ -122,14 +114,8 @@ if __name__ == "__main__":
                     project_in_progress_date = datetime.strptime(
                         params["COMPUTED_PROJECT_IN_PROGRESS_DATE"], '%Y-%m-%d'
                     )
-                    # print(f'121 in_progress: {repr(project_in_progress_date)}')
-                    # print(f'121 in_progress type: {type(project_in_progress_date)}')
-                    # print(f'121 date_today: {repr(date_today)}')
-                    # print(f'121 date_today type: {type(date_today)}')
 
                     dt_delta = datetime.now() - project_in_progress_date
-                    # print(f'131 dt_delta: {repr(dt_delta)}')
-                    # print(f'131 dt_delta type: {type(dt_delta)}')
                     if dt_delta.days < 0:
                         dt_delta = timedelta(days=0)
                     params["COMPUTED_IN_PROGRESS_AGE_DAYS"] = dt_delta.days
@@ -276,78 +262,19 @@ if __name__ == "__main__":
 
                     return stage_date
 
-            # TODO: Modify to overwrite values if new value is greater
-            # def compute_stage_age(params, root, project_info_filename, stage_key_date, stage_key_age):
-            #     """
-            #     Compute the age in days for a given stage key in the params dictionary.
-            #
-            #     Args:
-            #         params (dict): The dictionary holding stage data.
-            #         root (str): The root directory for the file.
-            #         project_info_filename (str): The name of the file where data will be written.
-            #         stage_key_date (str): The key for the stage date (e.g., "COMPUTED_DATE_IN_STAGE_X").
-            #         stage_key_age (str): The key for the stage age in days (e.g., "COMPUTED_DAYS_IN_STAGE_X").
-            #
-            #     Returns:
-            #         int: The computed or existing stage age in days.
-            #     """
-            #     # logging.info(f'fn param stage_key_date == {repr(stage_key_date)}')
-            #     # logging.info(f'fn param stage_key_age == {repr(stage_key_age)}')
-            #     stage_date_str = params.get(stage_key_date)
-            #     # logging.info(f'stage_date_str == {repr(stage_date_str)}')
-            #     current_date = date.today()
-            #
-            #     if stage_date_str:
-            #         stage_date = datetime.datetime.strptime(stage_date_str, DATE_FMT).date()
-            #         logging.info(f'stage_date == {repr(stage_date)}')
-            #
-            #         if params[stage_key_age] is None:
-            #             if stage_date <= current_date:
-            #                 stage_age = (current_date - stage_date).days
-            #                 logging.info(f'stage_age == {repr(stage_age)}')
-            #                 params[stage_key_age] = stage_age
-            #
-            #                 # Write the computed age to the file
-            #                 # logging.info(
-            #                 #     f'root == {repr(root)},'
-            #                 #     f' project_info_filename == {repr(project_info_filename)},'
-            #                 #     f' stage_key_age == {repr(stage_key_age)},'
-            #                 #     f' stage_age == {repr(stage_key_age)}'
-            #                 # )
-            #                 write_to_project_info(root, project_info_filename, stage_key_age, stage_age)
-            #
-            #                 return stage_age
-            #             elif stage_date > current_date:
-            #                 logging.info(f"Date associated with stage is in the future: {stage_date}")
-            #         else:
-            #             # Return the existing age value
-            #             # logging.info(f'params[stage_key_age] == {repr(params[stage_key_age])}')
-            #             stage_age = params[stage_key_age]
-            #             # logging.info(f'stage_age == {repr(stage_age)}')
-            #             # logging.info(f"Existing age for {stage_key_age}: {stage_age}")
-            #             # logging.info(
-            #             #     f'root == {repr(root)},'
-            #             #     f' project_info_filename == {repr(project_info_filename)},'
-            #             #     f' stage_key_age == {repr(stage_key_age)},'
-            #             #     f' stage_age == {repr(stage_key_age)}'
-            #             # )
-            #             return stage_age
-            #     else:
-            #         logging.warning(f"Unable to compute age: Missing date for {stage_key_date}")
-            #         return None
 
+            # `def compute_stage_age(...)` was made obsolete by reports/parser.compute_phase_dwell() & archived in resources/vestigial_code.py
+
+        """
         # TODO: Write statement to capture first stage. Fist stage should reflect start date
         #           This can be done my taking minimum value in stage date dict
-
+        # 
         # TODO: IF previous stage is hold, and if var`off_hold_date` is null then datetime.datetime.now()
-        #   Wont work for multiple holds
-
-        # TODO: replace `else: stage_#_date` with existing computed date where possible
-        #   e.g.: stage_3_date = datetime.datetime.strptime(
-        #                         params["COMPUTED_PROJECT_IN_PROGRESS_DATE"][:10],
-        #                         DATE_FMT)
-
+        #           Won't work for multiple holds
+        # 
         # TODO: [FUTURE] build the `if project_phases[phase] == [int]:` into a class
+        """
+
 
         # Update the project info file with the previous phase
         if project_phases[phase] == 0:
@@ -503,16 +430,6 @@ if __name__ == "__main__":
                     print(f'compute_phase_dwell(initial_phase_date) type: {type(initial_phase_date)}')
                     logging.error(f"Error parsing date")
 
-        # Old Method of calling funciton that calculates time in stage
-        # if project_phases[phase] == 3:
-        #     parameter_key = 'COMPUTED_DATE_IN_STAGE_3_IN_PROGRESS'
-        #     stage_3_date = compute_stage_date(
-        #         params, root, project_info_filename, "COMPUTED_DATE_IN_STAGE_3_IN_PROGRESS"
-        #     )
-        #
-        #     stage_3_age = compute_stage_age(
-        #         params, root, project_info_filename, "COMPUTED_DATE_IN_STAGE_3_IN_PROGRESS", "COMPUTED_DAYS_IN_STAGE_3_IN_PROGRESS"
-        #     )
 
         previous_phase_updated = False
         for line in fileinput.input(os.path.join(root, project_info_filename), inplace=True):

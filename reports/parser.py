@@ -119,10 +119,11 @@ def record_timestamp(root, project_info_txt):
 
 
 def compute_phase_dwell(root, project_info_txt, param_key, phase_date, today=dt_today):
-    print(f'parser_112 phase_date: {repr(phase_date)}')
-    print(f'parser_112 phase_date: {type(phase_date)}')
-    print(f'parser_112 today: {repr(dt_today)}')
-    print(f'parser_112 today: {type(dt_today)}')
+    # TODO: Run with lines 122-125, (print(...)) commented out and remove if not broken.
+    # print(f'parser_112 phase_date: {repr(phase_date)}')
+    # print(f'parser_112 phase_date: {type(phase_date)}')
+    # print(f'parser_112 today: {repr(dt_today)}')
+    # print(f'parser_112 today: {type(dt_today)}')
     file_path = os.path.join(root, project_info_txt)
     updated_lines = []
     key_found = False

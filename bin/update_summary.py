@@ -34,8 +34,8 @@ dictConfig({
 from reports.parser import *
 from reports.summary import *
 
-sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-project_root = os.environ['PYTHONPATH']
+# sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+# project_root = os.environ['PYTHONPATH']
 datetime_today = dateutil.utils.today()
 
 

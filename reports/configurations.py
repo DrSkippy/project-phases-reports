@@ -1,19 +1,26 @@
-# USAGE:
-#
-#   cd /Users/s.hendrickson/Documents/OneDrive - F5, Inc
-#   python ~/Working/2023-08-23_project_visibility/bin/update_summary.py
-#   cat "./Project Folders/summary.csv"
-#
-import os
+"""
+USAGE:
 
-# TODO: convert path variables to relative/dynamic paths
+  cd /Users/s.hendrickson/Documents/OneDrive - F5, Inc
+  python ~/Working/2023-08-23_project_visibility/bin/update_summary.py
+  cat "./Project Folders/summary.csv"
+
 # Locations
 # SH Local Path: /Users/s.hendrickson/Documents/OneDrive - F5, Inc
 # KW Local Path: /Users/ke.wilson/Desktop/test_data_accel
-project_info_filename = "PROJECT_INFO.txt"
-projects_tree_root = "/Users/ke.wilson/Desktop/test_data_accel"
+"""
+
+import os
+from resources.path_utils import SystemInfo
+
+
+system_info = SystemInfo() # If Scott, then Scott's path. If Keelor, then options. Else, path from user input()
+projects_tree_root = system_info.return_system_info()
+
 project_folders_root = "Projects Folders"
+project_info_filename = "PROJECT_INFO.txt"
 projects_tree_project_folders = os.path.join(projects_tree_root, project_folders_root)
+
 # Files
 summary_path = os.path.join(projects_tree_project_folders, "summary.csv")
 data_product_links_path = os.path.join(projects_tree_project_folders, "data_product_links.md")
@@ -33,8 +40,6 @@ DATE_FMT = "%Y-%m-%d"
 These are the data elements to populate columns of the output csv for the status spreadsheet
   All-caps items are read from the project_info_file while normal case items are derived or computed.
 """
-
-#TODO: add columns from MetricsDefinition.csv
 
 project_params_dict = {
     "Phases": None,
@@ -164,17 +169,18 @@ project_phases = {
 # keep a reverse map for lookup
 index_project_phases = {v: k for k, v in project_phases.items()}
 
-phase_date_dict = {
-    "STAGE_0_IDEAS": None,
-    "STAGE_1_CHARTERING": None,
-    "STAGE_2_COMMITTED": None,
-    "STAGE_3_IN_PROGRESS": None,
-    "STAGE_4_ON_HOLD": None,
-    "STAGE_5_ROLLOUT": None,
-    "STAGE_6_COMPLETED": None,
-    "STAGE_7_MAINTENANCE": None,
-    "STAGE_9_AD_HOC": None
-}
+# TODO: run with phase_date_dict commented out and see if it breaks. If no, remove.
+# phase_date_dict = {
+#     "STAGE_0_IDEAS": None,
+#     "STAGE_1_CHARTERING": None,
+#     "STAGE_2_COMMITTED": None,
+#     "STAGE_3_IN_PROGRESS": None,
+#     "STAGE_4_ON_HOLD": None,
+#     "STAGE_5_ROLLOUT": None,
+#     "STAGE_6_COMPLETED": None,
+#     "STAGE_7_MAINTENANCE": None,
+#     "STAGE_9_AD_HOC": None
+# }
 
 # Ordering determined by Data Accelerator Analysts for Owners Reports etc.
 active_projects_order = [

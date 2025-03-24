@@ -34,6 +34,7 @@ projects_tree_project_folders = os.path.join(projects_tree_root, project_folders
 
 # Files
 summary_path = os.path.join(projects_tree_project_folders, "summary.csv")
+analytics_summary_path = os.path.join(projects_tree_project_folders, "analytics_summary.csv")
 data_product_links_path = os.path.join(projects_tree_project_folders, "data_product_links.md")
 owner_views_active_path = os.path.join(projects_tree_project_folders, "owner_views_active.md")
 owner_views_commit_path = os.path.join(projects_tree_project_folders, "owner_views_commit.md")

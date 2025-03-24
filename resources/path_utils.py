@@ -26,7 +26,8 @@ class SystemInfo:
             elif self.path_user == 'ke.wilson':
                 print("Enter 'test' to set target path to '/Users/ke.wilson/Desktop/test_data_accel'. \n"
                       "Enter 'OneDrive' to set target path to '/Users/ke.wilson/Library/CloudStorage/OneDrive-F5,Inc/Documents - Data Accelerator - Enterprise Analytics'. \n"
-                      "Enter 'other' to specify a target path.")
+                      "Enter 'other' to specify a target path. \n"
+                      "Enter 'cancel' to end the program.")
                 kw_path_input = input("Enter one of the following [test/OneDrive/other]: ")
                 if kw_path_input == 'test':
                     print("Path to projects directory set as: '/Users/ke.wilson/Desktop/test_data_accel'")
@@ -43,6 +44,9 @@ class SystemInfo:
                     kw_custom_path = input("Enter target path without quotations: ")
                     print(f"Path to projects directory set as: '{kw_custom_path}'")
                     return kw_custom_path
+                elif kw_path_input == 'cancel':
+                    print(f"You responded with '{kw_path_input}. The program will now end.")
+                    sys.exit("\n\nProgram terminated due to user input.")
                 else:
                     print(f"Invalid user input: '{kw_path_input}'.\nThe program will now end.")
                     sys.exit("\n\nProgram terminated due to user input.")

@@ -262,19 +262,7 @@ if __name__ == "__main__":
 
                     return stage_date
 
-
             # `def compute_stage_age(...)` was made obsolete by reports/parser.compute_phase_dwell() & archived in resources/vestigial_code.py
-
-        """
-        # TODO: Write statement to capture first stage. Fist stage should reflect start date
-        #           This can be done my taking minimum value in stage date dict
-        # 
-        # TODO: IF previous stage is hold, and if var`off_hold_date` is null then datetime.datetime.now()
-        #           Won't work for multiple holds
-        # 
-        # TODO: [FUTURE] build the `if project_phases[phase] == [int]:` into a class
-        """
-
 
         # Update the project info file with the previous phase
         if project_phases[phase] == 0:

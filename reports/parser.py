@@ -116,13 +116,28 @@ def record_timestamp(root, project_info_txt):
             project_info_file.writelines(updated_lines)
 
 
-def compute_phase_dwell(root, project_info_txt, param_key, phase_date, today=dt_today):
+def compute_stage_date(params, stage_key):
+    """
+    Compute the date for a given stage key in the params dictionary.
+    Returns (stage_date: datetime, needs_write: bool, value_to_write: str or None)
+    """
+    if params[stage_key] is None:
+        # return date as dt & str and flag for future write
+        stage_date = datetime.now()
+        params[stage_key] = stage_date.strftime(DATE_FMT)
+        return stage_date, True, stage_date.strftime(DATE_FMT)
+    else:
+        # Just parse, no write required
+        stage_date = datetime.strptime(params[stage_key][:10], DATE_FMT)
+        return stage_date, False, None
+
+
+def compute_phase_dwell(root, project_info_txt, param_key, phase_date, today):
     file_path = os.path.join(root, project_info_txt)
     updated_lines = []
     key_found = False
-
-    phase_datetime = datetime.combine(phase_date, time.min)     # parse_date(phase_date, datetime)
-    time_in_phase = dt_today - phase_datetime
+    phase_datetime = datetime.combine(phase_date, time.min)
+    time_in_phase = today - phase_datetime
     with open(file_path, "r") as project_info_file:
         for line in project_info_file:
             if line.startswith(f"{param_key}:"):
@@ -130,13 +145,9 @@ def compute_phase_dwell(root, project_info_txt, param_key, phase_date, today=dt_
                 key_found = True
             else:
                 updated_lines.append(line)
-
-        if not key_found:
-            updated_lines.append(f"{param_key}: {time_in_phase}\n")
-
-        with open(file_path, "w") as project_info_file:
-            project_info_file.writelines(updated_lines)
-
+    if not key_found:
+        updated_lines.append(f"{param_key}: {time_in_phase}\n")
+    return updated_lines
 
 def extract_params(root):
     """

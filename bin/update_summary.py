@@ -1,5 +1,6 @@
 import uuid
 import fileinput
+from datetime import datetime
 from logging.config import dictConfig
 # Can't remember why I included the sys.path.append(...) line below. Leaving as comment in case it's important
 # sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -57,6 +58,16 @@ if __name__ == "__main__":
         new_completion_time_minus_hold = None
         new_commit_to_completion_days = None
         new_charter_to_completion_days = None
+        new_stage_0_date = None
+        new_stage_1_date = None
+        new_stage_2_date = None
+        new_stage_3_date = None
+        new_stage_4_date = None
+        new_stage_5_date = None
+        new_stage_6_date = None
+        new_stage_7_date = None
+        new_stage_9_date = None
+
 
         # Process Project Info file
         with open(os.path.join(root, project_info_filename), "r") as project_info_file:
@@ -227,52 +238,115 @@ TODO: Scott has this set up as two blocks. The inner block, (e.g. `if project_ph
                 project_id = params["Project_ID"]
 
 
-            def write_to_project_info(root, project_info_filename, key, value):
-                """
-                Write a key and value pair to the file.
-
-                Args:
-                    root (str): The root directory for the file.
-                    project_info_filename (str): The name of the file where data will be written.
-                    key (str): The key being written.
-                    value (str): The value being written.
-                """
-                with open(os.path.join(root, project_info_filename), "a") as project_info_file:
-                    project_info_file.write(f"{key}: {value}\n")
-                logging.info(f"project_info_file.write: key == {repr(key)}, value == {repr(value)}")
-                logging.info(f"Wrote {key}: {value} to {project_info_filename}")
-
-
-            def compute_stage_date(params, root, project_info_filename, stage_key):
-                """
-                Compute the date for a given stage key in the params dictionary.
-
-                Args:
-                    params (dict): The dictionary holding stage data.
-                    root (str): The root directory for the file.
-                    project_info_filename (str): The name of the file where data will be written.
-                    stage_key (str): The key for the current stage date (e.g., "COMPUTED_DATE_IN_STAGE_X").
-
-                Returns:
-                    datetime.datetime: The computed or existing stage date.
-                """
-                if params[stage_key] is None:
-                    # Set the current date for the stage
-                    stage_date = datetime.now()
-                    params[stage_key] = stage_date.strftime(DATE_FMT)
-
-                    # Write the new computed date to the file
-                    write_to_project_info(root, project_info_filename, stage_key, stage_date.strftime(DATE_FMT))
-
-                    return stage_date
+            if project_phases[phase] == 0:
+                if params["COMPUTED_DATE_IN_STAGE_0_IDEAS"] is None:
+                    stage_0_date = datetime.now()
+                    params["COMPUTED_DATE_IN_STAGE_0_IDEAS"] = stage_0_date.strftime(DATE_FMT)
+                    new_stage_0_date = stage_0_date
                 else:
-                    # Parse the existing date from the params
-                    stage_date = datetime.strptime(params[stage_key][:10], DATE_FMT)
-                    logging.info(f"Existing date for {stage_key}: {stage_date}")
+                    stage_0_date = datetime.strptime(
+                        params["COMPUTED_DATE_IN_STAGE_0_IDEAS"][:10],
+                        DATE_FMT)
+                    dt_delta = date_today - stage_0_date
+                    params["COMPUTED_DAYS_IN_STAGE_0_IDEAS"] = dt_delta.days
 
-                    return stage_date
+            if project_phases[phase] == 1:
+                if params["COMPUTED_DATE_IN_STAGE_1_CHARTERING"] is None:
+                    stage_1_date = datetime.now()
+                    params["COMPUTED_DATE_IN_STAGE_1_CHARTERING"] = stage_1_date.strftime(DATE_FMT)
+                    new_stage_1_date = stage_1_date
+                else:
+                    stage_1_date = datetime.strptime(
+                        params["COMPUTED_DATE_IN_STAGE_1_CHARTERING"][:10],
+                        DATE_FMT)
+                    dt_delta = date_today - stage_1_date
+                    params["COMPUTED_DAYS_IN_STAGE_1_CHARTERING"] = dt_delta.days
 
-            # `def compute_stage_age(...)` was made obsolete by reports/parser.compute_phase_dwell() & archived in resources/vestigial_code.py
+            if project_phases[phase] == 2:
+                if params["COMPUTED_DATE_IN_STAGE_2_COMMITTED"] is None:
+                    stage_2_date = datetime.now()
+                    params["COMPUTED_DATE_IN_STAGE_2_COMMITTED"] = stage_2_date.strftime(DATE_FMT)
+                    new_stage_2_date = stage_2_date
+                else:
+                    stage_2_date = datetime.strptime(
+                        params["COMPUTED_DATE_IN_STAGE_2_COMMITTED"][:10],
+                        DATE_FMT)
+                    dt_delta = date_today - stage_2_date
+                    params["COMPUTED_DAYS_IN_STAGE_2_COMMITTED"] = dt_delta.days
+
+            if project_phases[phase] == 3:
+                if params["COMPUTED_DATE_IN_STAGE_3_IN_PROGRESS"] is None:
+                    stage_3_date = datetime.now()
+                    params["COMPUTED_DATE_IN_STAGE_3_IN_PROGRESS"] = stage_3_date.strftime(DATE_FMT)
+                    new_stage_3_date = stage_3_date
+                else:
+                    stage_3_date = datetime.strptime(
+                        params["COMPUTED_DATE_IN_STAGE_3_IN_PROGRESS"][:10],
+                        DATE_FMT)
+                    dt_delta = date_today - stage_3_date
+                    params["COMPUTED_DAYS_IN_STAGE_3_IN_PROGRESS"] = dt_delta.days
+
+            if project_phases[phase] == 4:
+                if params["COMPUTED_DATE_IN_STAGE_4_ON_HOLD"] is None:
+                    stage_4_date = datetime.now()
+                    params["COMPUTED_DATE_IN_STAGE_4_ON_HOLD"] = stage_4_date.strftime(DATE_FMT)
+                    new_stage_4_date = stage_4_date
+                else:
+                    stage_4_date = datetime.strptime(
+                        params["COMPUTED_DATE_IN_STAGE_4_ON_HOLD"][:10],
+                        DATE_FMT)
+                    dt_delta = date_today - stage_4_date
+                    params["COMPUTED_DAYS_IN_STAGE_4_ON_HOLD"] = dt_delta.days
+
+            if project_phases[phase] == 5:
+                if params["COMPUTED_DATE_IN_STAGE_5_ROLLOUT"] is None:
+                    stage_5_date = datetime.now()
+                    params["COMPUTED_DATE_IN_STAGE_5_ROLLOUT"] = stage_5_date.strftime(DATE_FMT)
+                    new_stage_5_date = stage_5_date
+                else:
+                    stage_5_date = datetime.strptime(
+                        params["COMPUTED_DATE_IN_STAGE_5_ROLLOUT"][:10],
+                        DATE_FMT)
+                    dt_delta = date_today - stage_5_date
+                    params["COMPUTED_DAYS_IN_STAGE_5_ROLLOUT"] = dt_delta.days
+
+            if project_phases[phase] == 6:
+                if params["COMPUTED_DATE_IN_STAGE_6_COMPLETED"] is None:
+                    stage_6_date = datetime.now()
+                    params["COMPUTED_DATE_IN_STAGE_6_COMPLETED"] = stage_6_date.strftime(DATE_FMT)
+                    new_stage_6_date = stage_6_date
+                else:
+                    stage_6_date = datetime.strptime(
+                        params["COMPUTED_DATE_IN_STAGE_6_COMPLETED"][:10],
+                        DATE_FMT)
+                    dt_delta = date_today - stage_6_date
+                    params["COMPUTED_DAYS_IN_STAGE_6_COMPLETED"] = dt_delta.days
+
+            if project_phases[phase] == 7:
+                if params["COMPUTED_DATE_IN_STAGE_7_MAINTENANCE"] is None:
+                    stage_7_date = datetime.now()
+                    params["COMPUTED_DATE_IN_STAGE_7_MAINTENANCE"] = stage_7_date.strftime(DATE_FMT)
+                    new_stage_7_date = stage_7_date
+                else:
+                    stage_7_date = datetime.strptime(
+                        params["COMPUTED_DATE_IN_STAGE_7_MAINTENANCE"][:10],
+                        DATE_FMT)
+                    dt_delta = date_today - stage_7_date
+                    params["COMPUTED_DAYS_IN_STAGE_7_MAINTENANCE"] = dt_delta.days
+
+            if project_phases[phase] == 9:
+                if params["COMPUTED_DATE_IN_STAGE_9_AD_HOC"] is None:
+                    stage_9_date = datetime.now()
+                    params["COMPUTED_DATE_IN_STAGE_9_AD_HOC"] = stage_9_date.strftime(DATE_FMT)
+                    new_stage_9_date = stage_9_date
+                else:
+                    stage_9_date = datetime.strptime(
+                        params["COMPUTED_DATE_IN_STAGE_9_AD_HOC"][:10],
+                        DATE_FMT)
+                    dt_delta = date_today - stage_9_date
+                    params["COMPUTED_DAYS_IN_STAGE_9_AD_HOC"] = dt_delta.days
+
+
 
         # Update the project info file with the previous phase
         if project_phases[phase] == 0:
@@ -486,6 +560,51 @@ TODO: Scott has this set up as two blocks. The inner block, (e.g. `if project_ph
             with open(os.path.join(root, project_info_filename), "a") as project_info_file:
                 project_info_file.write(
                     f'COMPUTED_CHARTER_TO_COMPLETION_DAYS: {new_charter_to_completion_days}\n')
+
+        if new_stage_0_date is not None:
+            with open(os.path.join(root, project_info_filename), "a") as project_info_file:
+                project_info_file.write(
+                    f"COMPUTED_DATE_IN_STAGE_0_IDEAS: {new_stage_0_date.strftime(DATE_FMT)}\n")
+        
+        if new_stage_1_date is not None:
+            with open(os.path.join(root, project_info_filename), "a") as project_info_file:
+                project_info_file.write(
+                    f"COMPUTED_DATE_IN_STAGE_1_CHARTERING: {new_stage_1_date.strftime(DATE_FMT)}\n")
+
+        if new_stage_2_date is not None:
+            with open(os.path.join(root, project_info_filename), "a") as project_info_file:
+                project_info_file.write(
+                    f"COMPUTED_DATE_IN_STAGE_2_COMMITTED: {new_stage_2_date.strftime(DATE_FMT)}\n")
+
+        if new_stage_3_date is not None:
+            with open(os.path.join(root, project_info_filename), "a") as project_info_file:
+                project_info_file.write(
+                    f"COMPUTED_DATE_IN_STAGE_3_IN_PROGRESS: {new_stage_3_date.strftime(DATE_FMT)}\n")
+
+        if new_stage_4_date is not None:
+            with open(os.path.join(root, project_info_filename), "a") as project_info_file:
+                project_info_file.write(
+                    f"COMPUTED_DATE_IN_STAGE_4_ON_HOLD: {new_stage_4_date.strftime(DATE_FMT)}\n")
+
+        if new_stage_5_date is not None:
+            with open(os.path.join(root, project_info_filename), "a") as project_info_file:
+                project_info_file.write(
+                    f"COMPUTED_DATE_IN_STAGE_5_ROLLOUT: {new_stage_5_date.strftime(DATE_FMT)}\n")
+
+        if new_stage_6_date is not None:
+            with open(os.path.join(root, project_info_filename), "a") as project_info_file:
+                project_info_file.write(
+                    f"COMPUTED_DATE_IN_STAGE_6_COMPLETED: {new_stage_6_date.strftime(DATE_FMT)}\n")
+
+        if new_stage_7_date is not None:
+            with open(os.path.join(root, project_info_filename), "a") as project_info_file:
+                project_info_file.write(
+                    f"COMPUTED_DATE_IN_STAGE_7_MAINTENANCE: {new_stage_7_date.strftime(DATE_FMT)}\n")
+
+        if new_stage_9_date is not None:
+            with open(os.path.join(root, project_info_filename), "a") as project_info_file:
+                project_info_file.write(
+                    f"COMPUTED_DATE_IN_STAGE_9_AD_HOC: {new_stage_9_date.strftime(DATE_FMT)}\n")
 
         project_records_list.append(params)
         create_reports(project_records_list)

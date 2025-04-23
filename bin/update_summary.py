@@ -91,6 +91,14 @@ if __name__ == "__main__":
 
             record_timestamp(root, project_info_filename)
 
+"""
+TODO: Scott has this set up as two blocks. The inner block, (e.g. `if project_phases[phase] >= 6:`),
+    reads/evaluates PROJECT_INFO.txt and the outer block, (e.g. `if new_project_end_date is not None:`) writes values
+    back to the PROJECT_INFO.txt file. The two are separated to avoid reading and writing at the same time. My statements
+    are written as part of the inner -- ensure that they are not writing to an open file slash move writes to outer block.
+    
+"""
+            # Scott
             if project_phases[phase] >= 6:
                 # Completed projects
                 if params["COMPUTED_PROJECT_END_DATE"] is None:
@@ -102,6 +110,7 @@ if __name__ == "__main__":
                         params["COMPUTED_PROJECT_END_DATE"][:10],
                         DATE_FMT)
 
+            # Scott
             if project_phases[phase] >= 3:
                 # In Progress projects
                 if params["COMPUTED_PROJECT_IN_PROGRESS_DATE"] is None:
@@ -120,6 +129,7 @@ if __name__ == "__main__":
                         dt_delta = timedelta(days=0)
                     params["COMPUTED_IN_PROGRESS_AGE_DAYS"] = dt_delta.days
 
+            # Scott
             if project_phases[phase] >= 1:
                 # Chartering - Active projects
                 if params["COMPUTED_PROJECT_START_DATE"] is None:
@@ -134,7 +144,7 @@ if __name__ == "__main__":
                     dt_delta = date_today - project_start_date
                     params["COMPUTED_AGE_DAYS"] = dt_delta.days
 
-            # COMPUTED_COMPLETION_TIME_DAYS
+            # COMPUTED_COMPLETION_TIME_DAYS KW
             if (params["COMPUTED_PROJECT_END_DATE"] is not None and
                     params["COMPUTED_PROJECT_START_DATE"] is not None):
                 end_date = datetime.strptime(params["COMPUTED_PROJECT_END_DATE"][:10], DATE_FMT)
@@ -149,7 +159,7 @@ if __name__ == "__main__":
             else:
                 logging.info("Missing values needed to Compute COMPUTED_COMPLETION_TIME_DAYS")
 
-            # COMPUTED_IN_PROGRESS_TO_COMPLETION_DAYS
+            # COMPUTED_IN_PROGRESS_TO_COMPLETION_DAYS KW
             if (params["COMPUTED_IN_PROGRESS_TO_COMPLETION_DAYS"] is None and
                     params["COMPUTED_PROJECT_END_DATE"] is not None and
                     params["COMPUTED_PROJECT_START_DATE"] is not None):
@@ -418,7 +428,7 @@ if __name__ == "__main__":
                     print(f'compute_phase_dwell(initial_phase_date) type: {type(initial_phase_date)}')
                     logging.error(f"Error parsing date")
 
-
+# TODO: Combine `previous_phase_updated` & `previous_phase_updated`
         previous_phase_updated = False
         for line in fileinput.input(os.path.join(root, project_info_filename), inplace=True):
             if line.startswith("COMPUTED_PREVIOUS_PHASE:"):
@@ -428,7 +438,7 @@ if __name__ == "__main__":
                 print(line, end='')
 
         # If the previous phase was not updated, it didn't exist. So, append it to the end of the file
-        if not previous_phase_updated:
+        previous_phase_updated:
             with open(os.path.join(root, project_info_filename), "a") as project_info_file:
                 project_info_file.write(f'COMPUTED_PREVIOUS_PHASE: {phase}\n')
 

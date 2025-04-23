@@ -86,12 +86,9 @@ def current_utc_datetime():
 
 def days_between_dates(start_date, end_date):
     """
-    Calculate the number of days between two dates. Returns 0 if invalid.
+    Calculate the number of days between two dates. Returns -999 if invalid.
     """
     if start_date and end_date:
         delta = end_date - start_date
         return max(delta.days, 0)
-    return 0
-
-
-
+    return -999

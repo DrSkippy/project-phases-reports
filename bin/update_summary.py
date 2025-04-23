@@ -8,7 +8,7 @@ from logging.config import dictConfig
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 # Import Project Module(s) Below
-from resources.date_utils import parse_date
+from resources.date_utils import parse_date, days_between_dates
 from reports.parser import *
 from reports.summary import *
 
@@ -69,6 +69,15 @@ if __name__ == "__main__":
         new_stage_6_date = None
         new_stage_7_date = None
         new_stage_9_date = None
+        new_stage_0_age = None
+        new_stage_1_age = None
+        new_stage_2_age = None
+        new_stage_3_age = None
+        new_stage_4_age = None
+        new_stage_5_age = None
+        new_stage_6_age = None
+        new_stage_7_age = None
+        new_stage_9_age = None
 
 
         # Process Project Info file
@@ -159,8 +168,8 @@ if __name__ == "__main__":
             # COMPUTED_COMPLETION_TIME_DAYS KW
             if (params["COMPUTED_PROJECT_END_DATE"] is not None and
                     params["COMPUTED_PROJECT_START_DATE"] is not None):
-                end_date = params["COMPUTED_PROJECT_END_DATE"][:10], DATE_FMT
-                start_date = params["COMPUTED_PROJECT_START_DATE"][:10], DATE_FMT
+                end_date = parse_date(params["COMPUTED_PROJECT_END_DATE"], 'datetime')
+                start_date = parse_date(params["COMPUTED_PROJECT_START_DATE"], 'datetime')
                 if params["COMPUTED_COMPLETION_TIME_DAYS"] is None:
                     completion_time_days = (end_date - start_date).days
                     params["COMPUTED_COMPLETION_TIME_DAYS"] = completion_time_days
@@ -175,8 +184,8 @@ if __name__ == "__main__":
             if (params["COMPUTED_IN_PROGRESS_TO_COMPLETION_DAYS"] is None and
                     params["COMPUTED_PROJECT_END_DATE"] is not None and
                     params["COMPUTED_PROJECT_START_DATE"] is not None):
-                end_date = params["COMPUTED_PROJECT_END_DATE"][:10], DATE_FMT
-                in_progress_date = params["COMPUTED_PROJECT_IN_PROGRESS_DATE"][:10], DATE_FMT
+                end_date = parse_date(params["COMPUTED_PROJECT_END_DATE"], 'datetime')
+                in_progress_date = parse_date(params["COMPUTED_PROJECT_IN_PROGRESS_DATE"], 'datetime')
                 days_progress_to_complete = (end_date - in_progress_date).days
                 params["COMPUTED_IN_PROGRESS_TO_COMPLETION_DAYS"] = days_progress_to_complete
                 new_days_progress_to_close = params["COMPUTED_IN_PROGRESS_TO_COMPLETION_DAYS"]
@@ -248,8 +257,9 @@ if __name__ == "__main__":
                     stage_0_date = datetime.strptime(
                         params["COMPUTED_DATE_IN_STAGE_0_IDEAS"][:10],
                         DATE_FMT)
-                    dt_delta = date_today - stage_0_date
-                    params["COMPUTED_DAYS_IN_STAGE_0_IDEAS"] = dt_delta.days
+                    dt_delta = days_between_dates(stage_0_date, date_today)
+                    params["COMPUTED_DAYS_IN_STAGE_0_IDEAS"] = dt_delta
+                    new_stage_0_age = dt_delta
 
             if project_phases[phase] == 1:
                 if params["COMPUTED_DATE_IN_STAGE_1_CHARTERING"] is None:
@@ -284,8 +294,9 @@ if __name__ == "__main__":
                     stage_3_date = datetime.strptime(
                         params["COMPUTED_DATE_IN_STAGE_3_IN_PROGRESS"][:10],
                         DATE_FMT)
-                    dt_delta = date_today - stage_3_date
-                    params["COMPUTED_DAYS_IN_STAGE_3_IN_PROGRESS"] = dt_delta.days
+                    dt_delta = days_between_dates(stage_3_date, date_today)
+                    params["COMPUTED_DAYS_IN_STAGE_3_IN_PROGRESS"] = dt_delta
+                    new_stage_3_age = dt_delta
 
             if project_phases[phase] == 4:
                 if params["COMPUTED_DATE_IN_STAGE_4_ON_HOLD"] is None:
@@ -412,6 +423,11 @@ if __name__ == "__main__":
                 project_info_file.write(
                     f"COMPUTED_DATE_IN_STAGE_0_IDEAS: {new_stage_0_date.strftime(DATE_FMT)}\n")
 
+        if new_stage_0_age is not None:
+            with open(os.path.join(root, project_info_filename), "a") as project_info_file:
+                project_info_file.write(
+                    f"COMPUTED_DAYS_IN_STAGE_0_IDEAS: {new_stage_0_age}\n")
+
         if new_stage_1_date is not None:
             with open(os.path.join(root, project_info_filename), "a") as project_info_file:
                 project_info_file.write(
@@ -426,6 +442,11 @@ if __name__ == "__main__":
             with open(os.path.join(root, project_info_filename), "a") as project_info_file:
                 project_info_file.write(
                     f"COMPUTED_DATE_IN_STAGE_3_IN_PROGRESS: {new_stage_3_date.strftime(DATE_FMT)}\n")
+
+        if new_stage_3_age is not None:
+            with open(os.path.join(root, project_info_filename), "a") as project_info_file:
+                project_info_file.write(
+                    f"COMPUTED_DAYS_IN_STAGE_3_IN_PROGRESS: {new_stage_0_age}\n")
 
         if new_stage_4_date is not None:
             with open(os.path.join(root, project_info_filename), "a") as project_info_file:

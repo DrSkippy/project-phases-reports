@@ -1,9 +1,11 @@
+import sys
+import os
 import uuid
 import fileinput
 from datetime import datetime
 from logging.config import dictConfig
 # Can't remember why I included the sys.path.append(...) line below. Leaving as comment in case it's important
-# sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 # Import Project Module(s) Below
 from resources.date_utils import parse_date
@@ -101,15 +103,15 @@ if __name__ == "__main__":
                 params["COMPUTED_PREVIOUS_PHASE"] = phase
 
             record_timestamp(root, project_info_filename)
-
-"""
-TODO: Scott has this set up as two blocks. The inner block, (e.g. `if project_phases[phase] >= 6:`),
-    reads/evaluates PROJECT_INFO.txt and the outer block, (e.g. `if new_project_end_date is not None:`) writes values
-    back to the PROJECT_INFO.txt file. The two are separated to avoid reading and writing at the same time. My statements
-    are written as part of the inner -- ensure that they are not writing to an open file slash move writes to outer block.
-    
-"""
-            # Scott
+#
+# """
+# TODO: Scott has this set up as two blocks. The inner block, (e.g. `if project_phases[phase] >= 6:`),
+#     reads/evaluates PROJECT_INFO.txt and the outer block, (e.g. `if new_project_end_date is not None:`) writes values
+#     back to the PROJECT_INFO.txt file. The two are separated to avoid reading and writing at the same time. My statements
+#     are written as part of the inner -- ensure that they are not writing to an open file slash move writes to outer block.
+#
+# """
+#             # Scott
             if project_phases[phase] >= 6:
                 # Completed projects
                 if params["COMPUTED_PROJECT_END_DATE"] is None:
@@ -118,8 +120,7 @@ TODO: Scott has this set up as two blocks. The inner block, (e.g. `if project_ph
                     new_project_end_date = params["COMPUTED_PROJECT_END_DATE"]
                 else:
                     date_today = datetime.strptime(
-                        params["COMPUTED_PROJECT_END_DATE"][:10],
-                        DATE_FMT)
+                        params["COMPUTED_PROJECT_END_DATE"][:10], DATE_FMT)
 
             # Scott
             if project_phases[phase] >= 3:
@@ -158,8 +159,8 @@ TODO: Scott has this set up as two blocks. The inner block, (e.g. `if project_ph
             # COMPUTED_COMPLETION_TIME_DAYS KW
             if (params["COMPUTED_PROJECT_END_DATE"] is not None and
                     params["COMPUTED_PROJECT_START_DATE"] is not None):
-                end_date = datetime.strptime(params["COMPUTED_PROJECT_END_DATE"][:10], DATE_FMT)
-                start_date = datetime.strptime(params["COMPUTED_PROJECT_START_DATE"][:10], DATE_FMT)
+                end_date = params["COMPUTED_PROJECT_END_DATE"][:10], DATE_FMT
+                start_date = params["COMPUTED_PROJECT_START_DATE"][:10], DATE_FMT
                 if params["COMPUTED_COMPLETION_TIME_DAYS"] is None:
                     completion_time_days = (end_date - start_date).days
                     params["COMPUTED_COMPLETION_TIME_DAYS"] = completion_time_days
@@ -174,8 +175,8 @@ TODO: Scott has this set up as two blocks. The inner block, (e.g. `if project_ph
             if (params["COMPUTED_IN_PROGRESS_TO_COMPLETION_DAYS"] is None and
                     params["COMPUTED_PROJECT_END_DATE"] is not None and
                     params["COMPUTED_PROJECT_START_DATE"] is not None):
-                end_date = datetime.strptime(params["COMPUTED_PROJECT_END_DATE"][:10], DATE_FMT)
-                in_progress_date = datetime.strptime(params["COMPUTED_PROJECT_IN_PROGRESS_DATE"][:10], DATE_FMT)
+                end_date = params["COMPUTED_PROJECT_END_DATE"][:10], DATE_FMT
+                in_progress_date = params["COMPUTED_PROJECT_IN_PROGRESS_DATE"][:10], DATE_FMT
                 days_progress_to_complete = (end_date - in_progress_date).days
                 params["COMPUTED_IN_PROGRESS_TO_COMPLETION_DAYS"] = days_progress_to_complete
                 new_days_progress_to_close = params["COMPUTED_IN_PROGRESS_TO_COMPLETION_DAYS"]
@@ -347,161 +348,6 @@ TODO: Scott has this set up as two blocks. The inner block, (e.g. `if project_ph
                     params["COMPUTED_DAYS_IN_STAGE_9_AD_HOC"] = dt_delta.days
 
 
-
-        # Update the project info file with the previous phase
-        if project_phases[phase] == 0:
-            parameter_date_key = "COMPUTED_DATE_IN_STAGE_0_IDEAS"
-            parameter_date_key_verbose = params["COMPUTED_DATE_IN_STAGE_0_IDEAS"]
-            parameter_date_key_datetime = parse_date(parameter_date_key_verbose, 'datetime')
-
-            parameter_age_key = "COMPUTED_DAYS_IN_STAGE_0_IDEAS"
-            stage_0_date = compute_stage_date(params, root, project_info_filename, parameter_date_key)
-
-            if parameter_date_key_datetime is not None:
-                initial_phase_date = parameter_date_key_datetime
-                try:
-                    compute_phase_dwell(root, project_info_filename, parameter_age_key, initial_phase_date)
-                except ValueError as e:
-                    print(f'compute_phase_dwell(initial_phase_date): {repr(initial_phase_date)}')
-                    print(f'compute_phase_dwell(initial_phase_date) type: {type(initial_phase_date)}')
-                    logging.error(f"Error parsing date")
-
-        if project_phases[phase] == 1:
-            parameter_date_key = "COMPUTED_DATE_IN_STAGE_1_CHARTERING"
-            parameter_date_key_verbose = params["COMPUTED_DATE_IN_STAGE_1_CHARTERING"]
-            parameter_date_key_datetime = parse_date(parameter_date_key_verbose, 'datetime')
-
-            parameter_age_key = "COMPUTED_DAYS_IN_STAGE_1_CHARTERING"
-            stage_1_date = compute_stage_date(params, root, project_info_filename, parameter_date_key)
-
-            if parameter_date_key_datetime is not None:
-                initial_phase_date = parameter_date_key_datetime
-                try:
-                    compute_phase_dwell(root, project_info_filename, parameter_age_key, initial_phase_date)
-                except ValueError as e:
-                    print(f'compute_phase_dwell(initial_phase_date): {repr(initial_phase_date)}')
-                    print(f'compute_phase_dwell(initial_phase_date) type: {type(initial_phase_date)}')
-                    logging.error(f"Error parsing date")
-
-        if project_phases[phase] == 2:
-            parameter_date_key = "COMPUTED_DATE_IN_STAGE_2_COMMITTED"
-            parameter_date_key_verbose = params["COMPUTED_DATE_IN_STAGE_2_COMMITTED"]
-            parameter_date_key_datetime = parse_date(parameter_date_key_verbose, 'datetime')
-
-            parameter_age_key = "COMPUTED_DAYS_IN_STAGE_2_COMMITTED"
-            stage_2_date = compute_stage_date(params, root, project_info_filename, parameter_date_key)
-
-            if parameter_date_key_datetime is not None:
-                initial_phase_date = parameter_date_key_datetime
-                try:
-                    compute_phase_dwell(root, project_info_filename, parameter_age_key, initial_phase_date)
-                except ValueError as e:
-                    print(f'compute_phase_dwell(initial_phase_date): {repr(initial_phase_date)}')
-                    print(f'compute_phase_dwell(initial_phase_date) type: {type(initial_phase_date)}')
-                    logging.error(f"Error parsing date")
-
-        if project_phases[phase] == 3:
-            parameter_date_key = "COMPUTED_DATE_IN_STAGE_3_IN_PROGRESS"
-            parameter_date_key_verbose = params["COMPUTED_DATE_IN_STAGE_3_IN_PROGRESS"]
-            parameter_date_key_datetime = parse_date(parameter_date_key_verbose, 'datetime')
-
-            parameter_age_key = "COMPUTED_DAYS_IN_STAGE_3_IN_PROGRESS"
-            stage_3_date = compute_stage_date(params, root, project_info_filename, parameter_date_key)
-
-            if parameter_date_key_datetime is not None:
-                initial_phase_date = parameter_date_key_datetime
-                try:
-                    compute_phase_dwell(root, project_info_filename, parameter_age_key, initial_phase_date)
-                except ValueError as e:
-                    print(f'compute_phase_dwell(initial_phase_date): {repr(initial_phase_date)}')
-                    print(f'compute_phase_dwell(initial_phase_date) type: {type(initial_phase_date)}')
-                    logging.error(f"Error parsing date")
-
-        if project_phases[phase] == 4:
-            parameter_date_key = "COMPUTED_DATE_IN_STAGE_4_ON_HOLD"
-            parameter_date_key_verbose = params["COMPUTED_DATE_IN_STAGE_4_ON_HOLD"]
-            parameter_date_key_datetime = parse_date(parameter_date_key_verbose, 'datetime')
-
-            parameter_age_key = "COMPUTED_DAYS_IN_STAGE_4_ON_HOLD"
-            stage_4_date = compute_stage_date(params, root, project_info_filename, parameter_date_key)
-
-            if parameter_date_key_datetime is not None:
-                initial_phase_date = parameter_date_key_datetime
-                try:
-                    compute_phase_dwell(root, project_info_filename, parameter_age_key, initial_phase_date)
-                except ValueError as e:
-                    print(f'compute_phase_dwell(initial_phase_date): {repr(initial_phase_date)}')
-                    print(f'compute_phase_dwell(initial_phase_date) type: {type(initial_phase_date)}')
-                    logging.error(f"Error parsing date")
-
-        if project_phases[phase] == 5:
-            parameter_date_key = "COMPUTED_DATE_IN_STAGE_5_ROLLOUT"
-            parameter_date_key_verbose = params["COMPUTED_DATE_IN_STAGE_5_ROLLOUT"]
-            parameter_date_key_datetime = parse_date(parameter_date_key_verbose, 'datetime')
-
-            parameter_age_key = "COMPUTED_DAYS_IN_STAGE_5_ROLLOUT"
-            stage_2_date = compute_stage_date(params, root, project_info_filename, parameter_date_key)
-
-            if parameter_date_key_datetime is not None:
-                initial_phase_date = parameter_date_key_datetime
-                try:
-                    compute_phase_dwell(root, project_info_filename, parameter_age_key, initial_phase_date)
-                except ValueError as e:
-                    print(f'compute_phase_dwell(initial_phase_date): {repr(initial_phase_date)}')
-                    print(f'compute_phase_dwell(initial_phase_date) type: {type(initial_phase_date)}')
-                    logging.error(f"Error parsing date")
-
-        if project_phases[phase] == 6:
-            parameter_date_key = "COMPUTED_DATE_IN_STAGE_6_COMPLETED"
-            parameter_date_key_verbose = params["COMPUTED_DATE_IN_STAGE_6_COMPLETED"]
-            parameter_date_key_datetime = parse_date(parameter_date_key_verbose, 'datetime')
-
-            parameter_age_key = "COMPUTED_DAYS_IN_STAGE_6_COMPLETED"
-            stage_6_date = compute_stage_date(params, root, project_info_filename, parameter_date_key)
-
-            if parameter_date_key_datetime is not None:
-                initial_phase_date = parameter_date_key_datetime
-                try:
-                    compute_phase_dwell(root, project_info_filename, parameter_age_key, initial_phase_date)
-                except ValueError as e:
-                    print(f'compute_phase_dwell(initial_phase_date): {repr(initial_phase_date)}')
-                    print(f'compute_phase_dwell(initial_phase_date) type: {type(initial_phase_date)}')
-                    logging.error(f"Error parsing date")
-
-        if project_phases[phase] == 7:
-            parameter_date_key = "COMPUTED_DATE_IN_STAGE_7_MAINTENANCE"
-            parameter_date_key_verbose = params["COMPUTED_DATE_IN_STAGE_7_MAINTENANCE"]
-            parameter_date_key_datetime = parse_date(parameter_date_key_verbose, 'datetime')
-
-            parameter_age_key = "COMPUTED_DAYS_IN_STAGE_7_MAINTENANCE"
-            stage_7_date = compute_stage_date(params, root, project_info_filename, parameter_date_key)
-
-            if parameter_date_key_datetime is not None:
-                initial_phase_date = parameter_date_key_datetime
-                try:
-                    compute_phase_dwell(root, project_info_filename, parameter_age_key, initial_phase_date)
-                except ValueError as e:
-                    print(f'compute_phase_dwell(initial_phase_date): {repr(initial_phase_date)}')
-                    print(f'compute_phase_dwell(initial_phase_date) type: {type(initial_phase_date)}')
-                    logging.error(f"Error parsing date")
-
-        if project_phases[phase] == 9:
-            parameter_date_key = "COMPUTED_DATE_IN_STAGE_9_AD_HOC"
-            parameter_date_key_verbose = params["COMPUTED_DATE_IN_STAGE_9_AD_HOC"]
-            parameter_date_key_datetime = parse_date(parameter_date_key_verbose, 'datetime')
-
-            parameter_age_key = "COMPUTED_DAYS_IN_STAGE_9_AD_HOC"
-            stage_9_date = compute_stage_date(params, root, project_info_filename, parameter_date_key)
-
-            if parameter_date_key_datetime is not None:
-                initial_phase_date = parameter_date_key_datetime
-                try:
-                    compute_phase_dwell(root, project_info_filename, parameter_age_key, initial_phase_date)
-                except ValueError as e:
-                    print(f'compute_phase_dwell(initial_phase_date): {repr(initial_phase_date)}')
-                    print(f'compute_phase_dwell(initial_phase_date) type: {type(initial_phase_date)}')
-                    logging.error(f"Error parsing date")
-
 # TODO: Combine `previous_phase_updated` & `previous_phase_updated`
         previous_phase_updated = False
         for line in fileinput.input(os.path.join(root, project_info_filename), inplace=True):
@@ -512,7 +358,7 @@ TODO: Scott has this set up as two blocks. The inner block, (e.g. `if project_ph
                 print(line, end='')
 
         # If the previous phase was not updated, it didn't exist. So, append it to the end of the file
-        previous_phase_updated:
+        if not previous_phase_updated:
             with open(os.path.join(root, project_info_filename), "a") as project_info_file:
                 project_info_file.write(f'COMPUTED_PREVIOUS_PHASE: {phase}\n')
 
@@ -565,7 +411,7 @@ TODO: Scott has this set up as two blocks. The inner block, (e.g. `if project_ph
             with open(os.path.join(root, project_info_filename), "a") as project_info_file:
                 project_info_file.write(
                     f"COMPUTED_DATE_IN_STAGE_0_IDEAS: {new_stage_0_date.strftime(DATE_FMT)}\n")
-        
+
         if new_stage_1_date is not None:
             with open(os.path.join(root, project_info_filename), "a") as project_info_file:
                 project_info_file.write(

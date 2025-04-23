@@ -4,17 +4,13 @@
 ├── bin
 │   ├── email_address_generator.py
 │   ├── read_docx.py
-│   ├── update_summary.py
-│   ├── update_summary_backup.py
-│   └── update_summary_trunc.py
+│   └── update_summary.py
 ├── create_directory_tree.sh
 ├── directory_tree.txt
 ├── metrics
 │   ├── __init__.py
 │   └── display.py
 ├── poetry.lock
-├── project_info_files
-│   └── PROJECT_INFO.txt
 ├── pyproject.toml
 ├── reports
 │   ├── __init__.py
@@ -29,4 +25,4 @@
 └── tests
     └── __init__.py
 
-7 directories, 23 files
+6 directories, 20 files

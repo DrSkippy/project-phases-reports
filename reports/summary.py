@@ -1,4 +1,5 @@
 import csv
+import os
 import datetime
 import logging
 from collections import defaultdict
@@ -108,6 +109,7 @@ def synthesize_owner_block(project_records_list, owner, phase_filter='active', p
     ret = ""
     result = [f"## {owner:}\n\n"]
     counts = defaultdict(lambda: 0)
+    logging.info(f"Synthesize Owner Block: project_owner_key={project_owner_key} owner={owner}")
 
     if isinstance(phase_filter, list):
         if isinstance(phase_filter[0], int):

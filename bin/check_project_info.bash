@@ -40,4 +40,11 @@ echo
 echo "Files with NOTES formatting problems:"
 grep "^NOTE" "${BASE_DIR}"/*/*/PROJECT_INFO.txt | grep -v -E "NOTES_[0-9]{4}-[0-9]{2}-[0-9]{2}_?[0-9]?:" | cut -d":" -f1,2 
 
+echo
+echo "Creating links to OneDrive-hosted Charter Documents for each Project:"
+
+CHTR_BASE="https://f5.sharepoint.com/:w:/r/sites/salesandmktg/mktg/Enterprise%20Analytics/Shared%20Documents/Projects%20Folders/"
+#   1-Chartering/APEX%20Test%20Log%20Analysis-All%20logs/Project%20Charter%20Template.docx
+find  "${BASE_DIR}" "arter*.doc" 
+
 echo "DONE"

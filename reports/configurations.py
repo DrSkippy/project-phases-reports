@@ -1,22 +1,45 @@
-# USAGE:
-#
-#   cd /Users/s.hendrickson/Documents/OneDrive - F5, Inc
-#   python ~/Working/2023-08-23_project_visibility/bin/update_summary.py
-#   cat "./Project Folders/summary.csv"
-#
-import os
+"""
+USAGE:
+
+  cd /Users/s.hendrickson/Documents/OneDrive - F5, Inc
+  python ~/Working/2023-08-23_project_visibility/bin/update_summary.py
+  cat "./Project Folders/summary.csv"
 
 # TODO: convert path variables to relative/dynamic paths
 # Locations
-project_info_filename = "PROJECT_INFO.txt"
-projects_tree_root = "/Users/s.hendrickson/Documents/OneDrive - F5, Inc"
+# SH Local Path: /Users/s.hendrickson/Documents/OneDrive - F5, Inc
+# KW Local Path: /Users/ke.wilson/Desktop/test_data_accel
+"""
+
+import os
+
+# Import Project Module(s) Below
+from resources.path_utils import SystemInfo
+
+"""
+USAGE: 
+    Path from SystemInfo() class is based on `os.environ['USER']` and the username following '/Users/' in system path.
+    If `os.environ['USER']` & `/Users/[username]` match, AND the user is...
+    ...Scott, then Scott's path: "/Users/s.hendrickson/Documents/OneDrive - F5, Inc"
+    ...Keelor, then record option from user input:
+          ...test: "/Users/ke.wilson/Desktop/test_data_accel"
+          ...OneDrive: "/Users/ke.wilson/Library/CloudStorage/OneDrive-F5,Inc/Documents - Data Accelerator - Enterprise Analytics"
+          ...other: path from user input()
+    ...anyone else: path from user input()
+"""
+
+system_info = SystemInfo()
+projects_tree_root = system_info.return_system_info()
+
 project_folders_root = "Projects Folders"
+project_info_filename = "PROJECT_INFO.txt"
 projects_tree_project_folders = os.path.join(projects_tree_root, project_folders_root)
 sharepoint_url = "https://f5.sharepoint.com/"
 sharepoint_path = ":w:/r/sites/salesandmktg/mktg/Enterprise Analytics/Shared Documents/Projects Folders/"
 
 # Files
 summary_path = os.path.join(projects_tree_project_folders, "summary.csv")
+analytics_summary_path = os.path.join(projects_tree_project_folders, "analytics_summary.csv")
 data_product_links_path = os.path.join(projects_tree_project_folders, "data_product_links.md")
 owner_views_active_path = os.path.join(projects_tree_project_folders, "owner_views_active.md")
 owner_views_commit_path = os.path.join(projects_tree_project_folders, "owner_views_commit.md")
@@ -26,13 +49,15 @@ stakeholders_views_active_path = os.path.join(projects_tree_project_folders, "st
 title_phase_views_path = os.path.join(projects_tree_project_folders, "phase_views.md")
 stakeholder_list_path = os.path.join(projects_tree_project_folders, "stakeholder_list.txt")
 
-DATE_FMT = "%Y-%m-%d"
+
 NOTES_DELIMITER = "**;**"
+DATE_FMT = "%Y-%m-%d"
 
 """
 These are the data elements to populate columns of the output csv for the status spreadsheet
   All-caps items are read from the project_info_file while normal case items are derived or computed.
 """
+
 project_params_dict = {
     "Phases": None,
     "Project": None,
@@ -53,7 +78,38 @@ project_params_dict = {
     "COMPUTED_PROJECT_END_DATE": None,
     "COMPUTED_PREVIOUS_PHASE": None,
     "COMMIT_JUSTIFICATIONS": None,
-    "CharterLink": None
+    "CharterLink": None,
+# New Columns
+    # MIN Date in Stage
+    "COMPUTED_DATE_IN_STAGE_0_IDEAS": None,
+    "COMPUTED_DATE_IN_STAGE_1_CHARTERING": None,
+    "COMPUTED_DATE_IN_STAGE_2_COMMITTED": None,
+    "COMPUTED_DATE_IN_STAGE_3_IN_PROGRESS": None,
+    "COMPUTED_DATE_IN_STAGE_4_ON_HOLD": None,
+    "COMPUTED_DATE_IN_STAGE_5_ROLLOUT": None,
+    "COMPUTED_DATE_IN_STAGE_6_COMPLETED": None,
+    "COMPUTED_DATE_IN_STAGE_7_MAINTENANCE": None,
+    "COMPUTED_DATE_IN_STAGE_9_AD_HOC": None,
+    # Days In Stage
+    "COMPUTED_DAYS_IN_STAGE_0_IDEAS": None,
+    "COMPUTED_DAYS_IN_STAGE_1_CHARTERING": None,
+    "COMPUTED_DAYS_IN_STAGE_2_COMMITTED": None,
+    "COMPUTED_DAYS_IN_STAGE_3_IN_PROGRESS": None,
+    "COMPUTED_DAYS_IN_STAGE_4_ON_HOLD": None,
+    "COMPUTED_DAYS_IN_STAGE_5_ROLLOUT": None,
+    "COMPUTED_DAYS_IN_STAGE_6_COMPLETED": None,
+    "COMPUTED_DAYS_IN_STAGE_7_MAINTENANCE": None,
+    "COMPUTED_DAYS_IN_STAGE_9_AD_HOC": None,
+    # Days Between Stages
+    "COMPUTED_COMPLETION_TIME_DAYS": None,
+    "COMPUTED_TIME_ON_HOLD_DAYS": None,
+    "COMPUTED_IN_PROGRESS_TO_COMPLETION_DAYS": None,
+    "COMPUTED_COMPLETION_TIME_MINUS_HOLD_DAYS": None,
+    "COMPUTED_COMMIT_TO_COMPLETION_DAYS": None,
+    "COMPUTED_CHARTER_TO_COMPLETION_DAYS": None,
+# Metadata
+    "Project_ID": None,
+    "Report_Date": None,
 }
 
 """
@@ -81,8 +137,38 @@ name_field_map = {
     "Project Previous Phase": "COMPUTED_PROJECT_PREVIOUS_PHASE_DATE",
     "Project End Date": "COMPUTED_PROJECT_END_DATE",
     "Commit Justification": "COMMIT_JUSTIFICATIONS",
-    "CharterLink": "CharterLink"
+#New Columns
+    # MIN Date in Stage
+    "Stage 0 Ideas Date": "COMPUTED_DATE_IN_STAGE_0_IDEAS",
+    "Stage 1 Chartering Date": "COMPUTED_DATE_IN_STAGE_1_CHARTERING",
+    "Stage 2 Committed Date": "COMPUTED_DATE_IN_STAGE_2_COMMITTED",
+    "Stage 3 In Progress Date": "COMPUTED_DATE_IN_STAGE_3_IN_PROGRESS",
+    "Stage 4 On Hold Date": "COMPUTED_DATE_IN_STAGE_4_ON_HOLD",
+    "Stage 5 Rollout Date": "COMPUTED_DATE_IN_STAGE_5_ROLLOUT",
+    "Stage 6 Completed Date": "COMPUTED_DATE_IN_STAGE_6_COMPLETED",
+    "Stage 7 Maintenance Date": "COMPUTED_DATE_IN_STAGE_7_MAINTENANCE",
+    "Stage 9 Ad Hoc Date": "COMPUTED_DATE_IN_STAGE_9_AD_HOC",
+    # Days In Stage
+    "Stage 0 Ideas Age": "COMPUTED_DAYS_IN_STAGE_0_IDEAS",
+    "Stage 1 Chartering Age": "COMPUTED_DAYS_IN_STAGE_1_CHARTERING",
+    "Stage 2 Committed Age": "COMPUTED_DAYS_IN_STAGE_2_COMMITTED",
+    "Stage 3 In Progress Age": "COMPUTED_DAYS_IN_STAGE_3_IN_PROGRESS",
+    "Stage 4 On Hold Age": "COMPUTED_DAYS_IN_STAGE_4_ON_HOLD",
+    "Stage 5 Rollout Age": "COMPUTED_DAYS_IN_STAGE_5_ROLLOUT",
+    "Stage 6 Completed Age": "COMPUTED_DAYS_IN_STAGE_6_COMPLETED",
+    "Stage 7 Maintenance Age": "COMPUTED_DAYS_IN_STAGE_7_MAINTENANCE",
+    "Stage 9 Ad Hoc Age": "COMPUTED_DAYS_IN_STAGE_9_AD_HOC",
+    # Days Between Stages
+    "Days to Completion": "COMPUTED_COMPLETION_TIME_DAYS",
+    "Days on Hold": "COMPUTED_TIME_ON_HOLD_DAYS",
+    "Days In Progress to Complete": "COMPUTED_IN_PROGRESS_TO_COMPLETION_DAYS",
+    "Days to Completion less On Hold": "COMPUTED_COMPLETION_TIME_MINUS_HOLD_DAYS",
+    "Days Commit to Completion": "COMPUTED_COMMIT_TO_COMPLETION_DAYS",
+    # Metadata
+    "Project ID": "Project_ID",
+    "Report Date": "Report_Date"
 }
+
 # keep a reverse map for lookup
 field_name_map = {v: k for k, v in name_field_map.items()}
 

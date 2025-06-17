@@ -1,8 +1,13 @@
 import logging
-import datetime
+import dateutil.utils
+from datetime import datetime, time
 import re
 from urllib.parse import quote
+# Import Project Module(s) Below
 from reports.configurations import *
+
+
+dt_today = dateutil.utils.today()
 
 def normalize_note_date(note_line):
     """
@@ -42,7 +47,7 @@ def normalize_note_date(note_line):
             logging.error(f"ERROR: Note date is not in yyyy-mm-dd format: {head}")
 
     try:
-        d = datetime.datetime.strptime(conforming_head_date, "%Y-%m-%d")
+        d = datetime.strptime(conforming_head_date, "%Y-%m-%d")
     except ValueError:
         logging.error(f"ERROR: Invalid date ({conforming_head_date})")
 
@@ -85,6 +90,65 @@ def parse_project_info(project_info_file):
     return params_dict
 
 
+def record_timestamp(root, project_info_txt):
+    timestamp_key = "Report_Date"
+    timestamp_value = datetime.now().strftime(DATE_FMT)
+
+    file_path = os.path.join(root, project_info_txt)
+    updated_lines = []
+    key_found = False
+
+    with open(file_path, "r") as project_info_file:
+        for line in project_info_file:
+            if line.startswith(f"{timestamp_key}:"):
+                # Overwrite existing timestamp key in updated_line list
+                updated_lines.append(f"{timestamp_key}: {timestamp_value}\n")
+                key_found = True
+            else:
+                updated_lines.append(line)
+
+        # If key not found, append to file
+        if not key_found:
+            updated_lines.append(f"{timestamp_key}: {timestamp_value}\n")
+
+        # Write updated lines from list back to the file
+        with open(file_path, "w") as project_info_file:
+            project_info_file.writelines(updated_lines)
+
+
+def compute_stage_date(params, stage_key):
+    """
+    Compute the date for a given stage key in the params dictionary.
+    Returns (stage_date: datetime, needs_write: bool, value_to_write: str or None)
+    """
+    if params[stage_key] is None:
+        # return date as dt & str and flag for future write
+        stage_date = datetime.now()
+        params[stage_key] = stage_date.strftime(DATE_FMT)
+        return stage_date, True, stage_date.strftime(DATE_FMT)
+    else:
+        # Just parse, no write required
+        stage_date = datetime.strptime(params[stage_key][:10], DATE_FMT)
+        return stage_date, False, None
+
+
+def compute_phase_dwell(root, project_info_txt, param_key, phase_date, today):
+    file_path = os.path.join(root, project_info_txt)
+    updated_lines = []
+    key_found = False
+    phase_datetime = datetime.combine(phase_date, time.min)
+    time_in_phase = today - phase_datetime
+    with open(file_path, "r") as project_info_file:
+        for line in project_info_file:
+            if line.startswith(f"{param_key}:"):
+                updated_lines.append(f"{param_key}: {time_in_phase}\n")
+                key_found = True
+            else:
+                updated_lines.append(line)
+    if not key_found:
+        updated_lines.append(f"{param_key}: {time_in_phase}\n")
+    return updated_lines
+
 def extract_params(root):
     """
     Extract phase and project names for the file path.
@@ -99,7 +163,7 @@ def create_charter_link(root, dirs, files):
     """
     Create a link to the charter file.
     """
-    res = [] # list of urls to charter files in directory
+    res = []  # list of urls to charter files in directory
     for file in files:
         if file.endswith(".docx") and "charter" in file.lower():
             names = extract_params(root)
@@ -110,3 +174,6 @@ def create_charter_link(root, dirs, files):
                 res.append(url)
     return res
 
+    # Log extracted phase and project
+    logging.info(f"Extracted phase: {names[2]}, project: {names[3]}")
+    return names[2], names[3]

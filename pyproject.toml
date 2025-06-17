@@ -8,6 +8,11 @@ readme = "README.md"
 [tool.poetry.dependencies]
 python = "^3.10"
 docx2txt = "^0.8"
+uuid = "^1.30"
+python-dateutil = "^2.9.0.post0"
+pathlib = "^1.0.1"
+pandas = "^2.3.0"
+dateutils = "^0.6.12"
 
 
 [build-system]

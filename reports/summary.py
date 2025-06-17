@@ -1,9 +1,11 @@
 import csv
 import os
-import datetime
 import logging
 from collections import defaultdict
+from datetime import datetime, timedelta
+import pandas as pd
 
+# Import Project Module(s) Below
 from reports.configurations import *
 
 
@@ -85,7 +87,7 @@ def recent_notes(notes_text, recent_days=400, limit=200):
     """
     notes = [x.strip()[6:] for x in notes_text.split(NOTES_DELIMITER)]
     # check for recent notes
-    recent = datetime.datetime.now() - datetime.timedelta(days=recent_days)
+    recent = datetime.now() - timedelta(days=recent_days)
     notes_list = []
     for count, note in enumerate(notes):
         if count < limit:
@@ -94,7 +96,7 @@ def recent_notes(notes_text, recent_days=400, limit=200):
                 # notes with sequence within a date. Make bulleted list.
                 pre, sequence_number, post = note.split("::")
                 update_note = f"  {int(sequence_number)}. {pre[11:]}"
-            if datetime.datetime.strptime(note[:10].replace("_", "-"), DATE_FMT) >= recent:
+            if datetime.strptime(note[:10].replace("_", "-"), DATE_FMT) >= recent:
                 notes_list.append(update_note)
     return notes_list
 
@@ -194,7 +196,7 @@ def create_stakeholders_views(project_records_list):
 
     with open(stakeholders_views_active_path, "w") as outfile:
         outfile.write("# Data Accelerator - Project Stakeholders Views - ACTIVE\n\n")
-        outfile.write(f"({str(datetime.datetime.now())[:19]})\n\n")
+        outfile.write(f"({str(datetime.now())[:19]})\n\n")
         for owner in owners:
             block_string = synthesize_owner_block(project_records_list, owner, project_owner_key="BUSINESS_SPONSOR")
             if block_string:
@@ -230,7 +232,7 @@ def create_weekly_owners_views(project_records_list):
     This is an HTML document to take advantage of full table formatting control.
     """
     # Timestamp
-    current_timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    current_timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     # find unique owners
     owners = set([lines["ANALYTICS_DS_OWNER"] for lines in project_records_list])
     with open(weekly_owner_views_active_path, "w") as outfile:
@@ -280,7 +282,7 @@ def create_owners_commit_views(project_records_list):
         # Write the header
         outfile.write("# Data Accelerator - Project Owner Views - COMMIT\n\n")
         # Timestamp
-        current_timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        current_timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         outfile.write(f"({current_timestamp})\n\n")
 
         # Write synthesized owner blocks
@@ -297,17 +299,18 @@ def create_owners_views(project_records_list):
 
     with open(owner_views_active_path, "w") as outfile:
         outfile.write("# Data Accelerator - Project Owner Views - ACTIVE\n\n")
-        outfile.write(f"({str(datetime.datetime.now())[:19]})\n\n")
+        outfile.write(f"({str(datetime.now())[:19]})\n\n")
         for owner in owners:
             outfile.write(synthesize_owner_block(project_records_list, owner))
             outfile.write(synthesize_owner_maintenance_block(project_records_list, owner))
 
     with open(owner_views_completed_path, "w") as outfile:
         outfile.write("# Data Accelerator - Project Owner Views - COMPLETED & MAINTENANCE\n\n")
-        outfile.write(f"({str(datetime.datetime.now())[:19]})\n\n")
+        outfile.write(f"({str(datetime.now())[:19]})\n\n")
         for owner in owners:
             outfile.write(
-                synthesize_owner_block(project_records_list, owner, phase_filter=["6-Completed", "7-Maintenance"]))
+                synthesize_owner_block(project_records_list, owner,
+                                       phase_filter=["6-Completed", "7-Maintenance"]))
 
 
 def create_data_product_links(project_records):
@@ -349,9 +352,11 @@ def create_summary_csv(project_records):
     Parameters:
     project_records (list of dict): A list of dictionaries, each representing a project record.
     """
+
     # Open the file for writing
     with open(summary_path, "w", newline='') as outfile:
         # Initialize a CSV DictWriter with the specified field names and dialect
+        logging.info(f'project_params_dict.keys(): {project_params_dict.keys()}')
         csv_writer = csv.DictWriter(outfile, fieldnames=project_params_dict.keys(), dialect='excel')
 
         # Write the header row based on field_name_map
@@ -359,6 +364,13 @@ def create_summary_csv(project_records):
 
         # Write each project record as a row in the CSV file
         csv_writer.writerows(project_records)
+
+
+def create_analytics_summary_csv(project_records):
+    df_proj_records = pd.DataFrame(project_records, columns=project_params_dict.keys())
+    df_proj_records = df_proj_records.drop(['NOTES', 'CharterLink'], axis=1)
+    df_proj_records.to_csv(analytics_summary_path, index=False)
+
 
 
 def create_complete_stakeholder_list(project_records):
@@ -385,9 +397,11 @@ def create_complete_stakeholder_list(project_records):
         wrt.writerows(stakeholderlist)
 
 
+
 def create_reports(project_records_list):
-    # Create all the standard reports
+#    Create all the standard reports
     create_summary_csv(project_records_list)
+    create_analytics_summary_csv(project_records_list)
     create_data_product_links(project_records_list)
     create_owners_views(project_records_list)
     create_owners_commit_views(project_records_list)

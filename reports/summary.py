@@ -163,7 +163,7 @@ def synthesize_owner_maintenance_block(project_records_list, owner, project_owne
     for lines in project_records_list:
         # step through the project list to find owners and active projects of the ordered type
         _current_project_phase = project_phases[lines["Phases"]]  # convert phase name to sequence number
-        if _current_project_phase == 7 and owner in lines[project_owner_key]:
+        if (_current_project_phase == 7 or _current_project_phase == 6) and owner in lines[project_owner_key]:
             recent = recent_notes(lines["NOTES"], 14)
             if len(recent) > 0:
                 logging.info(f"Processing recent notes for {lines['Project']} in Phase 7 for {owner}")

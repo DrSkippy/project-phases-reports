@@ -27,7 +27,7 @@ dictConfig({
             'encoding': 'utf-8',
             'maxBytes': 900000,
             'backupCount': 3
-        }},
+    }},
     'root': {
         'level': 'DEBUG',
         'handlers': ['file']
@@ -101,8 +101,6 @@ if __name__ == "__main__":
                 params["COMMIT_JUSTIFICATIONS"] = "Commit justification required!\n\n"
 
             # #############################################################################################
-            # Compute derived values for timing of phases
-            # Phase changed?
             # params["COMPUTED_PREVIOUS_PHASE"] can be [None, stage = stage, stage /= stage
             if params["COMPUTED_PREVIOUS_PHASE"] is None:
                 params["COMPUTED_PREVIOUS_PHASE"] = phase
@@ -354,8 +352,6 @@ if __name__ == "__main__":
                     dt_delta = date_today - stage_9_date
                     params["COMPUTED_DAYS_IN_STAGE_9_AD_HOC"] = dt_delta.days
 
-
-# TODO: Combine `previous_phase_updated` & `previous_phase_updated`
         previous_phase_updated = False
         for line in fileinput.input(os.path.join(root, project_info_filename), inplace=True):
             if line.startswith("COMPUTED_PREVIOUS_PHASE:"):
@@ -387,7 +383,8 @@ if __name__ == "__main__":
         if params["COMPUTED_PREVIOUS_PHASE"] != phase:
             with open(os.path.join(root, project_info_filename), "a") as project_info_file:
                 project_info_file.write(
-                    f'PHASE_CHANGE: {params["COMPUTED_PREVIOUS_PHASE"]} -> {phase} DATE: {datetime.now().strftime(DATE_FMT)}\n')
+                    f'PHASE_CHANGE: {params["COMPUTED_PREVIOUS_PHASE"]} -> {phase} DATE: {datetime.now().strftime(DATE_FMT)}\n'
+                )
 
         if new_days_progress_to_close is not None:
             with open(os.path.join(root, project_info_filename), "a") as project_info_file:

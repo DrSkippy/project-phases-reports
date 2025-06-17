@@ -45,6 +45,7 @@ echo "Creating links to OneDrive-hosted Charter Documents for each Project:"
 
 CHTR_BASE="https://f5.sharepoint.com/:w:/r/sites/salesandmktg/mktg/Enterprise%20Analytics/Shared%20Documents/Projects%20Folders/"
 #   1-Chartering/APEX%20Test%20Log%20Analysis-All%20logs/Project%20Charter%20Template.docx
-find  "${BASE_DIR}" "arter*.doc" 
+find  "${BASE_DIR}" | grep "arter*.doc" 
 
+cd -
 echo "DONE"

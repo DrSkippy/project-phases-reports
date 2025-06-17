@@ -1,3 +1,4 @@
+#!/usr/bin/env -S poetry run python
 import sys
 import os
 import uuid
@@ -282,7 +283,8 @@ if __name__ == "__main__":
                         params["COMPUTED_DATE_IN_STAGE_3_IN_PROGRESS"] = stage_3_date.strftime(DATE_FMT)
                         new_stage_3_date = stage_3_date
                     elif params["COMPUTED_PROJECT_IN_PROGRESS_DATE"] is not None:
-                        stage_3_date = params["COMPUTED_PROJECT_IN_PROGRESS_DATE"]
+                        #stage_3_date = params["COMPUTED_PROJECT_IN_PROGRESS_DATE"]
+                        stage_3_date = datetime.strptime(params["COMPUTED_PROJECT_IN_PROGRESS_DATE"][:10],DATE_FMT)
                         params["COMPUTED_DATE_IN_STAGE_3_IN_PROGRESS"] = stage_3_date.strftime(DATE_FMT)
                         new_stage_3_date = stage_3_date
                 else:

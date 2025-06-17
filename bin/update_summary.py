@@ -33,6 +33,7 @@ dictConfig({
 from reports.parser import *
 from reports.summary import *
 
+# TODO: Document current outputs and compare against MetricsDefinition.csv to identify needs
 if __name__ == "__main__":
     logging.info("Starting update_summary.py")
 

@@ -4,9 +4,8 @@ import uuid
 import fileinput
 from datetime import datetime
 from logging.config import dictConfig
-# Can't remember why I included the sys.path.append(...) line below. Leaving as comment in case it's important
-sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))) # enables import of modules from resources
 # Import Project Module(s) Below
 from resources.date_utils import parse_date, days_between_dates
 from reports.parser import *
@@ -85,8 +84,6 @@ if __name__ == "__main__":
             logging.info(f"Processing file {projects_processed_counter} ({root})")
             projects_processed_counter += 1
             phase, project = extract_params(root)  # harvest parameters from path
-            print(phase)
-            print(project)
             logging.info(f"Phase: {phase}, Project: {project}")
             params = parse_project_info(project_info_file)
             params["Phases"] = phase
@@ -107,21 +104,12 @@ if __name__ == "__main__":
             # Compute derived values for timing of phases
             # Phase changed?
             # params["COMPUTED_PREVIOUS_PHASE"] can be [None, stage = stage, stage /= stage
-            # TODO: Evaluate stage dates as a dict and return key of chronologically previous value
-            # TODO: Add current stage start date?
             if params["COMPUTED_PREVIOUS_PHASE"] is None:
                 params["COMPUTED_PREVIOUS_PHASE"] = phase
 
             record_timestamp(root, project_info_filename)
-#
-# """
-# TODO: Scott has this set up as two blocks. The inner block, (e.g. `if project_phases[phase] >= 6:`),
-#     reads/evaluates PROJECT_INFO.txt and the outer block, (e.g. `if new_project_end_date is not None:`) writes values
-#     back to the PROJECT_INFO.txt file. The two are separated to avoid reading and writing at the same time. My statements
-#     are written as part of the inner -- ensure that they are not writing to an open file slash move writes to outer block.
-#
-# """
-#             # Scott
+
+            # Scott
             if project_phases[phase] >= 6:
                 # Completed projects
                 if params["COMPUTED_PROJECT_END_DATE"] is None:

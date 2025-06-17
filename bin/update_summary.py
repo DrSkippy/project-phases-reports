@@ -130,7 +130,7 @@ if __name__ == "__main__":
                     new_project_end_date = params["COMPUTED_PROJECT_END_DATE"]
                 else:
                     date_today = datetime.strptime(
-                        params["COMPUTED_PROJECT_END_DATE"][:10], DATE_FMT)
+                        params["COMPUTED_PROJECT_END_DATE"][:10], DATE_FMT) #
 
             # Scott
             if project_phases[phase] >= 3:
@@ -165,6 +165,8 @@ if __name__ == "__main__":
                         DATE_FMT)
                     dt_delta = date_today - project_start_date
                     params["COMPUTED_AGE_DAYS"] = dt_delta.days
+
+            date_today = datetime.now()
 
             # COMPUTED_COMPLETION_TIME_DAYS KW
             if (params["COMPUTED_PROJECT_END_DATE"] is not None and
@@ -248,7 +250,6 @@ if __name__ == "__main__":
             else:
                 project_id = params["Project_ID"]
 
-
             if project_phases[phase] == 0:
                 if params["COMPUTED_DATE_IN_STAGE_0_IDEAS"] is None:
                     stage_0_date = datetime.now()
@@ -287,10 +288,16 @@ if __name__ == "__main__":
                     params["COMPUTED_DAYS_IN_STAGE_2_COMMITTED"] = dt_delta.days
 
             if project_phases[phase] == 3:
+                # params["COMPUTED_PROJECT_IN_PROGRESS_DATE"]
                 if params["COMPUTED_DATE_IN_STAGE_3_IN_PROGRESS"] is None:
-                    stage_3_date = datetime.now()
-                    params["COMPUTED_DATE_IN_STAGE_3_IN_PROGRESS"] = stage_3_date.strftime(DATE_FMT)
-                    new_stage_3_date = stage_3_date
+                    if params["COMPUTED_PROJECT_IN_PROGRESS_DATE"] is None:
+                        stage_3_date = datetime.now()
+                        params["COMPUTED_DATE_IN_STAGE_3_IN_PROGRESS"] = stage_3_date.strftime(DATE_FMT)
+                        new_stage_3_date = stage_3_date
+                    elif params["COMPUTED_PROJECT_IN_PROGRESS_DATE"] is not None:
+                        stage_3_date = params["COMPUTED_PROJECT_IN_PROGRESS_DATE"]
+                        params["COMPUTED_DATE_IN_STAGE_3_IN_PROGRESS"] = stage_3_date.strftime(DATE_FMT)
+                        new_stage_3_date = stage_3_date
                 else:
                     stage_3_date = datetime.strptime(
                         params["COMPUTED_DATE_IN_STAGE_3_IN_PROGRESS"][:10],

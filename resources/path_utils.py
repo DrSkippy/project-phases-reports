@@ -69,8 +69,3 @@ if __name__ == "__main__":
     class_path = system_info.return_system_info()
     print(class_path)
 
-# project_info_filename = "PROJECT_INFO.txt"
-# projects_tree_root = "/Users/ke.wilson/Desktop/test_data_accel"
-# project_folders_root = "Projects Folders"
-# projects_tree_project_folders = os.path.join(projects_tree_root, project_folders_root)
-

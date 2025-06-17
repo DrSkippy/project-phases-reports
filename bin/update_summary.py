@@ -108,7 +108,6 @@ if __name__ == "__main__":
                 params["COMPUTED_PREVIOUS_PHASE"] = phase
 
             record_timestamp(root, project_info_filename)
-            project_phase_end_date = datetime.datetime.now()  # current last day of unfinished projects
 
             # Scott
             if project_phases[phase] >= 6:

@@ -370,35 +370,7 @@ def create_analytics_summary_csv(project_records):
     df_proj_records = pd.DataFrame(project_records, columns=project_params_dict.keys())
     df_proj_records = df_proj_records.drop(['NOTES', 'CharterLink'], axis=1)
     df_proj_records.to_csv(analytics_summary_path, index=False)
-#     """
-#     Writes a summary CSV file containing data for each project.
-#     The CSV file includes headers as specified by 'project_params_dict.keys()',
-#     omitting the "NOTES" key. Each project record in 'project_records' is written
-#     as a row in the CSV file.
-#
-#     Parameters:
-#     project_records (list of dict): A list of dictionaries, each representing a project record.
-#     project_params_dict (dict): A dictionary containing parameters for projects whose keys are column headers.
-#     analytics_summary_path (str): The file path where the summary CSV file will be written.
-#     """
-#
-#     # Open the file for writing
-#     with open(analytics_summary_path, "w", newline='', encoding="utf-8") as analytics_csv_out:
-#         # Filter out the "NOTES" key from the field names
-#         csv_columns = [key for key in project_params_dict.keys() if key != "NOTES"]
-#         logging.info(f"Filtered csv_columns (excluding 'NOTES'): {csv_columns}")
-#
-#         # Initialize a CSV DictWriter with the filtered csv_columns
-#         csv_writer = csv.DictWriter(analytics_csv_out, fieldnames=csv_columns, dialect='excel')
-#
-#         # Write the header row
-#         csv_writer.writeheader()
-#
-#         # Write each project record as a row in the CSV file, filtered to exclude "NOTES"
-#         for record in project_records:
-#             filtered_record = {key: value for key, value in record.items() if key in csv_columns}
-#             csv_writer.writerow(filtered_record)
-# # There’s a warning in PyCharm stating “Expected type 'SupportsWrite[str]', got 'TextIO' instead”
+
 
 
 def create_complete_stakeholder_list(project_records):

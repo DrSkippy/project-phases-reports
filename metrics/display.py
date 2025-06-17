@@ -146,10 +146,10 @@ def make_key_list(keys):
 
 if __name__ == "__main__":
     mdefs, keys = fetch_csv(PROJECT_PATH + FILENAME)
-    # # make_key_list(keys)
-    # mdts = simple_html_table(mdefs, TABLE1)
-    # with open(PROJECT_PATH + "/simple_table.html", "w") as ofile1:
-    #     ofile1.write(mdts)
-    # mdt = metric_html_tables(mdefs, keys)
-    # with open(PROJECT_PATH + "/metric_table.html", "w") as ofile2:
-    #     ofile2.write(mdt)
+    # make_key_list(keys)
+    mdts = simple_html_table(mdefs, TABLE1)
+    with open(PROJECT_PATH + "/simple_table.html", "w") as ofile1:
+        ofile1.write(mdts)
+    mdt = metric_html_tables(mdefs, keys)
+    with open(PROJECT_PATH + "/metric_table.html", "w") as ofile2:
+        ofile2.write(mdt)

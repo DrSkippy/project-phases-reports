@@ -15,15 +15,17 @@ import os
 # Import Project Module(s) Below
 from resources.path_utils import SystemInfo
 
-
-# Path from SystemInfo() class is based on `os.environ['USER']` and the username following '/Users/' in system path.
-# If `os.environ['USER']` & `/Users/[username]` match, AND the user is...
-# ...Scott, then Scott's path: "/Users/s.hendrickson/Documents/OneDrive - F5, Inc"
-# ...Keelor, then record option from user input:
-#       ...test: "/Users/ke.wilson/Desktop/test_data_accel"
-#       ...OneDrive: "/Users/ke.wilson/Library/CloudStorage/OneDrive-F5,Inc/Documents - Data Accelerator - Enterprise Analytics"
-#       ...other: path from user input()
-# ...anyone else: path from user input()
+"""
+USAGE: 
+    Path from SystemInfo() class is based on `os.environ['USER']` and the username following '/Users/' in system path.
+    If `os.environ['USER']` & `/Users/[username]` match, AND the user is...
+    ...Scott, then Scott's path: "/Users/s.hendrickson/Documents/OneDrive - F5, Inc"
+    ...Keelor, then record option from user input:
+          ...test: "/Users/ke.wilson/Desktop/test_data_accel"
+          ...OneDrive: "/Users/ke.wilson/Library/CloudStorage/OneDrive-F5,Inc/Documents - Data Accelerator - Enterprise Analytics"
+          ...other: path from user input()
+    ...anyone else: path from user input()
+"""
 
 system_info = SystemInfo()
 projects_tree_root = system_info.return_system_info()

@@ -31,6 +31,8 @@ projects_tree_root = system_info.return_system_info()
 project_folders_root = "Projects Folders"
 project_info_filename = "PROJECT_INFO.txt"
 projects_tree_project_folders = os.path.join(projects_tree_root, project_folders_root)
+sharepoint_url = "https://f5.sharepoint.com/"
+sharepoint_path = ":w:/r/sites/salesandmktg/mktg/Enterprise Analytics/Shared Documents/Projects Folders/"
 
 # Files
 summary_path = os.path.join(projects_tree_project_folders, "summary.csv")
@@ -73,6 +75,7 @@ project_params_dict = {
     "COMPUTED_PROJECT_END_DATE": None,
     "COMPUTED_PREVIOUS_PHASE": None,
     "COMMIT_JUSTIFICATIONS": None,
+    "CharterLink": None,
 # New Columns
     # MIN Date in Stage
     "COMPUTED_DATE_IN_STAGE_0_IDEAS": None,

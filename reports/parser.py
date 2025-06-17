@@ -2,7 +2,7 @@ import logging
 import dateutil.utils
 from datetime import datetime, time
 import re
-
+from urllib.parse import quote
 # Import Project Module(s) Below
 from reports.configurations import *
 
@@ -159,6 +159,21 @@ def extract_params(root):
     # Ensure names[1] matches expected values
     assert len(names) == 4, f"Unexpected path length: {len(names)} (expected 4)"
     assert names[1] == "Projects Folders", f"Unexpected value for names[1]: {repr(names[1])}"
+
+def create_charter_link(root, dirs, files):
+    """
+    Create a link to the charter file.
+    """
+    res = []  # list of urls to charter files in directory
+    for file in files:
+        if file.endswith(".docx") and "charter" in file.lower():
+            names = extract_params(root)
+            if len(names) == 2:
+                logging.info(f"Found charter file: {file} for phase: {names[0]}, project: {names[1]}")
+                url = sharepoint_url + quote(f"{sharepoint_path}/{names[0]}/{names[1]}/{file}")
+                logging.info(f"Charter URL: {url}")
+                res.append(url)
+    return res
 
     # Log extracted phase and project
     logging.info(f"Extracted phase: {names[2]}, project: {names[3]}")

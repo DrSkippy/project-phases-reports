@@ -1,6 +1,7 @@
 import logging
 import datetime
 import re
+from urllib.parse import quote
 from reports.configurations import *
 
 def normalize_note_date(note_line):
@@ -32,6 +33,7 @@ def normalize_note_date(note_line):
         logging.info(f"Sequence number {sequence_number} found")
         tail += f"::{sequence_number}::"  # append a sequence number to build bulleted list
     except (ValueError, AttributeError):
+        logging.warn(f"WARNING:  Note date is not in yyyy-mm-dd format: {head}")
         try:
             head_date = date_re.search(head).group(0)
             y, m, d = head_date.split("-")
@@ -92,3 +94,19 @@ def extract_params(root):
     assert (len(names) == 4 and names[1] == "Projects Folders")
     logging.info(f"Extracted phase: {names[2]}, project: {names[3]}")
     return names[2], names[3]
+
+def create_charter_link(root, dirs, files):
+    """
+    Create a link to the charter file.
+    """
+    res = [] # list of urls to charter files in directory
+    for file in files:
+        if file.endswith(".docx") and "charter" in file.lower():
+            names = extract_params(root)
+            if len(names) == 2:
+                logging.info(f"Found charter file: {file} for phase: {names[0]}, project: {names[1]}")
+                url = sharepoint_url + quote(f"{sharepoint_path}/{names[0]}/{names[1]}/{file}")
+                logging.info(f"Charter URL: {url}")
+                res.append(url)
+    return res
+

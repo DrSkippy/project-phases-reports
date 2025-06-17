@@ -12,6 +12,9 @@ project_info_filename = "PROJECT_INFO.txt"
 projects_tree_root = "/Users/s.hendrickson/Documents/OneDrive - F5, Inc"
 project_folders_root = "Projects Folders"
 projects_tree_project_folders = os.path.join(projects_tree_root, project_folders_root)
+sharepoint_url = "https://f5.sharepoint.com/"
+sharepoint_path = ":w:/r/sites/salesandmktg/mktg/Enterprise Analytics/Shared Documents/Projects Folders/"
+
 # Files
 summary_path = os.path.join(projects_tree_project_folders, "summary.csv")
 data_product_links_path = os.path.join(projects_tree_project_folders, "data_product_links.md")
@@ -49,7 +52,8 @@ project_params_dict = {
     "COMPUTED_PROJECT_ROLLOUT_DATE": None,
     "COMPUTED_PROJECT_END_DATE": None,
     "COMPUTED_PREVIOUS_PHASE": None,
-    "COMMIT_JUSTIFICATIONS": None
+    "COMMIT_JUSTIFICATIONS": None,
+    "CharterLink": None
 }
 
 """
@@ -76,7 +80,8 @@ name_field_map = {
     "Project Rollout Date": "COMPUTED_PROJECT_ROLLOUT_DATE",
     "Project Previous Phase": "COMPUTED_PROJECT_PREVIOUS_PHASE_DATE",
     "Project End Date": "COMPUTED_PROJECT_END_DATE",
-    "Commit Justification": "COMMIT_JUSTIFICATIONS"
+    "Commit Justification": "COMMIT_JUSTIFICATIONS",
+    "CharterLink": "CharterLink"
 }
 # keep a reverse map for lookup
 field_name_map = {v: k for k, v in name_field_map.items()}
@@ -134,6 +139,7 @@ td {
   padding: 8px;
   font-size: medium;
   font-color: #353b3c;
+  overflow-wrap: anywhere;
 }
 .tr-owner {
     height: 50px;
@@ -154,6 +160,7 @@ span {
 """
 
 HTML_FOOTER="""
+
 </body>
 </html>
 """

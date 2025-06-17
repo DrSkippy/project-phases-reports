@@ -154,11 +154,10 @@ def extract_params(root):
     Extract phase and project names for the file path.
         Assume start one directory above "Projects Folders"
     """
-    names = root.split("/")  # Split the path into components
-
-    # Ensure names[1] matches expected values
-    assert len(names) == 4, f"Unexpected path length: {len(names)} (expected 4)"
-    assert names[1] == "Projects Folders", f"Unexpected value for names[1]: {repr(names[1])}"
+    names = root.split("/")  # phase, project
+    assert (len(names) == 4 and names[1] == "Projects Folders")
+    logging.info(f"Extracted phase: {names[2]}, project: {names[3]}")
+    return names[2], names[3]
 
 def create_charter_link(root, dirs, files):
     """

@@ -70,15 +70,7 @@ if __name__ == "__main__":
         new_stage_6_date = None
         new_stage_7_date = None
         new_stage_9_date = None
-        new_stage_0_age = None
-        new_stage_1_age = None
-        new_stage_2_age = None
-        new_stage_3_age = None
-        new_stage_4_age = None
-        new_stage_5_age = None
-        new_stage_6_age = None
-        new_stage_7_age = None
-        new_stage_9_age = None
+
 
 
         # Process Project Info file
@@ -165,9 +157,9 @@ if __name__ == "__main__":
                     completion_time_days = (end_date - start_date).days
                     params["COMPUTED_COMPLETION_TIME_DAYS"] = completion_time_days
                     new_completion_time_days = completion_time_days
-                else:
-                    completion_time_days = params["COMPUTED_COMPLETION_TIME_DAYS"]
-                    params["COMPUTED_COMPLETION_TIME_DAYS"] = completion_time_days
+                # else:
+                #     completion_time_days = params["COMPUTED_COMPLETION_TIME_DAYS"]
+                #     params["COMPUTED_COMPLETION_TIME_DAYS"] = completion_time_days
             else:
                 logging.info("Missing values needed to Compute COMPUTED_COMPLETION_TIME_DAYS")
 
@@ -180,9 +172,9 @@ if __name__ == "__main__":
                 days_progress_to_complete = (end_date - in_progress_date).days
                 params["COMPUTED_IN_PROGRESS_TO_COMPLETION_DAYS"] = days_progress_to_complete
                 new_days_progress_to_close = params["COMPUTED_IN_PROGRESS_TO_COMPLETION_DAYS"]
-            elif params["COMPUTED_IN_PROGRESS_TO_COMPLETION_DAYS"] is not None:
-                days_progress_to_complete = params["COMPUTED_IN_PROGRESS_TO_COMPLETION_DAYS"]
-                params["COMPUTED_IN_PROGRESS_TO_COMPLETION_DAYS"] = days_progress_to_complete
+            # elif params["COMPUTED_IN_PROGRESS_TO_COMPLETION_DAYS"] is not None:
+            #     days_progress_to_complete = params["COMPUTED_IN_PROGRESS_TO_COMPLETION_DAYS"]
+            #     params["COMPUTED_IN_PROGRESS_TO_COMPLETION_DAYS"] = days_progress_to_complete
             else:
                 logging.info('Project does not have both a start date and end date')
 

@@ -173,7 +173,3 @@ def create_charter_link(root, dirs, files):
                 logging.info(f"Charter URL: {url}")
                 res.append(url)
     return res
-
-    # Log extracted phase and project
-    logging.info(f"Extracted phase: {names[2]}, project: {names[3]}")
-    return names[2], names[3]

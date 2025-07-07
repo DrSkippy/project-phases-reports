@@ -71,6 +71,7 @@ if __name__ == "__main__":
         new_stage_7_date = None
         new_stage_9_date = None
         new_stage_0_date = None
+        new_stage_0_age = None
         new_stage_1_age = None
         new_stage_2_age = None
         new_stage_3_age = None

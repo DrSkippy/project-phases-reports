@@ -70,7 +70,15 @@ if __name__ == "__main__":
         new_stage_6_date = None
         new_stage_7_date = None
         new_stage_9_date = None
-
+        new_stage_0_date = None
+        new_stage_1_age = None
+        new_stage_2_age = None
+        new_stage_3_age = None
+        new_stage_4_age = None
+        new_stage_5_age = None
+        new_stage_6_age = None
+        new_stage_7_age = None
+        new_stage_9_age = None
 
 
         # Process Project Info file

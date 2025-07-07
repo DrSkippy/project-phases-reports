@@ -196,10 +196,10 @@ if __name__ == "__main__":
                         "COMPUTED_DAYS_IN_STAGE_4_ON_HOLD"]).days
                     params["COMPUTED_IN_PROGRESS_TO_COMPLETION_DAYS"] = completion_time_minus_hold.strftime(DATE_FMT)
                     new_completion_time_minus_hold = completion_time_minus_hold
-                else:
-                    completion_time_minus_hold = datetime.strptime(
-                        params["COMPUTED_COMPLETION_TIME_MINUS_HOLD_DAYS"][:10], DATE_FMT)
-                    params["COMPUTED_COMPLETION_TIME_MINUS_HOLD_DAYS"] = completion_time_minus_hold
+                # else:
+                #     completion_time_minus_hold = datetime.strptime(
+                #         params["COMPUTED_COMPLETION_TIME_MINUS_HOLD_DAYS"][:10], DATE_FMT)
+                #     params["COMPUTED_COMPLETION_TIME_MINUS_HOLD_DAYS"] = completion_time_minus_hold
             else:
                 logging.info("Missing values needed to Compute COMPUTED_COMPLETION_TIME_MINUS_HOLD_DAYS")
 
@@ -207,8 +207,9 @@ if __name__ == "__main__":
             if (params["COMPUTED_PROJECT_END_DATE"] is not None and
                     params["COMPUTED_DATE_IN_STAGE_2_COMMITTED"] is not None):
                 if params["COMPUTED_COMMIT_TO_COMPLETION_DAYS"] is None:
-                    commit_to_completion_days = (
-                            params["COMPUTED_PROJECT_END_DATE"] - params["COMPUTED_DATE_IN_STAGE_2_COMMITTED"]).days
+                    end_date = parse_date(params["COMPUTED_PROJECT_END_DATE"], 'datetime')
+                    start_date = parse_date(params["COMPUTED_DATE_IN_STAGE_2_COMMITTED"], 'datetime')
+                    commit_to_completion_days = (end_date - start_date).days
                     params["COMPUTED_COMMIT_TO_COMPLETION_DAYS"] = commit_to_completion_days.strftime(DATE_FMT)
                     new_commit_to_completion_days = commit_to_completion_days
                 else:
@@ -226,10 +227,10 @@ if __name__ == "__main__":
                             params["COMPUTED_PROJECT_END_DATE"] - params["COMPUTED_DATE_IN_STAGE_1_CHARTERING"]).days
                     params["COMPUTED_CHARTER_TO_COMPLETION_DAYS"] = charter_to_completion_days.strftime(DATE_FMT)
                     new_charter_to_completion_days = charter_to_completion_days
-                else:
-                    charter_to_completion_days = datetime.strptime(
-                        params["COMPUTED_CHARTER_TO_COMPLETION_DAYS"][:10], DATE_FMT)
-                    params["COMPUTED_CHARTER_TO_COMPLETION_DAYS"] = charter_to_completion_days
+                # else:
+                #     charter_to_completion_days = datetime.strptime(
+                #         params["COMPUTED_CHARTER_TO_COMPLETION_DAYS"][:10], DATE_FMT)
+                #     params["COMPUTED_CHARTER_TO_COMPLETION_DAYS"] = charter_to_completion_days
             else:
                 logging.info("Missing values needed to Compute COMPUTED_CHARTER_TO_COMPLETION_DAYS")
 

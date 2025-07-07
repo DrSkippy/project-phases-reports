@@ -366,109 +366,90 @@ if __name__ == "__main__":
             else:
                 print(line, end='')
 
-        # If the previous phase was not updated, it didn't exist. So, append it to the end of the file
-        if not previous_phase_updated:
-            with open(os.path.join(root, project_info_filename), "a") as project_info_file:
+
+        with open(os.path.join(root, project_info_filename), "a") as project_info_file:
+            # If the previous phase was not updated, it didn't exist. So, append it to the end of the file
+            if not previous_phase_updated:
                 project_info_file.write(f'COMPUTED_PREVIOUS_PHASE: {phase}\n')
 
-        # Update the project info file with time values for phase transitions
-        if new_project_start_date is not None:
-            with open(os.path.join(root, project_info_filename), "a") as project_info_file:
+            # Update the project info file with time values for phase transitions
+            if new_project_start_date is not None:
                 project_info_file.write(f'COMPUTED_PROJECT_START_DATE: {new_project_start_date.strftime(DATE_FMT)}\n')
 
-        if new_project_in_progress_date is not None:
-            with open(os.path.join(root, project_info_filename), "a") as project_info_file:
+            if new_project_in_progress_date is not None:
                 project_info_file.write(
                     f'COMPUTED_PROJECT_IN_PROGRESS_DATE: {new_project_in_progress_date.strftime(DATE_FMT)}\n')
 
-        if new_project_end_date is not None:
-            with open(os.path.join(root, project_info_filename), "a") as project_info_file:
+            if new_project_end_date is not None:
                 project_info_file.write(f'COMPUTED_PROJECT_END_DATE: {new_project_end_date.strftime(DATE_FMT)}\n')
 
-        # if the phase changed, append a generic phase change record to end of the file
-        if params["COMPUTED_PREVIOUS_PHASE"] != phase:
-            with open(os.path.join(root, project_info_filename), "a") as project_info_file:
+            # if the phase changed, append a generic phase change record to end of the file
+            if params["COMPUTED_PREVIOUS_PHASE"] != phase:
                 project_info_file.write(
                     f'PHASE_CHANGE: {params["COMPUTED_PREVIOUS_PHASE"]} -> {phase} DATE: {datetime.now().strftime(DATE_FMT)}\n'
                 )
 
-        if new_days_progress_to_close is not None:
-            with open(os.path.join(root, project_info_filename), "a") as project_info_file:
+            if new_days_progress_to_close is not None:
                 project_info_file.write(
                     f'COMPUTED_IN_PROGRESS_TO_COMPLETION_DAYS: {new_days_progress_to_close}\n')
 
-        if new_completion_time_days is not None:
-            with open(os.path.join(root, project_info_filename), "a") as project_info_file:
+            if new_completion_time_days is not None:
                 project_info_file.write(
                     f'COMPUTED_COMPLETION_TIME_DAYS: {new_completion_time_days}\n')
 
-        if new_completion_time_minus_hold is not None:
-            with open(os.path.join(root, project_info_filename), "a") as project_info_file:
+            if new_completion_time_minus_hold is not None:
                 project_info_file.write(
                     f'COMPUTED_COMPLETION_TIME_MINUS_HOLD_DAYS: {new_completion_time_minus_hold}\n')
 
-        if new_commit_to_completion_days is not None:
-            with open(os.path.join(root, project_info_filename), "a") as project_info_file:
+            if new_commit_to_completion_days is not None:
                 project_info_file.write(
                     f'COMPUTED_COMMIT_TO_COMPLETION_DAYS: {new_commit_to_completion_days}\n')
 
-        if new_charter_to_completion_days is not None:
-            with open(os.path.join(root, project_info_filename), "a") as project_info_file:
+            if new_charter_to_completion_days is not None:
                 project_info_file.write(
                     f'COMPUTED_CHARTER_TO_COMPLETION_DAYS: {new_charter_to_completion_days}\n')
 
-        if new_stage_0_date is not None:
-            with open(os.path.join(root, project_info_filename), "a") as project_info_file:
+            if new_stage_0_date is not None:
                 project_info_file.write(
                     f"COMPUTED_DATE_IN_STAGE_0_IDEAS: {new_stage_0_date.strftime(DATE_FMT)}\n")
 
-        if new_stage_0_age is not None:
-            with open(os.path.join(root, project_info_filename), "a") as project_info_file:
+            if new_stage_0_age is not None:
                 project_info_file.write(
                     f"COMPUTED_DAYS_IN_STAGE_0_IDEAS: {new_stage_0_age}\n")
 
-        if new_stage_1_date is not None:
-            with open(os.path.join(root, project_info_filename), "a") as project_info_file:
+            if new_stage_1_date is not None:
                 project_info_file.write(
                     f"COMPUTED_DATE_IN_STAGE_1_CHARTERING: {new_stage_1_date.strftime(DATE_FMT)}\n")
 
-        if new_stage_2_date is not None:
-            with open(os.path.join(root, project_info_filename), "a") as project_info_file:
+            if new_stage_2_date is not None:
                 project_info_file.write(
                     f"COMPUTED_DATE_IN_STAGE_2_COMMITTED: {new_stage_2_date.strftime(DATE_FMT)}\n")
 
-        if new_stage_3_date is not None:
-            with open(os.path.join(root, project_info_filename), "a") as project_info_file:
+            if new_stage_3_date is not None:
                 project_info_file.write(
                     f"COMPUTED_DATE_IN_STAGE_3_IN_PROGRESS: {new_stage_3_date.strftime(DATE_FMT)}\n")
 
-        if new_stage_3_age is not None:
-            with open(os.path.join(root, project_info_filename), "a") as project_info_file:
+            if new_stage_3_age is not None:
                 project_info_file.write(
                     f"COMPUTED_DAYS_IN_STAGE_3_IN_PROGRESS: {new_stage_0_age}\n")
 
-        if new_stage_4_date is not None:
-            with open(os.path.join(root, project_info_filename), "a") as project_info_file:
+            if new_stage_4_date is not None:
                 project_info_file.write(
                     f"COMPUTED_DATE_IN_STAGE_4_ON_HOLD: {new_stage_4_date.strftime(DATE_FMT)}\n")
 
-        if new_stage_5_date is not None:
-            with open(os.path.join(root, project_info_filename), "a") as project_info_file:
+            if new_stage_5_date is not None:
                 project_info_file.write(
                     f"COMPUTED_DATE_IN_STAGE_5_ROLLOUT: {new_stage_5_date.strftime(DATE_FMT)}\n")
 
-        if new_stage_6_date is not None:
-            with open(os.path.join(root, project_info_filename), "a") as project_info_file:
+            if new_stage_6_date is not None:
                 project_info_file.write(
                     f"COMPUTED_DATE_IN_STAGE_6_COMPLETED: {new_stage_6_date.strftime(DATE_FMT)}\n")
 
-        if new_stage_7_date is not None:
-            with open(os.path.join(root, project_info_filename), "a") as project_info_file:
+            if new_stage_7_date is not None:
                 project_info_file.write(
                     f"COMPUTED_DATE_IN_STAGE_7_MAINTENANCE: {new_stage_7_date.strftime(DATE_FMT)}\n")
 
-        if new_stage_9_date is not None:
-            with open(os.path.join(root, project_info_filename), "a") as project_info_file:
+            if new_stage_9_date is not None:
                 project_info_file.write(
                     f"COMPUTED_DATE_IN_STAGE_9_AD_HOC: {new_stage_9_date.strftime(DATE_FMT)}\n")
 

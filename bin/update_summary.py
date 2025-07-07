@@ -210,7 +210,7 @@ if __name__ == "__main__":
                     end_date = parse_date(params["COMPUTED_PROJECT_END_DATE"], 'datetime')
                     start_date = parse_date(params["COMPUTED_DATE_IN_STAGE_2_COMMITTED"], 'datetime')
                     commit_to_completion_days = (end_date - start_date).days
-                    params["COMPUTED_COMMIT_TO_COMPLETION_DAYS"] = commit_to_completion_days.strftime(DATE_FMT)
+                    params["COMPUTED_COMMIT_TO_COMPLETION_DAYS"] = commit_to_completion_days
                     new_commit_to_completion_days = commit_to_completion_days
                 else:
                     commit_to_completion_days = datetime.strptime(
@@ -226,7 +226,7 @@ if __name__ == "__main__":
                     end_date = parse_date(params["COMPUTED_PROJECT_END_DATE"], 'datetime')
                     start_date = parse_date(params["COMPUTED_DATE_IN_STAGE_1_CHARTERING"], 'datetime')
                     charter_to_completion_days = (end_date - start_date).days
-                    params["COMPUTED_CHARTER_TO_COMPLETION_DAYS"] = charter_to_completion_days.strftime(DATE_FMT)
+                    params["COMPUTED_CHARTER_TO_COMPLETION_DAYS"] = charter_to_completion_days
                     new_charter_to_completion_days = charter_to_completion_days
                 # else:
                 #     charter_to_completion_days = datetime.strptime(

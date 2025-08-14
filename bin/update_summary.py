@@ -70,7 +70,6 @@ if __name__ == "__main__":
         new_stage_6_date = None
         new_stage_7_date = None
         new_stage_9_date = None
-        new_stage_0_date = None
         new_stage_0_age = None
         new_stage_1_age = None
         new_stage_2_age = None
@@ -166,9 +165,6 @@ if __name__ == "__main__":
                     completion_time_days = (end_date - start_date).days
                     params["COMPUTED_COMPLETION_TIME_DAYS"] = completion_time_days
                     new_completion_time_days = completion_time_days
-                # else:
-                #     completion_time_days = params["COMPUTED_COMPLETION_TIME_DAYS"]
-                #     params["COMPUTED_COMPLETION_TIME_DAYS"] = completion_time_days
             else:
                 logging.info("Missing values needed to Compute COMPUTED_COMPLETION_TIME_DAYS")
 
@@ -196,10 +192,6 @@ if __name__ == "__main__":
                         "COMPUTED_DAYS_IN_STAGE_4_ON_HOLD"]).days
                     params["COMPUTED_IN_PROGRESS_TO_COMPLETION_DAYS"] = completion_time_minus_hold.strftime(DATE_FMT)
                     new_completion_time_minus_hold = completion_time_minus_hold
-                # else:
-                #     completion_time_minus_hold = datetime.strptime(
-                #         params["COMPUTED_COMPLETION_TIME_MINUS_HOLD_DAYS"][:10], DATE_FMT)
-                #     params["COMPUTED_COMPLETION_TIME_MINUS_HOLD_DAYS"] = completion_time_minus_hold
             else:
                 logging.info("Missing values needed to Compute COMPUTED_COMPLETION_TIME_MINUS_HOLD_DAYS")
 
@@ -212,10 +204,6 @@ if __name__ == "__main__":
                     commit_to_completion_days = (end_date - start_date).days
                     params["COMPUTED_COMMIT_TO_COMPLETION_DAYS"] = commit_to_completion_days
                     new_commit_to_completion_days = commit_to_completion_days
-                else:
-                    commit_to_completion_days = datetime.strptime(
-                        params["COMPUTED_COMMIT_TO_COMPLETION_DAYS"][:10], DATE_FMT)
-                    params["COMPUTED_COMMIT_TO_COMPLETION_DAYS"] = commit_to_completion_days
             else:
                 logging.info("Missing values needed to Compute COMPUTED_COMPLETION_TIME_MINUS_HOLD_DAYS")
 
@@ -366,6 +354,11 @@ if __name__ == "__main__":
             else:
                 print(line, end='')
 
+        # replicate block above to write age if new value. prevents multiple lines for day in progress
+        # if new_stage_3_age is not None:
+        #     project_info_file.write(
+        #         f"COMPUTED_DAYS_IN_STAGE_3_IN_PROGRESS: {new_stage_3_age}\n")
+
 
         with open(os.path.join(root, project_info_filename), "a") as project_info_file:
             # If the previous phase was not updated, it didn't exist. So, append it to the end of the file
@@ -384,11 +377,12 @@ if __name__ == "__main__":
                 project_info_file.write(f'COMPUTED_PROJECT_END_DATE: {new_project_end_date.strftime(DATE_FMT)}\n')
 
             # if the phase changed, append a generic phase change record to end of the file
+            # possible to compute everything from here
             if params["COMPUTED_PREVIOUS_PHASE"] != phase:
                 project_info_file.write(
                     f'PHASE_CHANGE: {params["COMPUTED_PREVIOUS_PHASE"]} -> {phase} DATE: {datetime.now().strftime(DATE_FMT)}\n'
                 )
-
+            def if_param_not_none
             if new_days_progress_to_close is not None:
                 project_info_file.write(
                     f'COMPUTED_IN_PROGRESS_TO_COMPLETION_DAYS: {new_days_progress_to_close}\n')
@@ -431,7 +425,7 @@ if __name__ == "__main__":
 
             if new_stage_3_age is not None:
                 project_info_file.write(
-                    f"COMPUTED_DAYS_IN_STAGE_3_IN_PROGRESS: {new_stage_0_age}\n")
+                    f"COMPUTED_DAYS_IN_STAGE_3_IN_PROGRESS: {new_stage_3_age}\n")
 
             if new_stage_4_date is not None:
                 project_info_file.write(

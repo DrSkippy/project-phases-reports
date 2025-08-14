@@ -38,9 +38,8 @@ dictConfig({
 datetime_today = dateutil.utils.today()
 
 def process_project_directory(root, dirs, files):
-    date_today = datetime.now()
-    project_records_list = [] # if you want to accumulate/process multiple, or return single param at end
 
+    date_today = datetime.now()
     new_project_start_date = None
     new_project_end_date = None
     new_project_in_progress_date = None
@@ -49,26 +48,46 @@ def process_project_directory(root, dirs, files):
     new_completion_time_minus_hold = None
     new_commit_to_completion_days = None
     new_charter_to_completion_days = None
-    new_stage_0_date = None
-    new_stage_1_date = None
-    new_stage_2_date = None
-    new_stage_3_date = None
-    new_stage_4_date = None
-    new_stage_5_date = None
-    new_stage_6_date = None
-    new_stage_7_date = None
-    new_stage_9_date = None
-    new_stage_0_age = None
-    new_stage_1_age = None
-    new_stage_2_age = None
-    new_stage_3_age = None
-    new_stage_4_age = None
-    new_stage_5_age = None
-    new_stage_6_age = None
-    new_stage_7_age = None
-    new_stage_9_age = None
 
-    # try:
+    # funtion to handle `if project_phases[phase] == n` logic
+    def update_stage(params, phase_to_check, current_phase, date_key, age_key, date_today, special_case=None):
+        new_date = None
+        new_age = None
+
+        if current_phase != phase_to_check:
+            return new_date, new_age
+
+        # Special case for stage 3
+        if special_case == "stage_3":
+            if params[date_key] is None:
+                if params["COMPUTED_PROJECT_IN_PROGRESS_DATE"] is None:
+                    stage_date = datetime.now()
+                    params[date_key] = stage_date.strftime(DATE_FMT)
+                    new_date = stage_date
+                else:
+                    stage_date = datetime.strptime(params["COMPUTED_PROJECT_IN_PROGRESS_DATE"][:10], DATE_FMT)
+                    params[date_key] = stage_date.strftime(DATE_FMT)
+                    new_date = stage_date
+            else:
+                stage_date = datetime.strptime(params[date_key][:10], DATE_FMT)
+                dt_delta = days_between_dates(stage_date, date_today)
+                params[age_key] = dt_delta
+                new_age = dt_delta
+            return new_date, new_age
+
+        # Generic logic for non-stage 3 stages
+        if params[date_key] is None:
+            stage_date = datetime.now()
+            params[date_key] = stage_date.strftime(DATE_FMT)
+            new_date = stage_date
+        else:
+            stage_date = datetime.strptime(params[date_key][:10], DATE_FMT)
+            dt_delta = date_today - stage_date
+            params[age_key] = dt_delta.days if hasattr(dt_delta, "days") else dt_delta
+            new_age = params[age_key]
+        return new_date, new_age
+
+
     with open(os.path.join(root, project_info_filename), "r") as project_info_file:
         phase, project = extract_params(root)
         params = parse_project_info(project_info_file)
@@ -83,17 +102,10 @@ def process_project_directory(root, dirs, files):
         else:
             params["COMMIT_JUSTIFICATIONS"] = "Commit justification required!\n\n"
 
-        # #############################################################################################
+
         # params["COMPUTED_PREVIOUS_PHASE"] can be [None, stage = stage, stage /= stage
         if params["COMPUTED_PREVIOUS_PHASE"] is None:
             params["COMPUTED_PREVIOUS_PHASE"] = phase
-
-
-        # TESTING NOTES: "COMPUTED_DAYS_IN_STAGE_3_IN_PROGRESS" is not updating. This logic should be satisfied
-        #    by the `if project_phases[phase] == 3...` block but included to be safe, (replicating "COMPUTED_PREVIOUS_PHASE")
-        # if project_phases[phase] == 3 and params["COMPUTED_DAYS_IN_STAGE_3_IN_PROGRESS"] is None:
-        #     params["COMPUTED_DAYS_IN_STAGE_3_IN_PROGRESS"] = 0
-
 
         record_timestamp(root, project_info_filename)
 
@@ -164,9 +176,6 @@ def process_project_directory(root, dirs, files):
             days_progress_to_complete = (end_date - in_progress_date).days
             params["COMPUTED_IN_PROGRESS_TO_COMPLETION_DAYS"] = days_progress_to_complete
             new_days_progress_to_close = params["COMPUTED_IN_PROGRESS_TO_COMPLETION_DAYS"]
-        # elif params["COMPUTED_IN_PROGRESS_TO_COMPLETION_DAYS"] is not None:
-        #     days_progress_to_complete = params["COMPUTED_IN_PROGRESS_TO_COMPLETION_DAYS"]
-        #     params["COMPUTED_IN_PROGRESS_TO_COMPLETION_DAYS"] = days_progress_to_complete
         else:
             logging.info('Project does not have both a start date and end date')
 
@@ -204,10 +213,6 @@ def process_project_directory(root, dirs, files):
                 charter_to_completion_days = (end_date - start_date).days
                 params["COMPUTED_CHARTER_TO_COMPLETION_DAYS"] = charter_to_completion_days
                 new_charter_to_completion_days = charter_to_completion_days
-            # else:
-            #     charter_to_completion_days = datetime.strptime(
-            #         params["COMPUTED_CHARTER_TO_COMPLETION_DAYS"][:10], DATE_FMT)
-            #     params["COMPUTED_CHARTER_TO_COMPLETION_DAYS"] = charter_to_completion_days
         else:
             logging.info("Missing values needed to Compute COMPUTED_CHARTER_TO_COMPLETION_DAYS")
 
@@ -217,122 +222,51 @@ def process_project_directory(root, dirs, files):
         else:
             project_id = params["Project_ID"]
 
-        if project_phases[phase] == 0:
-            if params["COMPUTED_DATE_IN_STAGE_0_IDEAS"] is None:
-                stage_0_date = datetime.now()
-                params["COMPUTED_DATE_IN_STAGE_0_IDEAS"] = stage_0_date.strftime(DATE_FMT)
-                new_stage_0_date = stage_0_date
-            else:
-                stage_0_date = datetime.strptime(
-                    params["COMPUTED_DATE_IN_STAGE_0_IDEAS"][:10],
-                    DATE_FMT)
-                dt_delta = days_between_dates(stage_0_date, date_today)
-                params["COMPUTED_DAYS_IN_STAGE_0_IDEAS"] = dt_delta
-                new_stage_0_age = dt_delta
-
-        if project_phases[phase] == 1:
-            if params["COMPUTED_DATE_IN_STAGE_1_CHARTERING"] is None:
-                stage_1_date = datetime.now()
-                params["COMPUTED_DATE_IN_STAGE_1_CHARTERING"] = stage_1_date.strftime(DATE_FMT)
-                new_stage_1_date = stage_1_date
-            else:
-                stage_1_date = datetime.strptime(
-                    params["COMPUTED_DATE_IN_STAGE_1_CHARTERING"][:10],
-                    DATE_FMT)
-                dt_delta = date_today - stage_1_date
-                params["COMPUTED_DAYS_IN_STAGE_1_CHARTERING"] = dt_delta.days
-
-        if project_phases[phase] == 2:
-            if params["COMPUTED_DATE_IN_STAGE_2_COMMITTED"] is None:
-                stage_2_date = datetime.now()
-                params["COMPUTED_DATE_IN_STAGE_2_COMMITTED"] = stage_2_date.strftime(DATE_FMT)
-                new_stage_2_date = stage_2_date
-            else:
-                stage_2_date = datetime.strptime(
-                    params["COMPUTED_DATE_IN_STAGE_2_COMMITTED"][:10],
-                    DATE_FMT)
-                dt_delta = date_today - stage_2_date
-                params["COMPUTED_DAYS_IN_STAGE_2_COMMITTED"] = dt_delta.days
-
-        if project_phases[phase] == 3:
-            # params["COMPUTED_PROJECT_IN_PROGRESS_DATE"]
-            if params["COMPUTED_DATE_IN_STAGE_3_IN_PROGRESS"] is None:
-                if params["COMPUTED_PROJECT_IN_PROGRESS_DATE"] is None:
-                    stage_3_date = datetime.now()
-                    params["COMPUTED_DATE_IN_STAGE_3_IN_PROGRESS"] = stage_3_date.strftime(DATE_FMT)
-                    new_stage_3_date = stage_3_date
-                elif params["COMPUTED_PROJECT_IN_PROGRESS_DATE"] is not None:
-                    # stage_3_date = params["COMPUTED_PROJECT_IN_PROGRESS_DATE"]
-                    stage_3_date = datetime.strptime(params["COMPUTED_PROJECT_IN_PROGRESS_DATE"][:10], DATE_FMT)
-                    params["COMPUTED_DATE_IN_STAGE_3_IN_PROGRESS"] = stage_3_date.strftime(DATE_FMT)
-                    new_stage_3_date = stage_3_date
-            else:
-                stage_3_date = datetime.strptime(
-                    params["COMPUTED_DATE_IN_STAGE_3_IN_PROGRESS"][:10],
-                    DATE_FMT)
-                dt_delta = days_between_dates(stage_3_date, date_today)
-                params["COMPUTED_DAYS_IN_STAGE_3_IN_PROGRESS"] = dt_delta
-                new_stage_3_age = dt_delta
-
-        if project_phases[phase] == 4:
-            if params["COMPUTED_DATE_IN_STAGE_4_ON_HOLD"] is None:
-                stage_4_date = datetime.now()
-                params["COMPUTED_DATE_IN_STAGE_4_ON_HOLD"] = stage_4_date.strftime(DATE_FMT)
-                new_stage_4_date = stage_4_date
-            else:
-                stage_4_date = datetime.strptime(
-                    params["COMPUTED_DATE_IN_STAGE_4_ON_HOLD"][:10],
-                    DATE_FMT)
-                dt_delta = date_today - stage_4_date
-                params["COMPUTED_DAYS_IN_STAGE_4_ON_HOLD"] = dt_delta.days
-
-        if project_phases[phase] == 5:
-            if params["COMPUTED_DATE_IN_STAGE_5_ROLLOUT"] is None:
-                stage_5_date = datetime.now()
-                params["COMPUTED_DATE_IN_STAGE_5_ROLLOUT"] = stage_5_date.strftime(DATE_FMT)
-                new_stage_5_date = stage_5_date
-            else:
-                stage_5_date = datetime.strptime(
-                    params["COMPUTED_DATE_IN_STAGE_5_ROLLOUT"][:10],
-                    DATE_FMT)
-                dt_delta = date_today - stage_5_date
-                params["COMPUTED_DAYS_IN_STAGE_5_ROLLOUT"] = dt_delta.days
-
-        if project_phases[phase] == 6:
-            if params["COMPUTED_DATE_IN_STAGE_6_COMPLETED"] is None:
-                stage_6_date = datetime.now()
-                params["COMPUTED_DATE_IN_STAGE_6_COMPLETED"] = stage_6_date.strftime(DATE_FMT)
-                new_stage_6_date = stage_6_date
-            else:
-                stage_6_date = datetime.strptime(
-                    params["COMPUTED_DATE_IN_STAGE_6_COMPLETED"][:10],
-                    DATE_FMT)
-                dt_delta = date_today - stage_6_date
-                params["COMPUTED_DAYS_IN_STAGE_6_COMPLETED"] = dt_delta.days
-
-        if project_phases[phase] == 7:
-            if params["COMPUTED_DATE_IN_STAGE_7_MAINTENANCE"] is None:
-                stage_7_date = datetime.now()
-                params["COMPUTED_DATE_IN_STAGE_7_MAINTENANCE"] = stage_7_date.strftime(DATE_FMT)
-                new_stage_7_date = stage_7_date
-            else:
-                stage_7_date = datetime.strptime(
-                    params["COMPUTED_DATE_IN_STAGE_7_MAINTENANCE"][:10],
-                    DATE_FMT)
-                dt_delta = date_today - stage_7_date
-                params["COMPUTED_DAYS_IN_STAGE_7_MAINTENANCE"] = dt_delta.days
-
-        if project_phases[phase] == 9:
-            if params["COMPUTED_DATE_IN_STAGE_9_AD_HOC"] is None:
-                stage_9_date = datetime.now()
-                params["COMPUTED_DATE_IN_STAGE_9_AD_HOC"] = stage_9_date.strftime(DATE_FMT)
-                new_stage_9_date = stage_9_date
-            else:
-                stage_9_date = datetime.strptime(
-                    params["COMPUTED_DATE_IN_STAGE_9_AD_HOC"][:10],
-                    DATE_FMT)
-                dt_delta = date_today - stage_9_date
-                params["COMPUTED_DAYS_IN_STAGE_9_AD_HOC"] = dt_delta.days
+        new_stage_0_date, new_stage_0_age = update_stage(
+            params, 0, project_phases[phase],
+            "COMPUTED_DATE_IN_STAGE_0_IDEAS", "COMPUTED_DAYS_IN_STAGE_0_IDEAS",
+            date_today
+        )
+        new_stage_1_date, new_stage_1_age = update_stage(
+            params, 1, project_phases[phase],
+            "COMPUTED_DATE_IN_STAGE_1_CHARTERING", "COMPUTED_DAYS_IN_STAGE_1_CHARTERING",
+            date_today
+        )
+        new_stage_2_date, new_stage_2_age = update_stage(
+            params, 2, project_phases[phase],
+            "COMPUTED_DATE_IN_STAGE_2_COMMITTED", "COMPUTED_DAYS_IN_STAGE_2_COMMITTED",
+            date_today
+        )
+        new_stage_3_date, new_stage_3_age = update_stage(
+            params, 3, project_phases[phase],
+            "COMPUTED_DATE_IN_STAGE_3_IN_PROGRESS", "COMPUTED_DAYS_IN_STAGE_3_IN_PROGRESS",
+            date_today, special_case="stage_3"
+        )
+        new_stage_4_date, new_stage_4_age = update_stage(
+            params, 4, project_phases[phase],
+            "COMPUTED_DATE_IN_STAGE_4_ON_HOLD", "COMPUTED_DAYS_IN_STAGE_4_ON_HOLD",
+            date_today
+        )
+        new_stage_5_date, new_stage_5_age = update_stage(
+            params, 5, project_phases[phase],
+            "COMPUTED_DATE_IN_STAGE_5_ROLLOUT", "COMPUTED_DAYS_IN_STAGE_5_ROLLOUT",
+            date_today
+        )
+        new_stage_6_date, new_stage_6_age = update_stage(
+            params, 6, project_phases[phase],
+            "COMPUTED_DATE_IN_STAGE_6_COMPLETED", "COMPUTED_DAYS_IN_STAGE_6_COMPLETED",
+            date_today
+        )
+        new_stage_7_date, new_stage_7_age = update_stage(
+            params, 7, project_phases[phase],
+            "COMPUTED_DATE_IN_STAGE_7_MAINTENANCE", "COMPUTED_DAYS_IN_STAGE_7_MAINTENANCE",
+            date_today
+        )
+        new_stage_9_date, new_stage_9_age = update_stage(
+            params, 9, project_phases[phase],
+            "COMPUTED_DATE_IN_STAGE_9_AD_HOC", "COMPUTED_DAYS_IN_STAGE_9_AD_HOC",
+            date_today
+        )
 
 
     previous_phase_updated = False
@@ -343,43 +277,18 @@ def process_project_directory(root, dirs, files):
         else:
             print(line, end='')
 
-    # stage_3_age_updated = False
-    # for line in fileinput.input(os.path.join(root, project_info_filename), inplace=True):
-    #     if line.startswith("COMPUTED_DAYS_IN_STAGE_3_IN_PROGRESS:"):
-    #         if new_stage_3_age is not None:
-    #             print(f"COMPUTED_DAYS_IN_STAGE_3_IN_PROGRESS: {new_stage_3_age}")
-    #             stage_3_age_updated = True
-    #         # else: delete the line by not printing it
-    #     else:
-    #         print(line, end='')
-
     stage_3_age_updated = False
-    field = "COMPUTED_DAYS_IN_STAGE_3_IN_PROGRESS"
-    stage_3_age_value = new_stage_3_age
-    print(f"Updating {field} with value: {stage_3_age_value}")
-
-    for line in fileinput.input(os.path.join(root, project_info_filename), inplace=True):
-        if line.startswith(f"{field}:"):
-            if stage_3_age_value is not None:
-                print(f"{field}: {stage_3_age_value}")
+    if project_phases[phase] == 3 and new_stage_3_age is not None:
+        for line in fileinput.input(os.path.join(root, project_info_filename), inplace=True):
+            if line.startswith("COMPUTED_DAYS_IN_STAGE_3_IN_PROGRESS:"):
+                print(f"COMPUTED_DAYS_IN_STAGE_3_IN_PROGRESS: {new_stage_3_age}")
                 stage_3_age_updated = True
-            # else: line not printed (removed)
-        else:
-            print(line, end='')
-
-    # GENERIC REPLACEMENT FOR `previous_phase_updated = False` AND `stage_3_age_updated = False` BLOCKS
-    #     should be usable for all(?) fields written to the bottom of project_info that should _not_ be duplicated
-    # field_updated = False
-    # for line in fileinput.input(filename, inplace=True):
-    #     if line.startswith(f"{field_name}:"):
-    #         if value is not None:
-    #             print(f"{field_name}: {value}")
-    #             field_updated = True
-    #     else:
-    #         print(line, end='')
-    # if not field_updated and value is not None:
-    #     with open(filename, "a") as f:
-    #         f.write(f"{field_name}: {value}\n")
+            else:
+                print(line, end='')
+        if not stage_3_age_updated:
+            # Separate `with open()...` block inside if project_phases[phase] == 3 to prevent deleting line with <> 3
+            with open(os.path.join(root, project_info_filename), "a") as project_info_file:
+                project_info_file.write(f"COMPUTED_DAYS_IN_STAGE_3_IN_PROGRESS: {new_stage_3_age}\n")
 
 
     with open(os.path.join(root, project_info_filename), "a") as project_info_file:
@@ -417,10 +326,6 @@ def process_project_directory(root, dirs, files):
         if not previous_phase_updated:
             project_info_file.write(f'COMPUTED_PREVIOUS_PHASE: {phase}\n')
 
-        print(f"Updating {field} with value: {stage_3_age_value}")
-        if not stage_3_age_updated and stage_3_age_value is not None:
-            project_info_file.write(f"COMPUTED_DAYS_IN_STAGE_3_IN_PROGRESS: {stage_3_age_value}\n")
-
         # Update the project info file with time values for phase transitions
         if new_project_start_date is not None:
             project_info_file.write(f'COMPUTED_PROJECT_START_DATE: {new_project_start_date.strftime(DATE_FMT)}\n')
@@ -439,11 +344,7 @@ def process_project_directory(root, dirs, files):
                 f'PHASE_CHANGE: {params["COMPUTED_PREVIOUS_PHASE"]} -> {phase} DATE: {datetime.now().strftime(DATE_FMT)}\n'
             )
 
-
     return params
-    # except Exception as ex:
-    #     logging.error(f"Error processing project at {root}: {ex}")
-    #     return None
 
 
 def main():

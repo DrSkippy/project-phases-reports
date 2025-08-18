@@ -212,10 +212,10 @@ if __name__ == "__main__":
                     commit_to_completion_days = (end_date - start_date).days
                     params["COMPUTED_COMMIT_TO_COMPLETION_DAYS"] = commit_to_completion_days
                     new_commit_to_completion_days = commit_to_completion_days
-                else:
-                    commit_to_completion_days = datetime.strptime(
-                        params["COMPUTED_COMMIT_TO_COMPLETION_DAYS"][:10], DATE_FMT)
-                    params["COMPUTED_COMMIT_TO_COMPLETION_DAYS"] = commit_to_completion_days
+#                else:
+#                    commit_to_completion_days = int(
+#                        params["COMPUTED_COMMIT_TO_COMPLETION_DAYS"])
+#                    params["COMPUTED_COMMIT_TO_COMPLETION_DAYS"] = commit_to_completion_days
             else:
                 logging.info("Missing values needed to Compute COMPUTED_COMPLETION_TIME_MINUS_HOLD_DAYS")
 

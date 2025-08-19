@@ -151,7 +151,7 @@ def compute_phase_dwell(root, project_info_txt, param_key, phase_date, today):
 
 def extract_params(root):
     """
-    Extract phase and project names for the file path.
+    Extract phase and proji ect names for the file path.
         Assume start one directory above "Projects Folders"
     """
     names = root.split("/")  # phase, project

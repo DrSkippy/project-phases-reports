@@ -33,20 +33,25 @@ class ProjectFileObject:
         pass
 
     def phase1(self):
+        self._date_in_phase(key="COMPUTED_DATE_IN_STAGE_1_CHARTERING")
         self._project_start_date()
 
     def phase2(self):
+        self._date_in_phase(key="COMPUTED_DATE_IN_STAGE_2_COMMITTED")
         self._project_start_date()
 
     def phase3(self):
+        self._date_in_phase(key="COMPUTED_DATE_IN_STAGE_3_IN_PROGRESS")
         self._project_start_date()
         self._project_in_progress_date()
 
     def phase4(self):
+        self._date_in_phase(key="COMPUTED_DATE_IN_STAGE_4_ON_HOLD")
         self._project_start_date()
         self._project_in_progress_date()
 
     def phase5(self):
+        self._date_in_phase(key="COMPUTED_DATE_IN_STAGE_5_ROLLOUT")
         self._project_start_date()
         self._project_in_progress_date()
 
@@ -69,21 +74,10 @@ class ProjectFileObject:
                                                                                new=True)
 
     ##########################################################################
-    def _date_in_phase(self, key_date=None, key_days=None):
-        if self.params_dict[key_date] is None:
+    def _date_in_phase(self, key=None):
+        if self.params_dict[key] is None:
             # First time we processed file since project phase changed
-            self.params_dict[key_date] = StringLine(key=key, value=datetime_today, new=True)
-        elif self.params_dict[key_days] is None or self.params_dict[key_days].int_value == 0:
-            # First time we processed file since project phase changed
-            dt_delta = datetime_today - self.params_dict[key_date].date_value
-            self.params_dict[key_days] = StringLine(key=key_days, value=int(dt_delta.days), new=True)
-        else:
-            # Update the days if the date has changed
-            dt_delta = datetime_today - self.params_dict[key_date].date_value
-            if dt_delta.days != self.params_dict[key_days].int_value:
-                self.params_dict[key_days].update_value(int(dt_delta.days))
-                logging.info(f"Updated {key_days} for project {self.project} to {dt_delta.days} days.")
-
+            self.params_dict[key] = StringLine(key=key, value=datetime_today, new=True)
 
     def _project_in_progress_date(self):
         if self.params_dict["COMPUTED_PROJECT_IN_PROGRESS_DATE"].value is None:
@@ -149,7 +143,10 @@ class ProjectFileObject:
             current_phase = self.params_dict["COMPUTED_PREVIOUS_PHASE"].value
             self.params_dict["COMPUTED_PREVIOUS_PHASE"].update_value(self.phase)
             new_line = f'{current_phase} -> {self.phase} DATE: {datetime.now().strftime(DATE_FMT)}\n'
-            self.params_dict["PHASE_CHANGE"] = StringLine(key="PHASE_CHANGE", value=new_line, new=True)
+            self.params_dict["PHASE_CHANGE"] = StringLine(key="PHASE_CHANGE",
+                                                          value=new_line,
+                                                          new=True,
+                                                          in_reports=False)
 
     def extract_params(self):
         """
@@ -201,6 +198,9 @@ class ProjectFileObject:
         legacy_params = {}
         for key, line_obj in self.params_dict.items():
             if isinstance(line_obj, StringLine) or isinstance(line_obj, AggregateLines):
+                if not line_obj.in_reports:
+                    logging.info( f'In "{self.project_root}": at key={key} line_obj={line_obj} is not in reports')
+                    continue
                 legacy_params[key] = line_obj.get(key)
             else:
                 logging.info(
@@ -233,6 +233,7 @@ class ProjectFileObject:
 class AggregateLines:
     def __init__(self):
         self.aggregate_dict = {}
+        self.in_reports = True
 
     def add_line(self, line_obj):
         """
@@ -273,12 +274,13 @@ class AggregateLines:
 
 
 class StringLine:
-    def __init__(self, line=None, key=None, value=None, new=False):
+    def __init__(self, line=None, key=None, value=None, new=False, in_reports=True):
         self.line = line
         self.suffix = None  # raw line after "key:
         self.date_value = None
         self.int_value = None
         # Flags
+        self.in_reports = in_reports      # Set to false if field is only in file and not in reports
         self.parsed = False
         self.updated = False
         self.new = False

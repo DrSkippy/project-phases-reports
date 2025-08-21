@@ -1,27 +1,125 @@
-import logging
 import fileinput
+import logging
 import uuid
 from datetime import datetime
 
 from reports.configurations import *
 from reports.parser import normalize_note_date, create_charter_link
 
+datetime_today = datetime.now().date()
+
 
 class ProjectFileObject:
     def __init__(self, root, files, project_info_filename: str):
+        self.uuid = None
+        self.phase_functions = {
+            "0-Ideas": self.phase0,
+            "1-Chartering": self.phase1,
+            "2-Committed": self.phase2,
+            "3-In Progress": self.phase3,
+            "4-On Hold": self.phase4,
+            "5-Rollout": self.phase5,
+            "6-Completed": self.phase6}
         self.project_info_filepath = project_info_filename
         self.project_root = root
         self.files = files
         self.params_dict = project_params_dict.copy()
         self.parse_file()
         self.setup_special_fields()
+        self.phase_functions[self.phase]()
 
+    ##########################################################################
+    def phase0(self):
+        pass
+
+    def phase1(self):
+        self._project_start_date()
+
+    def phase2(self):
+        self._project_start_date()
+
+    def phase3(self):
+        self._project_start_date()
+        self._project_in_progress_date()
+
+    def phase4(self):
+        self._project_start_date()
+        self._project_in_progress_date()
+
+    def phase5(self):
+        self._project_start_date()
+        self._project_in_progress_date()
+
+    def phase6(self):
+        self._project_start_date()
+        self._project_in_progress_date()
+        if self.params_dict["COMPUTED_PROJECT_END_DATE"].value is None:
+            # First time we processed file since project phase changed to completed
+            self.params_dict["COMPUTED_PROJECT_END_DATE"] = StringLine(key="COMPUTED_PROJECT_END_DATE",
+                                                                       value=datetime_today,
+                                                                       new=True)
+        if self.params_dict["COMPUTED_PROJECT_START_DATE"].value is not None:
+            # First time we processed file since project phase changed to completed
+            if self.params_dict["COMPUTED_COMPLETION_TIME_DAYS"] is None:
+                self.params_dict["COMPUTED_COMPLETION_TIME_DAYS"] = StringLine(key="COMPUTED_COMPLETION_TIME_DAYS",
+                                                                               value=(self.params_dict[
+                                                                                          "COMPUTED_PROJECT_END_DATE"].date_value -
+                                                                                      self.params_dict[
+                                                                                          "COMPUTED_PROJECT_START_DATE"].date_value).days,
+                                                                               new=True)
+
+    ##########################################################################
+    def _date_in_phase(self, key_date=None, key_days=None):
+        if self.params_dict[key_date] is None:
+            # First time we processed file since project phase changed
+            self.params_dict[key_date] = StringLine(key=key, value=datetime_today, new=True)
+        elif self.params_dict[key_days] is None or self.params_dict[key_days].int_value == 0:
+            # First time we processed file since project phase changed
+            dt_delta = datetime_today - self.params_dict[key_date].date_value
+            self.params_dict[key_days] = StringLine(key=key_days, value=int(dt_delta.days), new=True)
+        else:
+            # Update the days if the date has changed
+            dt_delta = datetime_today - self.params_dict[key_date].date_value
+            if dt_delta.days != self.params_dict[key_days].int_value:
+                self.params_dict[key_days].update_value(int(dt_delta.days))
+                logging.info(f"Updated {key_days} for project {self.project} to {dt_delta.days} days.")
+
+
+    def _project_in_progress_date(self):
+        if self.params_dict["COMPUTED_PROJECT_IN_PROGRESS_DATE"].value is None:
+            # First time we processed file since project phase changed to completed
+            self.params_dict["COMPUTED_PROJECT_IN_PROGRESS_DATE"] = StringLine(key="COMPUTED_PROJECT_IN_PROGRESS_DATE",
+                                                                               value=datetime_today,
+                                                                               new=True)
+
+    def _project_start_date(self):
+        # Chartering - Active projects
+        if self.params_dict["COMPUTED_PROJECT_START_DATE"] is None:
+            # First time we processed file since project phase changed to active
+            self.params_dict["COMPUTED_PROJECT_START_DATE"] = StringLine(key="COMPUTED_PROJECT_START_DATE",
+                                                                         value=datetime_today,
+                                                                         new=True)
+        else:
+            project_start_date = self.params_dict["COMPUTED_PROJECT_START_DATE"].date_value
+            dt_delta = datetime_today - project_start_date
+            if self.params_dict["COMPUTED_AGE_DAYS"] is None or self.params_dict["COMPUTED_AGE_DAYS"] == 0:
+                # First time we processed file since project phase changed to active
+                self.params_dict["COMPUTED_AGE_DAYS"] = StringLine(key="COMPUTED_AGE_DAYS",
+                                                                   value=int(dt_delta.days),
+                                                                   new=True)
+            else:
+                # Update the age days if the project start date has changed
+                if dt_delta.days != self.params_dict["COMPUTED_AGE_DAYS"].int_value:
+                    self.params_dict["COMPUTED_AGE_DAYS"].update_value(int(dt_delta.days))
+                    logging.info(f"Updated age days for project {self.project} to {dt_delta.days} days.")
+
+    ##########################################################################
     def setup_special_fields(self):
-        self.uuid()
+        self.set_uuid()
         self.record_timestamp()
         self.determine_phase_change()
 
-    def uuid(self):
+    def set_uuid(self):
         """
         Generate a UUID for the project based on the root path.
         The UUID is stored in the params_dict under the key "UUID".
@@ -32,7 +130,8 @@ class ProjectFileObject:
 
     def record_timestamp(self):
         if "Report_Date" not in self.params_dict or self.params_dict["Report_Date"] is None:
-            self.params_dict["Report_Date"] = StringLine(key="Report_Date", value=datetime.now().strftime(DATE_FMT), new=True)
+            self.params_dict["Report_Date"] = StringLine(key="Report_Date", value=datetime.now().strftime(DATE_FMT),
+                                                         new=True)
         else:
             self.params_dict["Report_Date"].update_value(datetime.now().strftime(DATE_FMT))
 
@@ -42,7 +141,8 @@ class ProjectFileObject:
         If the phase or project has changed, update the params_dict accordingly.
         """
         if "COMPUTED_PREVIOUS_PHASE" not in self.params_dict or self.params_dict["COMPUTED_PREVIOUS_PHASE"] is None:
-            self.params_dict["COMPUTED_PREVIOUS_PHASE"] = StringLine(key="COMPUTED_PREVIOUS_PHASE", value=self.phase, new=True)
+            self.params_dict["COMPUTED_PREVIOUS_PHASE"] = StringLine(key="COMPUTED_PREVIOUS_PHASE", value=self.phase,
+                                                                     new=True)
             logging.info(f"Setting initial phase: {self.phase} for project: {self.project}")
         elif self.phase != self.params_dict["COMPUTED_PREVIOUS_PHASE"].value:
             logging.info(f"Phase has changed: {self.phase}, {self.project}")
@@ -60,7 +160,8 @@ class ProjectFileObject:
         assert (len(names) == 4 and names[1] == "Projects Folders")
         logging.info(f"Extracted phase: {names[2]}, project: {names[3]}")
         if names[2] is None or names[3] is None:
-            raise ValueError(f"Invalid project root path: {self.project_root}. Expected format: '/Projects Folders/<phase>/<project>'")
+            raise ValueError(
+                f"Invalid project root path: {self.project_root}. Expected format: '/Projects Folders/<phase>/<project>'")
         self.phase, self.project = names[2], names[3]
 
     def parse_file(self):
@@ -75,9 +176,8 @@ class ProjectFileObject:
             self.params_dict["Phases"] = StringLine(key="Phases", value=self.phase)
             self.params_dict["Project"] = StringLine(key="Project", value=self.project)
             self.params_dict["CharterLink"] = StringLine(key="CharterLink",
-                                            value=create_charter_link(self.project_root,
-                                                                      "refactor me away", self.files))
-
+                                                         value=create_charter_link(self.project_root,
+                                                                                   "refactor me away", self.files))
             ###########################################################################
             ## Parse the file line by line
             agg_lines = AggregateLines()
@@ -103,7 +203,8 @@ class ProjectFileObject:
             if isinstance(line_obj, StringLine) or isinstance(line_obj, AggregateLines):
                 legacy_params[key] = line_obj.get(key)
             else:
-                logging.info(f'In "{self.project_root}": at key={key} line_obj={line_obj} is not a StringLine or AggregateLines')
+                logging.info(
+                    f'In "{self.project_root}": at key={key} line_obj={line_obj} is not a StringLine or AggregateLines')
                 legacy_params[key] = line_obj
         return legacy_params
 
@@ -127,6 +228,7 @@ class ProjectFileObject:
                     project_info_file.write(str(obj) + "\n")
 
         return replaced_in_file, appended_in_file
+
 
 class AggregateLines:
     def __init__(self):
@@ -173,7 +275,7 @@ class AggregateLines:
 class StringLine:
     def __init__(self, line=None, key=None, value=None, new=False):
         self.line = line
-        self.suffix = None           # raw line after "key:
+        self.suffix = None  # raw line after "key:
         self.date_value = None
         self.int_value = None
         # Flags
@@ -218,7 +320,6 @@ class StringLine:
             self.value = None
             self.suffix = self.line[1:].strip()
             self.comment = True
-
 
     def parse(self, fields) -> str:
         self.key = fields[0].strip()

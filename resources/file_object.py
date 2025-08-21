@@ -1,17 +1,17 @@
 import logging
 import os
+import uuid
 from datetime import datetime
 
-from resources.configurations import *
-
-from reports.configurations import order_strings_by_date
-from reports.parser import normalize_note_date
+from reports.configurations import *
+from reports.parser import normalize_note_date, create_charter_link
 
 
 class ProjectFileObject:
-    def __init__(self, root, project_info_filename: str):
+    def __init__(self, root, files, project_info_filename: str):
         self.project_info_filepath = project_info_filename
         self.project_root = root
+        self.files = files
         self.params_dict = project_params_dict.copy()
         self.parse_file()
         self.setup_special_fields()
@@ -42,16 +42,16 @@ class ProjectFileObject:
         """
         if self.phase != self.params_dict["COMPUTED_PREVIOUS_PHASE"].value:
             logging.info(f"Phase has changed: {self.phase}, {self.project}")
-            new_line = f" {self.params_dict["COMPUTED_PREVIOUS_PHASE"].value} -> {self.phase} DATE: {datetime.now().strftime(DATE_FMT)}\n'
+            new_line = f'{self.params_dict["COMPUTED_PREVIOUS_PHASE"].value} -> {self.phase} DATE: {datetime.now().strftime(DATE_FMT)}\n'
             self.params_dict["COMPUTED_PREVIOUS_PHASE"].update_value(self.phase)
             self.params_dict["PHASE_CHANGE"] = StringLine(key="PHASE_CHANGE", value=new_line, new=True)
 
-    def extract_params(self, root):
+    def extract_params(self):
         """
         Extract phase and project names for the file path.
             Assume start one directory above "Projects Folders"
         """
-        names = root.split("/")  # phase, project
+        names = self.project_root.split("/")  # phase, project
         assert (len(names) == 4 and names[1] == "Projects Folders")
         logging.info(f"Extracted phase: {names[2]}, project: {names[3]}")
         self.phase, self.project = names[2], names[3]
@@ -59,16 +59,17 @@ class ProjectFileObject:
     def parse_file(self):
         # Process Project Info file
         projects_processed_counter = 0
-        with open(os.path.join(root, project_info_filename), "r") as project_info_file:
-            logging.info(f"Processing file {projects_processed_counter} ({root})")
+        with open(os.path.join(self.project_root, project_info_filename), "r") as project_info_file:
+            logging.info(f"Processing file {projects_processed_counter} ({self.project_root})")
             projects_processed_counter += 1
-            self.extract_params(root)  # harvest parameters from path
+            self.extract_params()  # harvest parameters from path
             ##########################################################################
             ## Meta parmaeters not parsed from file
             self.params_dict["Phase"] = StringLine(key="Phase", value=self.phase)
             self.params_dict["Project"] = StringLine(key="Project", value=self.project)
             self.params_dict["CharterLink"] = StringLine(key="CharterLink",
-                                            value=create_charter_link(root, "refactor me away", files))
+                                            value=create_charter_link(self.project_root,
+                                                                      "refactor me away", self.files))
 
             ###########################################################################
             ## Parse the file line by line
@@ -80,7 +81,7 @@ class ProjectFileObject:
                 elif obj.aggregate_key is not None and obj.aggregate_key in self.params_dict:
                     agg_lines.add_line(obj)
                     self.params_dict[obj.aggregate_key] = agg_lines
-                elif obj.comment
+                elif obj.comment:
                     logging.info(f"Comment line found: {obj.line}")
                 else:
                     logging.error(f"Key {obj.key} not found in params_dict, line: {line.strip()}")
@@ -157,8 +158,8 @@ class AggregateLines:
 
 
 class StringLine:
-    def __init__(self, line: str, key=None, value=None, new=False):
-        self.line = line.strip()     # raw line from the file
+    def __init__(self, line=None, key=None, value=None, new=False):
+        self.line = line
         self.suffix = None           # raw line after "key:
         self.date_value = None
         self.int_value = None
@@ -176,26 +177,35 @@ class StringLine:
         self.compute_aggregate_key()
 
     def route_line_for_parsing(self, key, new, value):
-        if self.line.startswith("#"):
-            # if the line starts with a comment, set it as a comment
-            self.key = None
-            self.value = None
-            self.suffix = self.line[1:].strip()
-            self.comment = True
+        if key is not None and value is not None:
+            # if key and value are provided, set them directly and create the line
+            self.key = key.strip()
+            if isinstance(value, str):
+                self.value = value.strip()
+            else:
+                # is a python number type or structure`
+                self.value = value
+            self.suffix = self.value
+            self.line = f"{key}: {value}"
+            self.new = new
         elif key is None or value is None or new is False:
+            if self.line is None or self.line == "":
+                raise ValueError(f"Line must be provided if key or value is not specified. ({line}, {key}, {value})")
+            self.line = self.line.strip()  # raw line from the file
             # if key or value is not provided, parse the line
             self.key = None
             self.value = None
             fields = [x.strip() for x in self.line.split(":")]
             self.parse(fields)
             self.set_parsed_value()
-        elif key is not None and value is not None:
-            # if key and value are provided, set them directly
-            self.key = key.strip()
-            self.value = value.strip()
-            self.suffix = self.value
-            self.line = f"{key}: {value}"
-            self.new = new
+        elif self.line.startswith("#"):
+            self.line = line.strip()  # raw line from the file
+            # if the line starts with a comment, set it as a comment
+            self.key = None
+            self.value = None
+            self.suffix = self.line[1:].strip()
+            self.comment = True
+
 
     def parse(self, fields) -> str:
         self.key = fields[0].strip()
@@ -227,7 +237,7 @@ class StringLine:
         if self.value is not None:
             try:
                 self.int_value = int(self.value)
-            except ValueError:
+            except (ValueError, TypeError):
                 logging.warning(f"Invalid integer format in line: {self.line}")
                 self.int_value = None
 
@@ -238,7 +248,7 @@ class StringLine:
         if self.value is not None:
             try:
                 self.date_value = datetime.strptime(self.value, DATE_FMT).date()
-            except ValueError:
+            except (ValueError, TypeError):
                 self.date_value = None
                 logging.warning(f"Invalid date format in line: {self.line}")
 

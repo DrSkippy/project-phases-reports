@@ -24,7 +24,7 @@ dictConfig({
             'class': 'logging.handlers.RotatingFileHandler',
             'formatter': 'default',
             'level': 'DEBUG',
-            'filename': 'update_summary.log',
+            'filename': 'update_summary_v2.log',
             'mode': 'a',
             'encoding': 'utf-8',
             'maxBytes': 900000,
@@ -42,7 +42,6 @@ if __name__ == "__main__":
     logging.info("Starting update_summary Version 2")
 
     ### TESTING
-    projects_tree_root = "/home/scott/Working/project-phases-reports/tests/projects_snapshot/"
     os.chdir(projects_tree_root)
     logging.info(f"Current directory: {os.getcwd()}")
 
@@ -56,7 +55,7 @@ if __name__ == "__main__":
             logging.warning(f"Skipping {root}")
             continue
 
-        proj = ProjectFileObject(root, project_info_filename)
+        proj = ProjectFileObject(root, files, project_info_filename)
         logging.debug(str(proj))
         project_objects_list.append(proj)
 

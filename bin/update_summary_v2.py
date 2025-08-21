@@ -1,18 +1,11 @@
 #!/usr/bin/env -S poetry run python
-import sys
-import os
-import uuid
-import fileinput
-from datetime import datetime
 from logging.config import dictConfig
 
-#sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))) # enables import of modules from resources
+# sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))) # enables import of modules from resources
 # Import Project Module(s) Below
-from resources.date_utils import parse_date, days_between_dates
 from reports.parser import *
 from reports.summary import *
 from resources.file_object import *
-
 
 dictConfig({
     'version': 1,
@@ -29,7 +22,7 @@ dictConfig({
             'encoding': 'utf-8',
             'maxBytes': 900000,
             'backupCount': 3
-    }},
+        }},
     'root': {
         'level': 'DEBUG',
         'handlers': ['file']
@@ -41,11 +34,9 @@ datetime_today = dateutil.utils.today()
 if __name__ == "__main__":
     logging.info("Starting update_summary Version 2")
 
-    ### TESTING
     os.chdir(projects_tree_root)
     logging.info(f"Current directory: {os.getcwd()}")
 
-    project_records_list = []
     project_objects_list = []
     projects_processed_counter = 0
 
@@ -56,7 +47,10 @@ if __name__ == "__main__":
             continue
 
         proj = ProjectFileObject(root, files, project_info_filename)
-        logging.debug(str(proj))
+        logging.debug(f'Processing root={root}: {str(proj)}')
         project_objects_list.append(proj)
 
+    logging.info(f"Processed {len(project_objects_list)} projects.")
     create_reports([p.get_legacy_params() for p in project_objects_list])
+    res = {obj.uuid: obj.finalize_file() for obj in project_objects_list}
+    logging.debug(f"Finalized files: {res}")

@@ -1,5 +1,5 @@
 import logging
-import os
+import fileinput
 import uuid
 from datetime import datetime
 
@@ -28,6 +28,7 @@ class ProjectFileObject:
         """
         if "Project_ID" not in self.params_dict or self.params_dict["Project_ID"] is None:
             self.params_dict["Project_ID"] = StringLine(key="Project_ID", value=str(uuid.uuid1()), new=True)
+        self.uuid = self.params_dict["Project_ID"].value
 
     def record_timestamp(self):
         if "Report_Date" not in self.params_dict or self.params_dict["Report_Date"] is None:
@@ -40,10 +41,14 @@ class ProjectFileObject:
         Determine if the phase or project has changed based on the file path.
         If the phase or project has changed, update the params_dict accordingly.
         """
-        if self.phase != self.params_dict["COMPUTED_PREVIOUS_PHASE"].value:
+        if "COMPUTED_PREVIOUS_PHASE" not in self.params_dict or self.params_dict["COMPUTED_PREVIOUS_PHASE"] is None:
+            self.params_dict["COMPUTED_PREVIOUS_PHASE"] = StringLine(key="COMPUTED_PREVIOUS_PHASE", value=self.phase, new=True)
+            logging.info(f"Setting initial phase: {self.phase} for project: {self.project}")
+        elif self.phase != self.params_dict["COMPUTED_PREVIOUS_PHASE"].value:
             logging.info(f"Phase has changed: {self.phase}, {self.project}")
-            new_line = f'{self.params_dict["COMPUTED_PREVIOUS_PHASE"].value} -> {self.phase} DATE: {datetime.now().strftime(DATE_FMT)}\n'
+            current_phase = self.params_dict["COMPUTED_PREVIOUS_PHASE"].value
             self.params_dict["COMPUTED_PREVIOUS_PHASE"].update_value(self.phase)
+            new_line = f'{current_phase} -> {self.phase} DATE: {datetime.now().strftime(DATE_FMT)}\n'
             self.params_dict["PHASE_CHANGE"] = StringLine(key="PHASE_CHANGE", value=new_line, new=True)
 
     def extract_params(self):
@@ -54,6 +59,8 @@ class ProjectFileObject:
         names = self.project_root.split("/")  # phase, project
         assert (len(names) == 4 and names[1] == "Projects Folders")
         logging.info(f"Extracted phase: {names[2]}, project: {names[3]}")
+        if names[2] is None or names[3] is None:
+            raise ValueError(f"Invalid project root path: {self.project_root}. Expected format: '/Projects Folders/<phase>/<project>'")
         self.phase, self.project = names[2], names[3]
 
     def parse_file(self):
@@ -65,7 +72,7 @@ class ProjectFileObject:
             self.extract_params()  # harvest parameters from path
             ##########################################################################
             ## Meta parmaeters not parsed from file
-            self.params_dict["Phase"] = StringLine(key="Phase", value=self.phase)
+            self.params_dict["Phases"] = StringLine(key="Phases", value=self.phase)
             self.params_dict["Project"] = StringLine(key="Project", value=self.project)
             self.params_dict["CharterLink"] = StringLine(key="CharterLink",
                                             value=create_charter_link(self.project_root,
@@ -93,27 +100,33 @@ class ProjectFileObject:
         """
         legacy_params = {}
         for key, line_obj in self.params_dict.items():
-            if isinstance(line_obj, StringLine):
+            if isinstance(line_obj, StringLine) or isinstance(line_obj, AggregateLines):
                 legacy_params[key] = line_obj.get(key)
             else:
+                logging.info(f'In "{self.project_root}": at key={key} line_obj={line_obj} is not a StringLine or AggregateLines')
                 legacy_params[key] = line_obj
         return legacy_params
 
     def finalize_file(self):
         # In place changes
-        for line in fileinput.input(os.path.join(root, project_info_filename), inplace=True):
-            for key, obj in self.params_dict:
-                if obj.updated and line.startswith(key):
+        replaced_in_file = False
+        appended_in_file = False
+        for line in fileinput.input(os.path.join(self.project_root, project_info_filename), inplace=True):
+            for key, obj in self.params_dict.items():
+                if isinstance(obj, StringLine) and obj.updated and line.startswith(key):
                     print(f"{key}: {obj.value}")
+                    replaced_in_file = True
                     break
             else:
                 print(line, end='')
         # Append new lines to the file
-        with open(os.path.join(root, project_info_filename), "a") as project_info_file:
+        with open(os.path.join(self.project_root, project_info_filename), "a") as project_info_file:
             for key, obj in self.params_dict.items():
                 if isinstance(obj, StringLine) and obj.new:
+                    append_in_file = True
                     project_info_file.write(str(obj) + "\n")
 
+        return replaced_in_file, appended_in_file
 
 class AggregateLines:
     def __init__(self):
@@ -130,7 +143,7 @@ class AggregateLines:
 
     def get_notes(self):
         if "NOTES" in self.aggregate_dict:
-            notes_list = [normalize_note_date(obl.line) for obj in self.aggregate_dict["NOTES"]]
+            notes_list = [normalize_note_date(obj.line) for obj in self.aggregate_dict["NOTES"]]
             notes_list = order_strings_by_date(notes_list)
             return NOTES_DELIMITER.join(notes_list) + "\n\n"
         else:

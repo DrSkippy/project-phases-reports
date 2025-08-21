@@ -14,9 +14,12 @@ class ProjectFileObject:
         self.project_root = root
         self.params_dict = project_params_dict.copy()
         self.parse_file()
+        self.setup_special_fields()
+
+    def setup_special_fields(self):
         self.uuid()
         self.record_timestamp()
-        self.determine_phsee_change()
+        self.determine_phase_change()
 
     def uuid(self):
         """
@@ -25,7 +28,7 @@ class ProjectFileObject:
         """
         if "Project_ID" not in self.params_dict or self.params_dict["Project_ID"] is None:
             self.params_dict["Project_ID"] = StringLine(key="Project_ID", value=str(uuid.uuid1()), new=True)
-            
+
     def record_timestamp(self):
         if "Report_Date" not in self.params_dict or self.params_dict["Report_Date"] is None:
             self.params_dict["Report_Date"] = StringLine(key="Report_Date", value=datetime.now().strftime(DATE_FMT), new=True)
@@ -155,44 +158,52 @@ class AggregateLines:
 
 class StringLine:
     def __init__(self, line: str, key=None, value=None, new=False):
-        self.line = line.strip()
+        self.line = line.strip()     # raw line from the file
+        self.suffix = None           # raw line after "key:
         self.date_value = None
         self.int_value = None
+        # Flags
         self.parsed = False
         self.updated = False
         self.new = False
         self.comment = False
+        # Parse lines
+        self.route_line_for_parsing(key, new, value)
+        self.parse_date()
+        self.parse_int()
+        # Deal with aggregates
+        self.aggregate_key = None
+        self.compute_aggregate_key()
+
+    def route_line_for_parsing(self, key, new, value):
         if self.line.startswith("#"):
             # if the line starts with a comment, set it as a comment
             self.key = None
             self.value = None
-            self.line = self.line[1:].strip()
+            self.suffix = self.line[1:].strip()
             self.comment = True
         elif key is None or value is None or new is False:
             # if key or value is not provided, parse the line
             self.key = None
             self.value = None
-            fields = [x.strip() for x in line.split(":")]
+            fields = [x.strip() for x in self.line.split(":")]
             self.parse(fields)
             self.set_parsed_value()
         elif key is not None and value is not None:
             # if key and value are provided, set them directly
             self.key = key.strip()
             self.value = value.strip()
+            self.suffix = self.value
             self.line = f"{key}: {value}"
             self.new = new
-        self.parse_date()
-        self.parse_int()
-        self.aggregate_key = None
-        self.compute_aggregate_key()
 
     def parse(self, fields) -> str:
         self.key = fields[0].strip()
-        self.line = ":".join(fields[1:]).strip().strip('"')
+        self.suffix = ":".join(fields[1:]).strip().strip('"')
 
     def set_parsed_value(self):
         if self.line is not None and self.line != "":
-            self.value = self.line
+            self.value = self.suffix
             self.parsed = True
         else:
             self.value = None

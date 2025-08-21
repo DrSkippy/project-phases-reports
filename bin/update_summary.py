@@ -454,4 +454,6 @@ if __name__ == "__main__":
                     f"COMPUTED_DATE_IN_STAGE_9_AD_HOC: {new_stage_9_date.strftime(DATE_FMT)}\n")
 
         project_records_list.append(params)
-        create_reports(project_records_list)
+
+    # Create reports based on the processed project records
+    create_reports(project_records_list)

@@ -5,7 +5,7 @@ from logging.config import dictConfig
 # Import Project Module(s) Below
 from reports.parser import *
 from reports.summary import *
-from resources.file_object import *
+from resources.project_file import *
 
 dictConfig({
     'version': 1,

@@ -66,14 +66,14 @@ class ProjectFileObject:
     def phase6(self):
         self._date_in_phase(key="COMPUTED_DATE_IN_STAGE_6_COMPLETED", age_key="COMPUTED_DAYS_IN_STAGE_6_COMPLETED")
         self._project_activity_class_start_date_age(date_key="COMPUTED_PROJECT_START_DATE", age_key="COMPUTED_AGE_DAYS")
-        if self.params_dict["COMPUTED_PROJECT_END_DATE"].value is None:
+        if self.params_dict["COMPUTED_PROJECT_END_DATE"] is None:
             # First time we processed file since project phase changed to completed
             self.params_dict["COMPUTED_PROJECT_END_DATE"] = StringLine(key="COMPUTED_PROJECT_END_DATE",
                                                                        value=datetime_today,
                                                                        new=True)
         self._days_between_phases(start_key="COMPUTED_PROJECT_START_DATE",
                                   end_key="COMPUTED_PROJECT_END_DATE",
-                                    age_key="COMPUTED_COMPLETION_TIME_DAYS")
+                                  age_key="COMPUTED_COMPLETION_TIME_DAYS")
         self._days_between_phases(start_key="COMPUTED_DATE_IN_STAGE_3_IN_PROGRESS",
                                   end_key="COMPUTED_PROJECT_END_DATE",
                                   age_key="COMPUTED_IN_PROGRESS_TO_COMPLETION_DAYS")
@@ -100,12 +100,18 @@ class ProjectFileObject:
         if self.params_dict[start_key] is not None and self.params_dict[end_key] is not None:
             start_date = self.params_dict[start_key].date_value
             end_date = self.params_dict[end_key].date_value
-            dt_delta = end_date - start_date
-            if self.params_dict[age_key] is None or self.params_dict[age_key] == 0:
-                # First time we processed file since project phase changed to active
-                self.params_dict[age_key] = StringLine(key=age_key,
-                                                       value=int(dt_delta.days),
-                                                       new=True)
+            try:
+                dt_delta = end_date - start_date
+            except TypeError as e:
+                logging.error(f"TypeError in computing days between {start_key}={self.params_dict[start_key].value} and "
+                             f"{end_key}={self.params_dict[end_key].value} for project {self.project}")
+                raise TypeError(e)
+            else:
+                if self.params_dict[age_key] is None or self.params_dict[age_key] == 0:
+                    # First time we processed file since project phase changed to active
+                    self.params_dict[age_key] = StringLine(key=age_key,
+                                                           value=int(dt_delta.days),
+                                                           new=True)
 
 
     def _date_in_phase(self, key=None, age_key=None):

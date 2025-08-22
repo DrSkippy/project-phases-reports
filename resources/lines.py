@@ -1,5 +1,5 @@
 import logging
-from datetime import datetime
+from datetime import datetime, date
 
 from reports.configurations import *
 from reports.parser import normalize_note_date, order_strings_by_date
@@ -88,14 +88,14 @@ class StringLine:
             # if the line starts with a comment, set it as a comment
             self.value = self.line[1:].strip()
             self.is_comment = True
+        self.parse_date_if_present()
+        self.parse_int_if_present()
 
     def parse_line(self) -> str:
         if self.line is not None and self.line != "":
             fields = [x.strip() for x in self.line.split(":")]
             self.key = fields[0].strip()
             self.value = ":".join(fields[1:]).strip().strip('"')
-            self.parse_date_if_present()
-            self.parse_int_if_present()
         else:
             raise ValueError(
                 f"Line must be provided if key or value is not specified. ({self.line}, {self.key}, {self.value})")
@@ -126,10 +126,17 @@ class StringLine:
         Parse the date from the line and set the date attribute.
         """
         if self.value is not None:
-            try:
-                self.date_value = datetime.strptime(self.value, DATE_FMT).date()
-            except (ValueError, TypeError):
-                logging.debug(f"Invalid date format in line: {self.line}")
+            if isinstance(self.value, datetime):
+                self.date_value = self.value.date()
+                return
+            elif isinstance(self.value, date):
+                self.date_value = self.value
+                return
+            else:
+                try:
+                    self.date_value = datetime.strptime(self.value, DATE_FMT).date()
+                except (ValueError, TypeError):
+                    logging.debug(f"Invalid date format in line: {self.line}")
 
     def update_value(self, value: str):
         """

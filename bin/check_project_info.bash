@@ -1,4 +1,4 @@
-
+set -e
 echo "Started at $(date)"
 
 BASE_DIR='/Users/s.hendrickson/Documents/OneDrive - F5, Inc/Projects Folders'
@@ -39,7 +39,7 @@ echo
 echo "Cleaning files with repeated None metrics:"
 for fl in  "${BASE_DIR}"/*/*/PROJECT_INFO.txt; do
   cp "$fl" "$fl.bak"
-  grep -v "COMPUTED_DAYS_IN_STAGE_3_IN_PROGRESS: None" "$fl" > "$fl.clean"
+  grep -v "COMPUTED_DAYS_IN_STAGE_3_IN_PROGRESS: None" "$fl" | uniq > "$fl.clean"
   mv "$fl.clean" "$fl"
 done
 

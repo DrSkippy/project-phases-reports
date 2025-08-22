@@ -71,17 +71,43 @@ class ProjectFileObject:
             self.params_dict["COMPUTED_PROJECT_END_DATE"] = StringLine(key="COMPUTED_PROJECT_END_DATE",
                                                                        value=datetime_today,
                                                                        new=True)
-        if self.params_dict["COMPUTED_PROJECT_START_DATE"].value is not None:
-            # First time we processed file since project phase changed to completed
-            if self.params_dict["COMPUTED_COMPLETION_TIME_DAYS"] is None:
-                self.params_dict["COMPUTED_COMPLETION_TIME_DAYS"] = StringLine(key="COMPUTED_COMPLETION_TIME_DAYS",
-                                                                               value=(self.params_dict[
-                                                                                          "COMPUTED_PROJECT_END_DATE"].date_value -
-                                                                                      self.params_dict[
-                                                                                          "COMPUTED_PROJECT_START_DATE"].date_value).days,
-                                                                               new=True)
+        self._days_between_phases(start_key="COMPUTED_PROJECT_START_DATE",
+                                  end_key="COMPUTED_PROJECT_END_DATE",
+                                    age_key="COMPUTED_COMPLETION_TIME_DAYS")
+        self._days_between_phases(start_key="COMPUTED_DATE_IN_STAGE_3_IN_PROGRESS",
+                                  end_key="COMPUTED_PROJECT_END_DATE",
+                                  age_key="COMPUTED_IN_PROGRESS_TO_COMPLETION_DAYS")
+        self._days_between_phases(start_key="COMPUTED_DATE_IN_STAGE_2_COMMITTED",
+                                  end_key="COMPUTED_PROJECT_END_DATE",
+                                  age_key="COMPUTED_COMMIT_TO_COMPLETION_DAYS")
+        self._days_between_phases(start_key="COMPUTED_DATE_IN_STAGE_1_CHARTERING",
+                                  end_key="COMPUTED_PROJECT_END_DATE",
+                                  age_key="COMPUTED_CHARTER_TO_COMPLETION_DAYS")
+        if (self.params_dict["COMPUTED_DAYS_IN_STAGE_4_ON_HOLD"] is not None and
+                self.params_dict["COMPUTED_IN_PROGRESS_TO_COMPLETION_DAYS"] is not None):
+            days = (self.params_dict["COMPUTED_IN_PROGRESS_TO_COMPLETION_DAYS"].int_value -
+                    self.params_dict["COMPUTED_DAYS_IN_STAGE_4_ON_HOLD"].int_value)
+            if (self.params_dict["COMPUTED_COMPLETION_TIME_MINUS_HOLD_DAYS"] is None or
+                self.params_dict["COMPUTED_COMPLETION_TIME_MINUS_HOLD_DAYS"] == 0):
+                # First time we processed file since project phase changed to completed
+                self.params_dict["COMPUTED_COMPLETION_TIME_MINUS_HOLD_DAYS"] = StringLine(key="COMPUTED_COMPLETION_TIME_MINUS_HOLD_DAYS",
+                                                                                   value=days,
+                                                                                   new=True)
+
 
     ###################### Phase Functions Helpers ##########################
+    def _days_between_phases(self, start_key=None, end_key=None, age_key=None):
+        if self.params_dict[start_key] is not None and self.params_dict[end_key] is not None:
+            start_date = self.params_dict[start_key].date_value
+            end_date = self.params_dict[end_key].date_value
+            dt_delta = end_date - start_date
+            if self.params_dict[age_key] is None or self.params_dict[age_key] == 0:
+                # First time we processed file since project phase changed to active
+                self.params_dict[age_key] = StringLine(key=age_key,
+                                                       value=int(dt_delta.days),
+                                                       new=True)
+
+
     def _date_in_phase(self, key=None, age_key=None):
         if self.params_dict[key] is None:
             # First time we processed file since project phase changed
@@ -153,7 +179,7 @@ class ProjectFileObject:
         The UUID is stored in the params_dict under the key "UUID".
         """
         if "Project_ID" not in self.params_dict or self.params_dict["Project_ID"] is None:
-            self.params_dict["Project_ID"] = StringLine(key="Project_ID", value=str(uuid.uuid1()), new=True)
+            self.params_dict["Project_ID"] = StringLine(key="Project_ID", value=str(uuid.uuid4()), new=True)
         self.uuid = self.params_dict["Project_ID"].value
 
     def record_timestamp(self):

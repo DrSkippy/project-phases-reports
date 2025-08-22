@@ -1,7 +1,11 @@
+# Script will exit on first command failure
+set -e
+#################################################################
 echo "Creating a new project snapshot tarball"
 dt=$(date +%Y-%m-%d_%H%M)
 echo "Started at $dt"
-src=/Users/s.hendrickson/Documents/OneDrive\ -\ F5,\ Inc/Projects\ Folders/
+src=/Users/s.hendrickson/Documents/OneDrive\ -\ F5,\ Inc/
+#src=/Users/s.hendrickson/Documents/OneDrive\ -\ F5,\ Inc/Projects\ Folders/
 dest=/Users/s.hendrickson/Working/project-phases-reports/tests/projects_snapshot/
 cd "${dest}"
 echo "*********************************************"
@@ -10,13 +14,15 @@ read -p "Hit enter to continue or Ctrl-C to abort"
 echo "*********************************************"
 rm -r *
 cd "${src}"
-echo "Creating new snapshot..."
-# find . -depth 3 -name "PROJECT_INFO.txt" -exec echo {} \; 
+#################################################################
+echo "Creating new snapshot of ${src}..."
+#find . -depth 4 -name "PROJECT_INFO.txt" -exec echo {} \; 
 # OSX
-find . -depth 3 -name "PROJECT_INFO.txt" -exec ditto "{}" "${dest}{}" \;
+find . -depth 4 -name "PROJECT_INFO.txt" -exec ditto "{}" "${dest}{}" \;
 # Bash
-# find . -depth 3 -name "PROJECT_INFO.txt" -exec cp --parents "{}" "${dest}{}" \;
-cd "${dest}"
+# find . -depth 4 -name "PROJECT_INFO.txt" -exec cp --parents "{}" "${dest}{}" \;
+cd "${dest}Projects Folders/"
+#################################################################
 nfiles=5
 echo "Culling files to ${nfiles} per phase..."
 for phases in *; do
@@ -34,7 +40,8 @@ for phases in *; do
   done
   cd ..
 done
-cd ..
+cd ../..
+#################################################################
 echo "Creating tarball..."
 tar -cvzf ./projects_snapshot.tar.gz projects_snapshot
 echo "Creation complete"

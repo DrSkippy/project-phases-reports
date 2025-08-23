@@ -12,22 +12,51 @@ echo "Started at $dt"
 src=projects_snapshot_original/
 dest=projects_snapshot/
 
-# Change to the destination's Projects Folders directory.
-cd "${dest}Projects Folders/"
+echo "Copying files to temporary space for comparison..."
+# temporary space for diff inputs (so we can move between phasews
+tmp=/tmp/project_diff/
+rm -rf "${tmp}"
+mkdir -p "${tmp}/updated"
+mkdir -p "${tmp}/original"
 
-echo "Comparing files per phase..."
-
+cd "${src}Projects Folders/"
 # Loop through each phase directory.
 for phases in */; do
   echo "${phases}"
   cd "${phases}"
   # Loop through each project in the phase.
   for projects in *; do
-    echo "comparing ${projects}..."
-    # Compare PROJECT_INFO.txt files and show differences.
-    diff -r "../../../${src}Projects Folders/${phases}/${projects}/PROJECT_INFO.txt" "${projects}/PROJECT_INFO.txt" || true
+    cp -r "${projects}/PROJECT_INFO.txt" "${tmp}original/${projects}.txt"
   done
   cd ..
 done
 
-echo "Comparison complete"
+cd "../../${dest}Projects Folders/"
+# Loop through each phase directory.
+for phases in */; do
+  echo "${phases}"
+  cd "${phases}"
+  # Loop through each project in the phase.
+  for projects in *; do
+    cp -r "${projects}/PROJECT_INFO.txt" "${tmp}updated/${projects}.txt"
+  done
+  cd ..
+done
+
+echo "Using temporary directory: ${tmp}"
+# Copy the source snapshot to the temporary directory.
+# Change to the destination's Projects Folders directory.
+
+cd "${tmp}/updated"
+echo "Comparing files per phase..."
+echo "*************************************************************************"
+# Loop through each phase directory.
+for projects in *; do
+  echo "-----------------------------------"
+  echo "comparing ${projects}..."
+  # Compare PROJECT_INFO.txt files and show differences.
+  diff -r "${tmp}updated/${projects}" "${tmp}original/${projects}" || true
+done
+
+echo "*************************************************************************"
+echo "Comparison complete!"

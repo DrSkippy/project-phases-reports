@@ -2,10 +2,12 @@
 __version__ = "2.0.0"
 
 import argparse
+import logging
+import os
 from logging.config import dictConfig
 
 from reports.summary import configure_report_path_globals, create_reports
-from resources.project_file import *
+from resources.project_file import project_info_filename, project_folders_root, ProjectFileObject
 
 dictConfig({
     'version': 1,
@@ -20,7 +22,7 @@ dictConfig({
             'filename': 'update_summary_v2.log',
             'mode': 'a',
             'encoding': 'utf-8',
-            'maxBytes': 900000,
+            'maxBytes': 1600000,
             'backupCount': 3
         }},
     'root': {
@@ -39,8 +41,10 @@ if __name__ == "__main__":
 
     if args.env == 'prod':
         projects_tree_root = os.getenv('PROJECT_PHASES_PROD_PROJECTS_FOLDERS_DIRECTORY')
-    else:
+    elif args.env == 'test':
         projects_tree_root = os.getenv('PROJECT_PHASES_TEST_SNAPSHOT_DIRECTORY')
+    else:
+        raise ValueError("Invalid environment specified. Use 'prod' or 'test'.")
     logging.info(f"Project folders root: {projects_tree_root}")
     configure_report_path_globals(projects_tree_root)
 

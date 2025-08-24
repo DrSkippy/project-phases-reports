@@ -7,8 +7,6 @@ from reports.configurations import *
 from reports.parser import create_charter_link
 from resources.lines import StringLine, AggregateLines
 
-datetime_today = datetime.now().date()
-
 
 class ProjectFileObject:
     def __init__(self, root, files, project_info_filename: str):
@@ -88,12 +86,12 @@ class ProjectFileObject:
             days = (self.params_dict["COMPUTED_IN_PROGRESS_TO_COMPLETION_DAYS"].int_value -
                     self.params_dict["COMPUTED_DAYS_IN_STAGE_4_ON_HOLD"].int_value)
             if (self.params_dict["COMPUTED_COMPLETION_TIME_MINUS_HOLD_DAYS"] is None or
-                self.params_dict["COMPUTED_COMPLETION_TIME_MINUS_HOLD_DAYS"] == 0):
+                    self.params_dict["COMPUTED_COMPLETION_TIME_MINUS_HOLD_DAYS"] == 0):
                 # First time we processed file since project phase changed to completed
-                self.params_dict["COMPUTED_COMPLETION_TIME_MINUS_HOLD_DAYS"] = StringLine(key="COMPUTED_COMPLETION_TIME_MINUS_HOLD_DAYS",
-                                                                                   value=days,
-                                                                                   new=True)
-
+                self.params_dict["COMPUTED_COMPLETION_TIME_MINUS_HOLD_DAYS"] = StringLine(
+                    key="COMPUTED_COMPLETION_TIME_MINUS_HOLD_DAYS",
+                    value=days,
+                    new=True)
 
     ###################### Phase Functions Helpers ##########################
     def _days_between_phases(self, start_key=None, end_key=None, age_key=None):
@@ -103,8 +101,9 @@ class ProjectFileObject:
             try:
                 dt_delta = end_date - start_date
             except TypeError as e:
-                logging.error(f"TypeError in computing days between {start_key}={self.params_dict[start_key].value} and "
-                             f"{end_key}={self.params_dict[end_key].value} for project {self.project}")
+                logging.error(
+                    f"TypeError in computing days between {start_key}={self.params_dict[start_key].value} and "
+                    f"{end_key}={self.params_dict[end_key].value} for project {self.project}")
                 raise TypeError(e)
             else:
                 if self.params_dict[age_key] is None or self.params_dict[age_key] == 0:
@@ -112,7 +111,6 @@ class ProjectFileObject:
                     self.params_dict[age_key] = StringLine(key=age_key,
                                                            value=int(dt_delta.days),
                                                            new=True)
-
 
     def _date_in_phase(self, key=None, age_key=None):
         if self.params_dict[key] is None:

@@ -1,13 +1,13 @@
 import logging
-import dateutil.utils
-from datetime import datetime, time
 import re
+from datetime import datetime, time
 from urllib.parse import quote
+
 # Import Project Module(s) Below
 from reports.configurations import *
 
 
-dt_today = dateutil.utils.today()
+# dt_today = dateutil.utils.today()
 
 def normalize_note_date(note_line):
     """
@@ -20,8 +20,8 @@ def normalize_note_date(note_line):
         transposed _ and - in dates --> use - in dates
         date string not in yyyy-mm-dd format --> correct it when possible
     """
-    date_re =  re.compile(r"\d{4}-\d{1,2}-\d{1,2}")
-    date_seq_re =  re.compile(r"\d{4}-\d{1,2}-\d{1,2}-\d{1,2}")   # date with sequence number
+    date_re = re.compile(r"\d{4}-\d{1,2}-\d{1,2}")
+    date_seq_re = re.compile(r"\d{4}-\d{1,2}-\d{1,2}-\d{1,2}")  # date with sequence number
     conforming_head_date = None
     try:
         head, tail = note_line.strip().split(":", 1)
@@ -29,7 +29,7 @@ def normalize_note_date(note_line):
         logging.warning(f"WARN: Note is poorly formed ({note_line})")
         # assume first space is between head and tail
         head, tail = note_line.strip().split(" ", 1)
-    head = head.replace("_","-")   # in case someone transposed in typing
+    head = head.replace("_", "-")  # in case someone transposed in typing
 
     try:
         head_date = date_seq_re.search(head).group(0)
@@ -51,7 +51,8 @@ def normalize_note_date(note_line):
     except ValueError:
         logging.error(f"ERROR: Invalid date ({conforming_head_date})")
 
-    return ":".join(["NOTES_"+conforming_head_date, " "+tail.strip()])
+    return ":".join(["NOTES_" + conforming_head_date, " " + tail.strip()])
+
 
 def parse_project_info(project_info_file):
     """
@@ -86,7 +87,7 @@ def parse_project_info(project_info_file):
 
     if params_dict["ANALYTICS_DS_OWNER"] is None:
         logging.error("ERROR: No owner specified. This is required! (Check of typos in file tags!)")
-    
+
     return params_dict
 
 
@@ -149,6 +150,7 @@ def compute_phase_dwell(root, project_info_txt, param_key, phase_date, today):
         updated_lines.append(f"{param_key}: {time_in_phase}\n")
     return updated_lines
 
+
 def extract_params(root):
     """
     Extract phase and proji ect names for the file path.
@@ -158,6 +160,7 @@ def extract_params(root):
     assert (len(names) == 4 and names[1] == "Projects Folders")
     logging.info(f"Extracted phase: {names[2]}, project: {names[3]}")
     return names[2], names[3]
+
 
 def create_charter_link(root, dirs, files):
     """

@@ -1,47 +1,52 @@
-# Script will exit on first command failure
-set -e
-#################################################################
+set -e   # exit on error
+set -u   # treat unset variables as an error
+echo "Started at $(date)"
+echo "*************************************************************************"
 echo "Creating a new project snapshot tarball"
+
 dt=$(date +%Y-%m-%d_%H%M)
-echo "Started at $dt"
-src=/Users/s.hendrickson/Documents/OneDrive\ -\ F5,\ Inc/
-#src=/Users/s.hendrickson/Documents/OneDrive\ -\ F5,\ Inc/Projects\ Folders/
-dest=/Users/s.hendrickson/Working/project-phases-reports/tests/projects_snapshot/
+
+src="${PROJECT_PHASES_PROD_PROJECTS_FOLDERS_DIRECTORY}"
+dest="${PROJECT_PHASES_TEST_SNAPSHOT_DIRECTORY}"
 cd "${dest}"
+
 echo "*********************************************"
 echo "Warning-Deleting everything in ${dest}"
 read -p "Hit enter to continue or Ctrl-C to abort"
 echo "*********************************************"
 rm -r *
+
 cd "${src}"
-#################################################################
+cd ..    # Go up to "Projects Folders" parent directory so the destination has the same structure.
 echo "Creating new snapshot of ${src}..."
-#find . -depth 4 -name "PROJECT_INFO.txt" -exec echo {} \; 
+find . -depth 4 -name "PROJECT_INFO.txt" -exec echo {} \;
 # OSX
+echo "Copying files to ${dest}..."
 find . -depth 4 -name "PROJECT_INFO.txt" -exec ditto "{}" "${dest}{}" \;
-# Bash
-# find . -depth 4 -name "PROJECT_INFO.txt" -exec cp --parents "{}" "${dest}{}" \;
+
 cd "${dest}Projects Folders/"
-#################################################################
 nfiles=5
+echo "*************************************************************************"
 echo "Culling files to ${nfiles} per phase..."
-for phases in *; do
-  echo "${phases}"
-  cd "${phases}"
+for phase in *; do
+  echo "${phase}"
+  cd "${phase}"
   count=0
-  for projects in *; do
+  for project in *; do
     if ((count < ${nfiles})); then
-      echo "Keeping ${projects}..."
+      echo "Keeping ${project}..."
     else
-      echo "Deleting ${projects}..."
-      rm -r "${projects}"
+      echo "Deleting ${project}..."
+      rm -r "${project}"
     fi
     ((count++))
   done
   cd ..
 done
-cd ../..
-#################################################################
-echo "Creating tarball..."
-tar -cvzf ./projects_snapshot.tar.gz projects_snapshot
+cd ../.. # Go back to directory with projects snapshot
+
+echo "*************************************************************************"
+projects_snapshot=$(basename "${PROJECT_PHASES_TEST_SNAPSHOT_DIRECTORY}")
+echo "Creating tarball of ${projects_snapshot}..."
+tar -cvzf "./projects_snapshot_${dt}.tar.gz" "${projects_snapshot}"
 echo "Creation complete"

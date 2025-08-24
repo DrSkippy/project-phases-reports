@@ -35,7 +35,7 @@ cd ..
 echo "Unpacking new snapshot of production data..."
 tar -xvzf projects_snapshot.tar.gz
 echo "Created comparison (original) copy of original snapshot as projects_snapshot_original/"
-cp -r projects_snapshot/ projects_snapshot_original/
+cp -r projects_snapshot/* projects_snapshot_original/
 
 echo "*************************************************************************"
 echo "Updating summary report for initial snapshot..."

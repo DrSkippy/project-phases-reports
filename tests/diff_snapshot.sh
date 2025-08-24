@@ -20,8 +20,8 @@ tmp=/tmp/project_diff
 echo "Using temporary directory: ${tmp}"
 # Copy the source snapshot to the temporary directory.
 # Change to the src_origination's Projects Folders directory.
-mkdir -p "${tmp}/"
 rm -rf "${tmp}/"
+mkdir -p "${tmp}/"
 mkdir -p "${tmp}/updated"
 mkdir -p "${tmp}/original"
 

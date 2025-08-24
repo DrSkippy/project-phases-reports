@@ -14,7 +14,6 @@ USAGE:
 import os
 
 # Import Project Module(s) Below
-from resources.path_utils import SystemInfo
 
 """
 USAGE: 
@@ -28,26 +27,42 @@ USAGE:
     ...anyone else: path from user input()
 """
 
-system_info = SystemInfo()
-projects_tree_root = system_info.return_system_info()
+# Moved into main script
+# system_info = SystemInfo()
+# projects_tree_root = system_info.return_system_info()
+# projects_tree_root = "/home/scott/Working/project-phases-reports/tests/projects_snapshot"
+# configure_report_path_globals(projects_tree_root)
 
 project_folders_root = "Projects Folders"
 project_info_filename = "PROJECT_INFO.txt"
-projects_tree_project_folders = os.path.join(projects_tree_root, project_folders_root)
 sharepoint_url = "https://f5.sharepoint.com/"
 sharepoint_path = ":w:/r/sites/salesandmktg/mktg/Enterprise Analytics/Shared Documents/Projects Folders/"
 
+# Report Files
+projects_tree_project_folders = None
+summary_path = None
+analytics_summary_path = None
+data_product_links_path = None
+owner_views_active_path = None
+owner_views_commit_path = None
+weekly_owner_views_active_path = None
+owner_views_completed_path = None
+stakeholders_views_active_path = None
+title_phase_views_path = None
+stakeholder_list_path = None
+
 # Files
-summary_path = os.path.join(projects_tree_project_folders, "summary.csv")
-analytics_summary_path = os.path.join(projects_tree_project_folders, "analytics_summary.csv")
-data_product_links_path = os.path.join(projects_tree_project_folders, "data_product_links.md")
-owner_views_active_path = os.path.join(projects_tree_project_folders, "owner_views_active.md")
-owner_views_commit_path = os.path.join(projects_tree_project_folders, "owner_views_commit.md")
-weekly_owner_views_active_path = os.path.join(projects_tree_project_folders, "weekly_owner_views_active.html")
-owner_views_completed_path = os.path.join(projects_tree_project_folders, "owner_views_completed.md")
-stakeholders_views_active_path = os.path.join(projects_tree_project_folders, "stakeholders_views_active.md")
-title_phase_views_path = os.path.join(projects_tree_project_folders, "phase_views.md")
-stakeholder_list_path = os.path.join(projects_tree_project_folders, "stakeholder_list.txt")
+# projects_tree_project_folders = os.path.join(projects_tree_root, project_folders_root)
+# summary_path = os.path.join(projects_tree_project_folders, "summary.csv")
+# analytics_summary_path = os.path.join(projects_tree_project_folders, "analytics_summary.csv")
+# data_product_links_path = os.path.join(projects_tree_project_folders, "data_product_links.md")
+# owner_views_active_path = os.path.join(projects_tree_project_folders, "owner_views_active.md")
+# owner_views_commit_path = os.path.join(projects_tree_project_folders, "owner_views_commit.md")
+# weekly_owner_views_active_path = os.path.join(projects_tree_project_folders, "weekly_owner_views_active.html")
+# owner_views_completed_path = os.path.join(projects_tree_project_folders, "owner_views_completed.md")
+# stakeholders_views_active_path = os.path.join(projects_tree_project_folders, "stakeholders_views_active.md")
+# title_phase_views_path = os.path.join(projects_tree_project_folders, "phase_views.md")
+# stakeholder_list_path = os.path.join(projects_tree_project_folders, "stakeholder_list.txt")
 
 
 NOTES_DELIMITER = "**;**"
@@ -79,7 +94,7 @@ project_params_dict = {
     "COMPUTED_PREVIOUS_PHASE": None,
     "COMMIT_JUSTIFICATIONS": None,
     "CharterLink": None,
-# New Columns
+    # New Columns
     # MIN Date in Stage
     "COMPUTED_DATE_IN_STAGE_0_IDEAS": None,
     "COMPUTED_DATE_IN_STAGE_1_CHARTERING": None,
@@ -107,7 +122,7 @@ project_params_dict = {
     "COMPUTED_COMPLETION_TIME_MINUS_HOLD_DAYS": None,
     "COMPUTED_COMMIT_TO_COMPLETION_DAYS": None,
     "COMPUTED_CHARTER_TO_COMPLETION_DAYS": None,
-# Metadata
+    # Metadata
     "Project_ID": None,
     "Report_Date": None,
 }
@@ -137,7 +152,7 @@ name_field_map = {
     "Project Previous Phase": "COMPUTED_PROJECT_PREVIOUS_PHASE_DATE",
     "Project End Date": "COMPUTED_PROJECT_END_DATE",
     "Commit Justification": "COMMIT_JUSTIFICATIONS",
-#New Columns
+    # New Columns
     # MIN Date in Stage
     "Stage 0 Ideas Date": "COMPUTED_DATE_IN_STAGE_0_IDEAS",
     "Stage 1 Chartering Date": "COMPUTED_DATE_IN_STAGE_1_CHARTERING",
@@ -198,7 +213,7 @@ active_projects_order = [
 ]
 
 # colors https://coolors.co/eef0f2-c6c7c4-a2999e-846a6a-353b3c
-CSS_STYLE="""
+CSS_STYLE = """
 <!DOCTYPE html>
 <html>
 <head>
@@ -245,11 +260,12 @@ span {
 
 """
 
-HTML_FOOTER="""
+HTML_FOOTER = """
 
 </body>
 </html>
 """
+
 
 def size_repr(size_string):
     """
@@ -285,5 +301,5 @@ def order_strings_by_date(string_list):
     Used for notes ordering in reports
         This works as desired if dates are yyyy-mm-dd format
     """
-    res = sorted(string_list, reverse=True, key = lambda x: x[:16].replace("_","-"))
+    res = sorted(string_list, reverse=True, key=lambda x: x[:16].replace("_", "-"))
     return res

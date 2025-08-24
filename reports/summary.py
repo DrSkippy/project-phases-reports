@@ -1,9 +1,9 @@
 import csv
-import os
 import logging
+import os
+import pandas as pd
 from collections import defaultdict
 from datetime import datetime, timedelta
-import pandas as pd
 
 # Import Project Module(s) Below
 from reports.configurations import *
@@ -372,7 +372,6 @@ def create_analytics_summary_csv(project_records):
     df_proj_records.to_csv(analytics_summary_path, index=False)
 
 
-
 def create_complete_stakeholder_list(project_records):
     """
     Creates a list of stakeholders from the provided project records.
@@ -397,9 +396,8 @@ def create_complete_stakeholder_list(project_records):
         wrt.writerows(stakeholderlist)
 
 
-
 def create_reports(project_records_list):
-#    Create all the standard reports
+    # Create all the standard reports
     create_summary_csv(project_records_list)
     create_analytics_summary_csv(project_records_list)
     create_data_product_links(project_records_list)
@@ -409,3 +407,28 @@ def create_reports(project_records_list):
     create_stakeholders_views(project_records_list)
     create_title_phase_views(project_records_list)
     create_complete_stakeholder_list(project_records_list)
+
+
+def configure_report_path_globals(projects_tree_root):
+    global projects_tree_project_folders
+    global summary_path
+    global analytics_summary_path
+    global data_product_links_path
+    global owner_views_active_path
+    global owner_views_commit_path
+    global weekly_owner_views_active_path
+    global owner_views_completed_path
+    global stakeholders_views_active_path
+    global title_phase_views_path
+    global stakeholder_list_path
+    projects_tree_project_folders = os.path.join(projects_tree_root, project_folders_root)
+    summary_path = os.path.join(projects_tree_project_folders, "summary.csv")
+    analytics_summary_path = os.path.join(projects_tree_project_folders, "analytics_summary.csv")
+    data_product_links_path = os.path.join(projects_tree_project_folders, "data_product_links.md")
+    owner_views_active_path = os.path.join(projects_tree_project_folders, "owner_views_active.md")
+    owner_views_commit_path = os.path.join(projects_tree_project_folders, "owner_views_commit.md")
+    weekly_owner_views_active_path = os.path.join(projects_tree_project_folders, "weekly_owner_views_active.html")
+    owner_views_completed_path = os.path.join(projects_tree_project_folders, "owner_views_completed.md")
+    stakeholders_views_active_path = os.path.join(projects_tree_project_folders, "stakeholders_views_active.md")
+    title_phase_views_path = os.path.join(projects_tree_project_folders, "phase_views.md")
+    stakeholder_list_path = os.path.join(projects_tree_project_folders, "stakeholder_list.txt")

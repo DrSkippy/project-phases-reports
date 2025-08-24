@@ -1,7 +1,9 @@
 #!/usr/bin/env -S poetry run python
+__version__ = "1.0.0"
 import sys
 import os
 import uuid
+import logging
 import fileinput
 from datetime import datetime
 from logging.config import dictConfig
@@ -41,6 +43,10 @@ datetime_today = dateutil.utils.today()
 # TODO: Document current outputs and compare against MetricsDefinition.csv to identify needs
 if __name__ == "__main__":
     logging.info("Starting update_summary.py")
+
+    # system_info = SystemInfo()
+    # projects_tree_root = system_info.return_system_info()
+    # configure_report_path_globals(projects_tree_root)
 
     os.chdir(projects_tree_root)
     logging.info(f"Current directory: {os.getcwd()}")

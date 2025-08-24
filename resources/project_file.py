@@ -222,6 +222,10 @@ class ProjectFileObject:
             Assume start one directory above "Projects Folders"
         """
         names = self.project_root.split("/")  # phase, project
+        for i_loc, name in enumerate(names):
+            if name == "Projects Folders":
+                break
+        names = names[i_loc - 1:]
         assert (len(names) == 4 and names[1] == "Projects Folders")
         logging.info(f"Extracted phase: {names[2]}, project: {names[3]}")
         if names[2] is None or names[3] is None:

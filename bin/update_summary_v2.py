@@ -1,10 +1,10 @@
 #!/usr/bin/env -S poetry run python
+__version__ = "2.0.0"
+
+import argparse
 from logging.config import dictConfig
 
-# sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))) # enables import of modules from resources
-# Import Project Module(s) Below
-from reports.parser import *
-from reports.summary import *
+from reports.summary import configure_report_path_globals, create_reports
 from resources.project_file import *
 
 dictConfig({
@@ -29,19 +29,26 @@ dictConfig({
     }
 })
 
-datetime_today = dateutil.utils.today()
-
 if __name__ == "__main__":
-    logging.info("Starting update_summary Version 2")
+    logging.info(f"Starting update_summary Version {__version__}")
 
-    os.chdir(projects_tree_root)
-    logging.info(f"Current directory: {os.getcwd()}")
+    parser = argparse.ArgumentParser(description="Update projects summary script")
+    parser.add_argument('--env', choices=['prod', 'test'], default='test',
+                        help='Set environment path from environment variables')
+    args = parser.parse_args()
+
+    if args.env == 'prod':
+        projects_tree_root = os.getenv('PROJECT_PHASES_PROD_PROJECTS_FOLDERS_DIRECTORY')
+    else:
+        projects_tree_root = os.getenv('PROJECT_PHASES_TEST_SNAPSHOT_DIRECTORY')
+    logging.info(f"Project folders root: {projects_tree_root}")
+    configure_report_path_globals(projects_tree_root)
 
     project_objects_list = []
     projects_processed_counter = 0
 
     # Walk the file system from the root directory
-    for root, dirs, files in os.walk(".", topdown=False):
+    for root, dirs, files in os.walk(projects_tree_root, topdown=False):
         if project_info_filename not in files or project_folders_root not in root:
             logging.warning(f"Skipping {root}")
             continue

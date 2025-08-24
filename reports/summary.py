@@ -422,7 +422,11 @@ def configure_report_path_globals(projects_tree_root, today_dt):
     global title_phase_views_path
     global stakeholder_list_path
     today_date_obj = today_dt
-    projects_tree_project_folders = os.path.join(projects_tree_root, project_folders_root)
+    # TODO fix this between test and prod
+    if projects_tree_root.endswith("Projects Folders"):
+        projects_tree_project_folders = projects_tree_root
+    else:
+        projects_tree_project_folders = os.path.join(projects_tree_root, project_folders_root)
     summary_path = os.path.join(projects_tree_project_folders, "summary.csv")
     analytics_summary_path = os.path.join(projects_tree_project_folders, "analytics_summary.csv")
     data_product_links_path = os.path.join(projects_tree_project_folders, "data_product_links.md")

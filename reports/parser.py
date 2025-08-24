@@ -7,8 +7,6 @@ from urllib.parse import quote
 from reports.configurations import *
 
 
-# dt_today = dateutil.utils.today()
-
 def normalize_note_date(note_line):
     """
     Extract the date from the note string and return it in a sortable format.
@@ -93,7 +91,7 @@ def parse_project_info(project_info_file):
 
 def record_timestamp(root, project_info_txt):
     timestamp_key = "Report_Date"
-    timestamp_value = datetime.now().strftime(DATE_FMT)
+    timestamp_value = today_date_obj.strftime(DATE_FMT)
 
     file_path = os.path.join(root, project_info_txt)
     updated_lines = []
@@ -124,7 +122,7 @@ def compute_stage_date(params, stage_key):
     """
     if params[stage_key] is None:
         # return date as dt & str and flag for future write
-        stage_date = datetime.now()
+        stage_date = today_date_obj
         params[stage_key] = stage_date.strftime(DATE_FMT)
         return stage_date, True, stage_date.strftime(DATE_FMT)
     else:

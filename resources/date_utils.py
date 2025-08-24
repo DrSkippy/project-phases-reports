@@ -1,16 +1,16 @@
-from datetime import datetime, date, time, timedelta, timezone
 import logging
-
+from datetime import datetime, date, time, timedelta, timezone
 
 DATE_FMT = "%Y-%m-%d"
 DATETIME_FMT = "%Y-%m-%dT%H:%M:%S"
 
 
-def earlier_date_check(trailing_date, leading_date):
-    if trailing_date <= leading_date:
-        return True
-    else:
-        return False
+# No uses found for this function yet
+# def earlier_date_check(trailing_date, leading_date):
+#    if trailing_date <= leading_date:
+#        return True
+#    else:
+#        return False
 
 def parse_date(date_input, type_out, date_format=DATE_FMT):
     if type(date_input) == str:
@@ -68,21 +68,20 @@ def parse_date(date_input, type_out, date_format=DATE_FMT):
         logging.error(f"date_str is {type(date_input)}")
 
 
+# No uses found for these functions yet
+# def format_date(dt, date_format=DATE_FMT):
+#    """
+#    Format a `datetime` object into a string.
+#    """
+#    if dt is None:
+#        return ""
+#    return dt.strftime(date_format)
 
-
-def format_date(dt, date_format=DATE_FMT):
-    """
-    Format a `datetime` object into a string.
-    """
-    if dt is None:
-        return ""
-    return dt.strftime(date_format)
-
-def current_utc_datetime():
-    """
-    Get the current UTC datetime.
-    """
-    return datetime.now(timezone.utc)
+# def current_utc_datetime():
+#    """
+#    Get the current UTC datetime.
+#    """
+#    return datetime.now(timezone.utc)
 
 def days_between_dates(start_date, end_date):
     """
@@ -91,4 +90,5 @@ def days_between_dates(start_date, end_date):
     if start_date and end_date:
         delta = end_date - start_date
         return max(delta.days, 0)
-    return -999
+    # avoid special values that are valid math values: return -999
+    return None

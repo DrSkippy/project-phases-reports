@@ -2,6 +2,16 @@ set -e   # exit on error
 set -u   # treat unset variables as an error
 echo "Started at $(date)"
 echo "*************************************************************************"
+echo "use options -p to scan production"
+
+if [ "${1:-}" = "-V1" ]; then
+  echo "Using ../bin/update_summary.py (V1) executable"
+  UPDATE_SUMMARY="${PROJECT_PHASES_REPOSITORY_DIRECTORY}/bin/update_summary.py"
+else
+  echo "Using ../bin/update_summary_V2.py (V2) executable"
+  UPDATE_SUMMARY="${PROJECT_PHASES_REPOSITORY_DIRECTORY}/bin/update_summary_v2.py"
+fi
+echo "Executable set to ${UPDATE_SUMMARY}"
 
 # Record the start time.
 dt=$(date +%Y-%m-%d_%H%M)
@@ -22,7 +32,7 @@ cp -r projects_snapshot projects_snapshot_original
 
 echo "*************************************************************************"
 echo "Updating summary report for initial snapshot..."
-poetry run python ../bin/update_summary_v2.py
+poetry run python ${UPDATE_SUMMARY}
 
 ./diff_snapshot.sh
 
@@ -32,7 +42,7 @@ echo "Promoting some projects to next phase..."
 
 echo "*************************************************************************"
 echo "Updating summary report for initial snapshot..."
-poetry run python ../bin/update_summary_v2.py
+poetry run python ${UPDATE_SUMMARY}
 
 ./diff_snapshot.sh
 

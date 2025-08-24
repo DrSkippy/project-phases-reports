@@ -125,16 +125,16 @@ if __name__ == "__main__":
                     # First time we processed file since project phase changed to completed
                     params["COMPUTED_PROJECT_END_DATE"] = datetime_today
                     new_project_end_date = params["COMPUTED_PROJECT_END_DATE"]
-                else:
-                    date_today = datetime.strptime(
-                        params["COMPUTED_PROJECT_END_DATE"][:10], DATE_FMT) #
+#                else:
+#                    datetime_today = datetime.strptime(
+#                        params["COMPUTED_PROJECT_END_DATE"][:10], DATE_FMT) #
 
             # Scott
             if project_phases[phase] >= 3:
                 # In Progress projects
                 if params["COMPUTED_PROJECT_IN_PROGRESS_DATE"] is None:
                     # First time we processed file since project phase changed to In Progress
-                    project_in_progress_date = datetime.now()
+                    project_in_progress_date = datetime_today
                     params["COMPUTED_PROJECT_IN_PROGRESS_DATE"] = project_in_progress_date.strftime(DATE_FMT)
                     new_project_in_progress_date = project_in_progress_date
                 else:
@@ -143,7 +143,7 @@ if __name__ == "__main__":
                         params["COMPUTED_PROJECT_IN_PROGRESS_DATE"], '%Y-%m-%d'
                     )
 
-                    dt_delta = datetime.now() - project_in_progress_date
+                    dt_delta = datetime_today - project_in_progress_date
                     if dt_delta.days < 0:
                         dt_delta = timedelta(days=0)
                     params["COMPUTED_IN_PROGRESS_AGE_DAYS"] = dt_delta.days
@@ -153,17 +153,15 @@ if __name__ == "__main__":
                 # Chartering - Active projects
                 if params["COMPUTED_PROJECT_START_DATE"] is None:
                     # First time we processed file since project phase changed to active
-                    project_start_date = datetime.now()
+                    project_start_date = datetime_today
                     params["COMPUTED_PROJECT_START_DATE"] = project_start_date.strftime(DATE_FMT)
                     new_project_start_date = project_start_date
                 else:
                     project_start_date = datetime.strptime(
                         params["COMPUTED_PROJECT_START_DATE"][:10],
                         DATE_FMT)
-                    dt_delta = date_today - project_start_date
+                    dt_delta = datetime_today - project_start_date
                     params["COMPUTED_AGE_DAYS"] = dt_delta.days
-
-            date_today = datetime.now()
 
             # COMPUTED_COMPLETION_TIME_DAYS KW
             if (params["COMPUTED_PROJECT_END_DATE"] is not None and
@@ -251,46 +249,46 @@ if __name__ == "__main__":
 
             if project_phases[phase] == 0:
                 if params["COMPUTED_DATE_IN_STAGE_0_IDEAS"] is None:
-                    stage_0_date = datetime.now()
+                    stage_0_date = datetime_today
                     params["COMPUTED_DATE_IN_STAGE_0_IDEAS"] = stage_0_date.strftime(DATE_FMT)
                     new_stage_0_date = stage_0_date
                 else:
                     stage_0_date = datetime.strptime(
                         params["COMPUTED_DATE_IN_STAGE_0_IDEAS"][:10],
                         DATE_FMT)
-                    dt_delta = days_between_dates(stage_0_date, date_today)
+                    dt_delta = days_between_dates(stage_0_date, datetime_today)
                     params["COMPUTED_DAYS_IN_STAGE_0_IDEAS"] = dt_delta
                     new_stage_0_age = dt_delta
 
             if project_phases[phase] == 1:
                 if params["COMPUTED_DATE_IN_STAGE_1_CHARTERING"] is None:
-                    stage_1_date = datetime.now()
+                    stage_1_date = datetime_today
                     params["COMPUTED_DATE_IN_STAGE_1_CHARTERING"] = stage_1_date.strftime(DATE_FMT)
                     new_stage_1_date = stage_1_date
                 else:
                     stage_1_date = datetime.strptime(
                         params["COMPUTED_DATE_IN_STAGE_1_CHARTERING"][:10],
                         DATE_FMT)
-                    dt_delta = date_today - stage_1_date
+                    dt_delta = datetime_today - stage_1_date
                     params["COMPUTED_DAYS_IN_STAGE_1_CHARTERING"] = dt_delta.days
 
             if project_phases[phase] == 2:
                 if params["COMPUTED_DATE_IN_STAGE_2_COMMITTED"] is None:
-                    stage_2_date = datetime.now()
+                    stage_2_date = datetime_today
                     params["COMPUTED_DATE_IN_STAGE_2_COMMITTED"] = stage_2_date.strftime(DATE_FMT)
                     new_stage_2_date = stage_2_date
                 else:
                     stage_2_date = datetime.strptime(
                         params["COMPUTED_DATE_IN_STAGE_2_COMMITTED"][:10],
                         DATE_FMT)
-                    dt_delta = date_today - stage_2_date
+                    dt_delta = datetime_today - stage_2_date
                     params["COMPUTED_DAYS_IN_STAGE_2_COMMITTED"] = dt_delta.days
 
             if project_phases[phase] == 3:
                 # params["COMPUTED_PROJECT_IN_PROGRESS_DATE"]
                 if params["COMPUTED_DATE_IN_STAGE_3_IN_PROGRESS"] is None:
                     if params["COMPUTED_PROJECT_IN_PROGRESS_DATE"] is None:
-                        stage_3_date = datetime.now()
+                        stage_3_date = datetime_today
                         params["COMPUTED_DATE_IN_STAGE_3_IN_PROGRESS"] = stage_3_date.strftime(DATE_FMT)
                         new_stage_3_date = stage_3_date
                     elif params["COMPUTED_PROJECT_IN_PROGRESS_DATE"] is not None:
@@ -302,68 +300,68 @@ if __name__ == "__main__":
                     stage_3_date = datetime.strptime(
                         params["COMPUTED_DATE_IN_STAGE_3_IN_PROGRESS"][:10],
                         DATE_FMT)
-                    dt_delta = days_between_dates(stage_3_date, date_today)
+                    dt_delta = days_between_dates(stage_3_date, datetime_today)
                     params["COMPUTED_DAYS_IN_STAGE_3_IN_PROGRESS"] = dt_delta
                     new_stage_3_age = dt_delta
 
             if project_phases[phase] == 4:
                 if params["COMPUTED_DATE_IN_STAGE_4_ON_HOLD"] is None:
-                    stage_4_date = datetime.now()
+                    stage_4_date = datetime_today
                     params["COMPUTED_DATE_IN_STAGE_4_ON_HOLD"] = stage_4_date.strftime(DATE_FMT)
                     new_stage_4_date = stage_4_date
                 else:
                     stage_4_date = datetime.strptime(
                         params["COMPUTED_DATE_IN_STAGE_4_ON_HOLD"][:10],
                         DATE_FMT)
-                    dt_delta = date_today - stage_4_date
+                    dt_delta = datetime_today - stage_4_date
                     params["COMPUTED_DAYS_IN_STAGE_4_ON_HOLD"] = dt_delta.days
 
             if project_phases[phase] == 5:
                 if params["COMPUTED_DATE_IN_STAGE_5_ROLLOUT"] is None:
-                    stage_5_date = datetime.now()
+                    stage_5_date = datetime_today
                     params["COMPUTED_DATE_IN_STAGE_5_ROLLOUT"] = stage_5_date.strftime(DATE_FMT)
                     new_stage_5_date = stage_5_date
                 else:
                     stage_5_date = datetime.strptime(
                         params["COMPUTED_DATE_IN_STAGE_5_ROLLOUT"][:10],
                         DATE_FMT)
-                    dt_delta = date_today - stage_5_date
+                    dt_delta = datetime_today - stage_5_date
                     params["COMPUTED_DAYS_IN_STAGE_5_ROLLOUT"] = dt_delta.days
 
             if project_phases[phase] == 6:
                 if params["COMPUTED_DATE_IN_STAGE_6_COMPLETED"] is None:
-                    stage_6_date = datetime.now()
+                    stage_6_date = datetime_today
                     params["COMPUTED_DATE_IN_STAGE_6_COMPLETED"] = stage_6_date.strftime(DATE_FMT)
                     new_stage_6_date = stage_6_date
                 else:
                     stage_6_date = datetime.strptime(
                         params["COMPUTED_DATE_IN_STAGE_6_COMPLETED"][:10],
                         DATE_FMT)
-                    dt_delta = date_today - stage_6_date
+                    dt_delta = datetime_today - stage_6_date
                     params["COMPUTED_DAYS_IN_STAGE_6_COMPLETED"] = dt_delta.days
 
             if project_phases[phase] == 7:
                 if params["COMPUTED_DATE_IN_STAGE_7_MAINTENANCE"] is None:
-                    stage_7_date = datetime.now()
+                    stage_7_date = datetime_today
                     params["COMPUTED_DATE_IN_STAGE_7_MAINTENANCE"] = stage_7_date.strftime(DATE_FMT)
                     new_stage_7_date = stage_7_date
                 else:
                     stage_7_date = datetime.strptime(
                         params["COMPUTED_DATE_IN_STAGE_7_MAINTENANCE"][:10],
                         DATE_FMT)
-                    dt_delta = date_today - stage_7_date
+                    dt_delta = datetime_today - stage_7_date
                     params["COMPUTED_DAYS_IN_STAGE_7_MAINTENANCE"] = dt_delta.days
 
             if project_phases[phase] == 9:
                 if params["COMPUTED_DATE_IN_STAGE_9_AD_HOC"] is None:
-                    stage_9_date = datetime.now()
+                    stage_9_date = datetime_today
                     params["COMPUTED_DATE_IN_STAGE_9_AD_HOC"] = stage_9_date.strftime(DATE_FMT)
                     new_stage_9_date = stage_9_date
                 else:
                     stage_9_date = datetime.strptime(
                         params["COMPUTED_DATE_IN_STAGE_9_AD_HOC"][:10],
                         DATE_FMT)
-                    dt_delta = date_today - stage_9_date
+                    dt_delta = datetime_today - stage_9_date
                     params["COMPUTED_DAYS_IN_STAGE_9_AD_HOC"] = dt_delta.days
 
         previous_phase_updated = False
@@ -394,7 +392,7 @@ if __name__ == "__main__":
             # if the phase changed, append a generic phase change record to end of the file
             if params["COMPUTED_PREVIOUS_PHASE"] != phase:
                 project_info_file.write(
-                    f'PHASE_CHANGE: {params["COMPUTED_PREVIOUS_PHASE"]} -> {phase} DATE: {datetime.now().strftime(DATE_FMT)}\n'
+                    f'PHASE_CHANGE: {params["COMPUTED_PREVIOUS_PHASE"]} -> {phase} DATE: {datetime_today.strftime(DATE_FMT)}\n'
                 )
 
             if new_days_progress_to_close is not None:

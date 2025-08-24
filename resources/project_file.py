@@ -67,7 +67,7 @@ class ProjectFileObject:
         if self.params_dict["COMPUTED_PROJECT_END_DATE"] is None:
             # First time we processed file since project phase changed to completed
             self.params_dict["COMPUTED_PROJECT_END_DATE"] = StringLine(key="COMPUTED_PROJECT_END_DATE",
-                                                                       value=datetime_today,
+                                                                       value=today_date_obj,
                                                                        new=True)
         self._days_between_phases(start_key="COMPUTED_PROJECT_START_DATE",
                                   end_key="COMPUTED_PROJECT_END_DATE",
@@ -115,7 +115,7 @@ class ProjectFileObject:
     def _date_in_phase(self, key=None, age_key=None):
         if self.params_dict[key] is None:
             # First time we processed file since project phase changed
-            self.params_dict[key] = StringLine(key=key, value=datetime_today, new=True)
+            self.params_dict[key] = StringLine(key=key, value=today_date_obj, new=True)
         elif self.params_dict["COMPUTED_PREVIOUS_PHASE"].existing_variable_updated:
             # Phase has changed since last time we processed file
             # determine the date_key and age_key for previous phase
@@ -136,7 +136,7 @@ class ProjectFileObject:
                 logging.info(f"No date value for {date_key} in project {self.project}, so age calculation failed.")
         if self.params_dict[key].date_value is not None:
             phase_start_date = self.params_dict[key].date_value
-            dt_delta = datetime_today - phase_start_date
+            dt_delta = today_date_obj - phase_start_date
             if age_key is not None:
                 if self.params_dict[age_key] is None or self.params_dict[age_key] == 0:
                     # First time we processed file since project phase changed to active
@@ -155,11 +155,11 @@ class ProjectFileObject:
         if self.params_dict[date_key] is None:
             # First time we processed file since project phase changed to active
             self.params_dict[date_key] = StringLine(key=date_key,
-                                                    value=datetime_today,
+                                                    value=today_date_obj,
                                                     new=True)
         else:
             project_start_date = self.params_dict[date_key].date_value
-            dt_delta = datetime_today - project_start_date
+            dt_delta = today_date_obj - project_start_date
             if self.params_dict[age_key] is None or self.params_dict[age_key] == 0:
                 # First time we processed file since project phase changed to active
                 self.params_dict[age_key] = StringLine(key=age_key,

@@ -34,7 +34,7 @@ USAGE:
 # projects_tree_root = "/home/scott/Working/project-phases-reports/tests/projects_snapshot"
 # configure_report_path_globals(projects_tree_root)
 
-datetime_today = datetime.now().date()
+today_date_obj = datetime.now().date()
 project_folders_root = "Projects Folders"
 project_info_filename = "PROJECT_INFO.txt"
 sharepoint_url = "https://f5.sharepoint.com/"

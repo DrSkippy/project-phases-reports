@@ -5,7 +5,6 @@ import pandas as pd
 from collections import defaultdict
 from datetime import datetime, timedelta
 
-# Import Project Module(s) Below
 from reports.configurations import *
 
 
@@ -87,7 +86,7 @@ def recent_notes(notes_text, recent_days=400, limit=200):
     """
     notes = [x.strip()[6:] for x in notes_text.split(NOTES_DELIMITER)]
     # check for recent notes
-    recent = datetime.now() - timedelta(days=recent_days)
+    recent = today_date_obj - timedelta(days=recent_days)
     notes_list = []
     for count, note in enumerate(notes):
         if count < limit:
@@ -96,7 +95,7 @@ def recent_notes(notes_text, recent_days=400, limit=200):
                 # notes with sequence within a date. Make bulleted list.
                 pre, sequence_number, post = note.split("::")
                 update_note = f"  {int(sequence_number)}. {pre[11:]}"
-            if datetime.strptime(note[:10].replace("_", "-"), DATE_FMT) >= recent:
+            if datetime.strptime(note[:10].replace("_", "-"), DATE_FMT).date() >= recent:
                 notes_list.append(update_note)
     return notes_list
 
@@ -196,7 +195,7 @@ def create_stakeholders_views(project_records_list):
 
     with open(stakeholders_views_active_path, "w") as outfile:
         outfile.write("# Data Accelerator - Project Stakeholders Views - ACTIVE\n\n")
-        outfile.write(f"({str(datetime.now())[:19]})\n\n")
+        outfile.write(f"({str(today_date_obj)[:19]})\n\n")
         for owner in owners:
             block_string = synthesize_owner_block(project_records_list, owner, project_owner_key="BUSINESS_SPONSOR")
             if block_string:
@@ -232,7 +231,7 @@ def create_weekly_owners_views(project_records_list):
     This is an HTML document to take advantage of full table formatting control.
     """
     # Timestamp
-    current_timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    current_timestamp = today_date_obj.strftime("%Y-%m-%d %H:%M:%S")
     # find unique owners
     owners = set([lines["ANALYTICS_DS_OWNER"] for lines in project_records_list])
     with open(weekly_owner_views_active_path, "w") as outfile:
@@ -282,7 +281,7 @@ def create_owners_commit_views(project_records_list):
         # Write the header
         outfile.write("# Data Accelerator - Project Owner Views - COMMIT\n\n")
         # Timestamp
-        current_timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        current_timestamp = today_date_obj.strftime("%Y-%m-%d %H:%M:%S")
         outfile.write(f"({current_timestamp})\n\n")
 
         # Write synthesized owner blocks
@@ -299,14 +298,14 @@ def create_owners_views(project_records_list):
 
     with open(owner_views_active_path, "w") as outfile:
         outfile.write("# Data Accelerator - Project Owner Views - ACTIVE\n\n")
-        outfile.write(f"({str(datetime.now())[:19]})\n\n")
+        outfile.write(f"({str(today_date_obj)[:19]})\n\n")
         for owner in owners:
             outfile.write(synthesize_owner_block(project_records_list, owner))
             outfile.write(synthesize_owner_maintenance_block(project_records_list, owner))
 
     with open(owner_views_completed_path, "w") as outfile:
         outfile.write("# Data Accelerator - Project Owner Views - COMPLETED & MAINTENANCE\n\n")
-        outfile.write(f"({str(datetime.now())[:19]})\n\n")
+        outfile.write(f"({str(today_date_obj)[:19]})\n\n")
         for owner in owners:
             outfile.write(
                 synthesize_owner_block(project_records_list, owner,

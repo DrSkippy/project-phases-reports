@@ -6,10 +6,10 @@ echo "use options -p to scan production"
 
 if [ "${1:-}" = "-p" ]; then
   echo "Using PRODUCTION data"
-  BASE_DIR="${PROJECT_PHASES_PROD_PROJECTS_FOLDERS_DIRECTORY}"
+  BASE_DIR="${PROJECT_PHASES_PROD_PROJECTS_FOLDERS_DIRECTORY}/Projects Folders"
 else
   echo "Using TEST data"
-  BASE_DIR="${PROJECT_PHASES_TEST_PROJECTS_FOLDERS_DIRECTORY}"
+  BASE_DIR="${PROJECT_PHASES_TEST_SNAPSHOT_DIRECTORY}/Projects Folders"
 fi
 cd "${BASE_DIR}"
 

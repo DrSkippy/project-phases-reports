@@ -6,6 +6,9 @@ from urllib.parse import quote
 # Import Project Module(s) Below
 from reports.configurations import *
 
+def set_date_obj(_today_date_obj):
+    global today_date_obj
+    today_date_obj = _today_date_obj
 
 def normalize_note_date(note_line):
     """

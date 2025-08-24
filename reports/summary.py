@@ -408,7 +408,8 @@ def create_reports(project_records_list):
     create_complete_stakeholder_list(project_records_list)
 
 
-def configure_report_path_globals(projects_tree_root):
+def configure_report_path_globals(projects_tree_root, today_dt):
+    global today_date_obj
     global projects_tree_project_folders
     global summary_path
     global analytics_summary_path
@@ -420,6 +421,7 @@ def configure_report_path_globals(projects_tree_root):
     global stakeholders_views_active_path
     global title_phase_views_path
     global stakeholder_list_path
+    today_date_obj = today_dt
     projects_tree_project_folders = os.path.join(projects_tree_root, project_folders_root)
     summary_path = os.path.join(projects_tree_project_folders, "summary.csv")
     analytics_summary_path = os.path.join(projects_tree_project_folders, "analytics_summary.csv")

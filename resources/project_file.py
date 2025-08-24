@@ -7,6 +7,9 @@ from reports.configurations import *
 from reports.parser import create_charter_link
 from resources.lines import StringLine, AggregateLines
 
+def set_date_obj(_today_date_obj):
+    global today_date_obj
+    today_date_obj = _today_date_obj
 
 class ProjectFileObject:
     def __init__(self, root, files, project_info_filename: str):
@@ -41,17 +44,20 @@ class ProjectFileObject:
 
     def phase2(self):
         self._date_in_phase(key="COMPUTED_DATE_IN_STAGE_2_COMMITTED", age_key="COMPUTED_DAYS_IN_STAGE_2_COMMITTED")
-        self._project_activity_class_start_date_age(date_key="COMPUTED_PROJECT_START_DATE", age_key="COMPUTED_AGE_DAYS")
+        self._project_activity_class_start_date_age(date_key="COMPUTED_PROJECT_START_DATE",
+                                                    age_key="COMPUTED_AGE_DAYS")
 
     def phase3(self):
         self._date_in_phase(key="COMPUTED_DATE_IN_STAGE_3_IN_PROGRESS", age_key="COMPUTED_DAYS_IN_STAGE_3_IN_PROGRESS")
-        self._project_activity_class_start_date_age(date_key="COMPUTED_PROJECT_START_DATE", age_key="COMPUTED_AGE_DAYS")
+        self._project_activity_class_start_date_age(date_key="COMPUTED_PROJECT_START_DATE",
+                                                    age_key="COMPUTED_AGE_DAYS")
         self._project_activity_class_start_date_age(date_key="COMPUTED_PROJECT_IN_PROGRESS_DATE",
                                                     age_key="COMPUTED_IN_PROGRESS_AGE_DAYS")
 
     def phase4(self):
         self._date_in_phase(key="COMPUTED_DATE_IN_STAGE_4_ON_HOLD", age_key="COMPUTED_DAYS_IN_STAGE_4_ON_HOLD")
-        self._project_activity_class_start_date_age(date_key="COMPUTED_PROJECT_START_DATE", age_key="COMPUTED_AGE_DAYS")
+        self._project_activity_class_start_date_age(date_key="COMPUTED_PROJECT_START_DATE",
+                                                    age_key="COMPUTED_AGE_DAYS")
         self._project_activity_class_start_date_age(date_key="COMPUTED_PROJECT_IN_PROGRESS_DATE",
                                                     age_key="COMPUTED_IN_PROGRESS_AGE_DAYS")
 
@@ -59,16 +65,18 @@ class ProjectFileObject:
         self._date_in_phase(key="COMPUTED_DATE_IN_STAGE_5_ROLLOUT", age_key="COMPUTED_DAYS_IN_STAGE_5_ROLLOUT")
         self._project_activity_class_start_date_age(date_key="COMPUTED_PROJECT_IN_PROGRESS_DATE",
                                                     age_key="COMPUTED_IN_PROGRESS_AGE_DAYS")
-        self._project_activity_class_start_date_age(date_key="COMPUTED_PROJECT_START_DATE", age_key="COMPUTED_AGE_DAYS")
+        self._project_activity_class_start_date_age(date_key="COMPUTED_PROJECT_START_DATE",
+                                                    age_key="COMPUTED_AGE_DAYS")
 
     def phase6(self):
         self._date_in_phase(key="COMPUTED_DATE_IN_STAGE_6_COMPLETED", age_key="COMPUTED_DAYS_IN_STAGE_6_COMPLETED")
-        self._project_activity_class_start_date_age(date_key="COMPUTED_PROJECT_START_DATE", age_key="COMPUTED_AGE_DAYS")
         if self.params_dict["COMPUTED_PROJECT_END_DATE"] is None:
             # First time we processed file since project phase changed to completed
             self.params_dict["COMPUTED_PROJECT_END_DATE"] = StringLine(key="COMPUTED_PROJECT_END_DATE",
                                                                        value=today_date_obj,
                                                                        new=True)
+        self._project_activity_class_start_date_age(date_key="COMPUTED_PROJECT_START_DATE",
+                                                    age_key="COMPUTED_AGE_DAYS")
         self._days_between_phases(start_key="COMPUTED_PROJECT_START_DATE",
                                   end_key="COMPUTED_PROJECT_END_DATE",
                                   age_key="COMPUTED_COMPLETION_TIME_DAYS")
@@ -113,41 +121,43 @@ class ProjectFileObject:
                                                            new=True)
 
     def _date_in_phase(self, key=None, age_key=None):
-        if self.params_dict[key] is None:
+        if self.params_dict[key] and self.params_dict[key].date_value is not None:
+            self._new_or_update_days(key, age_key)
+        else:
             # First time we processed file since project phase changed
             self.params_dict[key] = StringLine(key=key, value=today_date_obj, new=True)
-        elif self.params_dict["COMPUTED_PREVIOUS_PHASE"].existing_variable_updated:
+        if self.params_dict["COMPUTED_PREVIOUS_PHASE"].existing_variable_updated:
             # Phase has changed since last time we processed file
             # determine the date_key and age_key for previous phase
             prev_date_key = ("COMPUTED_DATE_IN_STAGE_" + self.previous_phase.split("-")[0]
                              + "_" + self.previous_phase.split("-")[1].replace(" ", "_").upper())
             prev_age_key = ("COMPUTED_DAYS_IN_STAGE_" + self.previous_phase.split("-")[0]
                             + "_" + self.previous_phase.split("-")[1].replace(" ", "_").upper())
-            logging.debug(f"Derived phase keys for previous phase: {prev_date_key}, {prev_age_key}")
-            if self.params_dict[prev_date_key].date_value is not None:
-                phase_start_date = self.params_dict[prev_date_key].date_value
-                dt_delta = self.params_dict[key].date_value - phase_start_date
-                if self.params_dict[prev_age_key] is None or self.params_dict[prev_age_key] == 0:
-                    # First time we processed file since project phase changed to active
-                    self.params_dict[prev_age_key].update_value(int(dt_delta.days))
-                    logging.info(
-                        f"Updated {prev_date_key} age days for project {self.project} to {dt_delta.days} days.")
+            logging.debug(f"Current phase keys: {key}, {age_key}")
+            logging.debug(f"Previous phase keys: {prev_date_key}, {prev_age_key}")
+            logging.debug(f"Previous phase: {self.previous_phase}")
+            logging.debug(f"Current date: {today_date_obj}")
+            self._new_or_update_days(prev_date_key, prev_age_key)
+
+
+    def _new_or_update_days(self, key, age_key):
+        phase_start_date = self.params_dict[key].date_value
+        dt_delta = today_date_obj - phase_start_date
+        logging.debug(f"Phase start date: {phase_start_date}, Today: {today_date_obj}, Delta days: {dt_delta.days}")
+        logging.debug(f"Age key: {age_key}, Current age days: {self.params_dict[age_key]}")
+        if age_key is not None:
+            if self.params_dict[age_key] is None:
+                # First time we processed file since project phase changed date added
+                self.params_dict[age_key] = StringLine(key=age_key,
+                                                       value=int(dt_delta.days),
+                                                       new=True)
             else:
-                logging.info(f"No date value for {date_key} in project {self.project}, so age calculation failed.")
-        if self.params_dict[key].date_value is not None:
-            phase_start_date = self.params_dict[key].date_value
-            dt_delta = today_date_obj - phase_start_date
-            if age_key is not None:
-                if self.params_dict[age_key] is None or self.params_dict[age_key] == 0:
-                    # First time we processed file since project phase changed to active
-                    self.params_dict[age_key] = StringLine(key=age_key,
-                                                           value=int(dt_delta.days),
-                                                           new=True)
-                else:
-                    # Update the age days if the phase start date has changed
-                    if dt_delta.days != self.params_dict[age_key].int_value:
-                        self.params_dict[age_key].update_value(int(dt_delta.days))
-                        logging.info(f"Updated {key} age days for project {self.project} to {dt_delta.days} days.")
+                # Update the age days if the phase start date has changed
+                if dt_delta.days != self.params_dict[age_key].int_value:
+                    self.params_dict[age_key].update_value(int(dt_delta.days))
+                    logging.info(f"Updated {key} age days for project {self.project} to {dt_delta.days} days.")
+        else:
+            raise ValueError(f"Age_key is None for key: {key}, no metrics added or updated")
 
     def _project_activity_class_start_date_age(self, date_key=None, age_key=None):
         # Active projects can start in any of phase 1, 2, 3, 4, or 5

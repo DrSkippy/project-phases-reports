@@ -48,7 +48,8 @@ if __name__ == "__main__":
 
     system_info = SystemInfo()
     projects_tree_root = system_info.return_system_info()
-    configure_report_path_globals(projects_tree_root)
+    configure_report_path_globals(projects_tree_root, datetime_today.date())
+    set_date_obj(datetime_today.date())
 
     os.chdir(projects_tree_root)
     logging.info(f"Current directory: {os.getcwd()}")

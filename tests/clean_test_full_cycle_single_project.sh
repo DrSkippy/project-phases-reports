@@ -52,7 +52,14 @@ dt=$(date +%Y-%m-%d_%H%M)
 # 23. Update summary report.
 # 24. Diff snapshot to show project in 6-Completed phase.
 ######################################################################################
-phase_seq=("0-Ideas" "1-Chartering" "2-Committed" "3-In Progress" "4-On Hold" "3-In Progress" "5-Rollout" "6-Completed")
+# Dates to inject into the project file to simulate movement through phases.
+LINE_MATCH=("COMPUTED_DATE_IN_STAGE_0_IDEAS:" "COMPUTED_PROJECT_START_DATE:" "COMPUTED_DATE_IN_STAGE_1_CHARTERING:" "COMPUTED_DATE_IN_STAGE_2_COMMITTED:" "COMPUTED_PROJECT_IN_PROGRESS_DATE:" "COMPUTED_DATE_IN_STAGE_3_IN_PROGRESS:" "COMPUTED_DATE_IN_STAGE_4_ON_HOLD:" "COMPUTED_DATE_IN_STAGE_5_ROLLOUT:" "COMPUTED_PROJECT_END_DATE:" "COMPUTED_DATE_IN_STAGE_6_COMPLETED:")
+# Corresponding dates to inject for each phase change.
+INJECTION_DATES=("2024-11-24"                 "2024-12-15"                   "2024-12-15"                           "2024-12-24"                          "2025-02-02"                         "2025-02-02"                            "2025-03-24"                        "2025-04-24"                        "2025-06-20"                 "2025-06-20")
+echo "Using injection dates: ${INJECTION_DATES[*]}"
+######################################################################################
+PHASE_SEQUENCE=("0-Ideas" "1-Chartering" "2-Committed" "3-In Progress" "4-On Hold"  "3-In Progress" "5-Rollout"  "6-Completed")
+PHASE_DATES=("2024-11-24" "2024-12-15"   "2024-12-24"  "2025-02-02"    "2025-03-24" "2025-04-02"    "2025-04-24" "2025-06-20")
 PROJECT_NAME="Sample Project for Testing"
 CLEAN_PROJECT_FILE="${PROJECT_PHASES_REPOSITORY_DIRECTORY}/tests/clean_sample_PROJECT_INFO.txt"
 echo "Using clean project file: ${CLEAN_PROJECT_FILE}"
@@ -69,31 +76,62 @@ rm -rf "projects_snapshot_original/Projects Folders"
 echo "Creating snapshot of production data..."
 mkdir -p projects_snapshot
 mkdir -p "projects_snapshot/Projects Folders"
-for phase in "${phase_seq[@]}"; do
+for phase in "${PHASE_SEQUENCE[@]}"; do
   mkdir -p "projects_snapshot/Projects Folders/${phase}"
 done
 
 echo "*************************************************************************"
 echo "Adding clean project to initial phase..."
-LAST_PHASE="${phase_seq[0]}"
+LAST_PHASE="${PHASE_SEQUENCE[0]}"    # split off first
 mkdir -p "projects_snapshot/Projects Folders/${LAST_PHASE}/${PROJECT_NAME}"
 cp "${CLEAN_PROJECT_FILE}" "projects_snapshot/Projects Folders/${LAST_PHASE}/${PROJECT_NAME}/PROJECT_INFO.txt"
 cp -r projects_snapshot/* projects_snapshot_original
 
 echo "*************************************************************************"
-for next_phase in "${phase_seq[@]:1}"; do
-  echo "Updating summary report for initial snapshot..."
-  poetry run python ${UPDATE_SUMMARY}
-  echo "Running diff to show project in ${LAST_PHASE} phase..."
-  ./diff_snapshot.sh
-  echo "Promoting project from ${LAST_PHASE} to ${next_phase}..."
-  mv "projects_snapshot/Projects Folders/${LAST_PHASE}/${PROJECT_NAME}" "projects_snapshot/Projects Folders/${next_phase}/"
-  LAST_PHASE="${next_phase}"
+echo "Injecting project file dates for phase: ${PHASE_SEQUENCE[0]}..."
+for i in "${!LINE_MATCH[@]}"; do
+  line="${LINE_MATCH[i]}"
+  injection="${INJECTION_DATES[i]}"
+  echo "Injecting line: ${injection} into project file matching: ${line}"
+  sed -i.bak "/${line}/c\\${line} ${injection}" "projects_snapshot/Projects Folders/${LAST_PHASE}/${PROJECT_NAME}/PROJECT_INFO.txt"
+  rm "projects_snapshot/Projects Folders/${LAST_PHASE}/${PROJECT_NAME}/PROJECT_INFO.txt.bak"
 done
 
 echo "Updating summary report for initial snapshot..."
-poetry run python ${UPDATE_SUMMARY}
+poetry run python ${UPDATE_SUMMARY} --inject-date "${PHASE_DATES[0]}"
+
 echo "Running diff to show project in ${LAST_PHASE} phase..."
+./diff_snapshot.sh
+PHASE_SEQUENCE=("${PHASE_SEQUENCE[@]:1}")  # remove first element
+PHASE_DATES=("${PHASE_DATES[@]:1}")      # remove first element
+
+echo "*************************************************************************"
+for j in "${!PHASE_SEQUENCE[@]}"; do
+
+  echo "Promoting project from ${LAST_PHASE} to ${PHASE_SEQUENCE[j]}..."
+  mv "projects_snapshot/Projects Folders/${LAST_PHASE}/${PROJECT_NAME}" "projects_snapshot/Projects Folders/${PHASE_SEQUENCE[j]}/"
+
+  echo "Injecting project file dates for phase: ${PHASE_SEQUENCE[j]}..."
+  for i in "${!LINE_MATCH[@]}"; do
+    line="${LINE_MATCH[i]}"
+    injection="${INJECTION_DATES[i]}"
+    echo "Injecting line: ${injection} into project file matching: ${line}"
+    sed -i.bak "/${line}/c\\${line} ${injection}" "projects_snapshot/Projects Folders/${PHASE_SEQUENCE[j]}/${PROJECT_NAME}/PROJECT_INFO.txt"
+    rm "projects_snapshot/Projects Folders/${PHASE_SEQUENCE[j]}/${PROJECT_NAME}/PROJECT_INFO.txt.bak"
+  done
+
+  echo "Updating summary report for initial snapshot..."
+  poetry run python ${UPDATE_SUMMARY} --inject-date "${PHASE_DATES[j]}"
+  poetry run python ${UPDATE_SUMMARY} --inject-date "${PHASE_DATES[j]}"
+
+  echo "Running diff to show project in ${LAST_PHASE} phase..."
+  ./diff_snapshot.sh
+
+  LAST_PHASE="${PHASE_SEQUENCE[j]}"
+done
+
+# Run one on today's date to show days in completed phase.
+poetry run python ${UPDATE_SUMMARY}
 ./diff_snapshot.sh
 
 echo "*************************************************************************"

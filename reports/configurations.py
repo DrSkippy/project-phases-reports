@@ -34,7 +34,8 @@ USAGE:
 # projects_tree_root = "/home/scott/Working/project-phases-reports/tests/projects_snapshot"
 # configure_report_path_globals(projects_tree_root)
 
-today_date_obj = datetime.now().date()
+today_date_obj = None
+#today_date_obj = datetime.now().date()
 project_folders_root = "Projects Folders"
 project_info_filename = "PROJECT_INFO.txt"
 sharepoint_url = "https://f5.sharepoint.com/"
@@ -86,8 +87,8 @@ project_params_dict = {
     "Project Folder": None,
     "DATA_PRODUCT_LINK": None,
     "NOTES": None,
-    "COMPUTED_AGE_DAYS": 0,
-    "COMPUTED_IN_PROGRESS_AGE_DAYS": 0,
+    "COMPUTED_AGE_DAYS": None,
+    "COMPUTED_IN_PROGRESS_AGE_DAYS": None,
     "COMPUTED_PROJECT_START_DATE": None,
     "COMPUTED_PROJECT_IN_PROGRESS_DATE": None,
     "COMPUTED_PROJECT_ON_HOLD_DATE": None,

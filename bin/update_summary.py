@@ -10,6 +10,8 @@ from logging.config import dictConfig
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))) # enables import of modules from resources
 # Import Project Module(s) Below
+import dateutil
+from resources.path_utils import SystemInfo
 from resources.date_utils import parse_date, days_between_dates
 from reports.parser import *
 from reports.summary import *
@@ -44,9 +46,9 @@ datetime_today = dateutil.utils.today()
 if __name__ == "__main__":
     logging.info("Starting update_summary.py")
 
-    # system_info = SystemInfo()
-    # projects_tree_root = system_info.return_system_info()
-    # configure_report_path_globals(projects_tree_root)
+    system_info = SystemInfo()
+    projects_tree_root = system_info.return_system_info()
+    configure_report_path_globals(projects_tree_root)
 
     os.chdir(projects_tree_root)
     logging.info(f"Current directory: {os.getcwd()}")
@@ -198,9 +200,9 @@ if __name__ == "__main__":
                     params["COMPUTED_DAYS_IN_STAGE_4_ON_HOLD"] is not None):
                 if params["COMPUTED_COMPLETION_TIME_MINUS_HOLD_DAYS"] is None:
                     completion_time_minus_hold = (
-                            params["COMPUTED_IN_PROGRESS_TO_COMPLETION_DAYS"] - params[
-                        "COMPUTED_DAYS_IN_STAGE_4_ON_HOLD"]).days
-                    params["COMPUTED_IN_PROGRESS_TO_COMPLETION_DAYS"] = completion_time_minus_hold.strftime(DATE_FMT)
+                            int(params["COMPUTED_IN_PROGRESS_TO_COMPLETION_DAYS"]) -
+                            int(params[ "COMPUTED_DAYS_IN_STAGE_4_ON_HOLD"]))
+                    params["COMPUTED_IN_PROGRESS_TO_COMPLETION_DAYS"] = completion_time_minus_hold
                     new_completion_time_minus_hold = completion_time_minus_hold
                 # else:
                 #     completion_time_minus_hold = datetime.strptime(

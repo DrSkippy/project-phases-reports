@@ -58,8 +58,10 @@ if __name__ == "__main__":
             continue
 
         proj = ProjectFileObject(root, files, project_info_filename)
+        print(f"Processing file {projects_processed_counter: 3} ({proj.phase}: {proj.project})")
         logging.debug(f'Processing root={root}: {str(proj)}')
         project_objects_list.append(proj)
+        projects_processed_counter += 1
 
     logging.info(f"Processed {len(project_objects_list)} projects.")
     create_reports([p.get_legacy_params() for p in project_objects_list])

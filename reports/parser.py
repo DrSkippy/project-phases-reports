@@ -154,12 +154,19 @@ def compute_phase_dwell(root, project_info_txt, param_key, phase_date, today):
 
 def extract_params(root):
     """
-    Extract phase and proji ect names for the file path.
+    Extract phase and project names for the file path.
         Assume start one directory above "Projects Folders"
     """
     names = root.split("/")  # phase, project
+    for i_loc, name in enumerate(names):
+        if name == "Projects Folders":
+            break
+    names = names[i_loc - 1:]
     assert (len(names) == 4 and names[1] == "Projects Folders")
     logging.info(f"Extracted phase: {names[2]}, project: {names[3]}")
+    if names[2] is None or names[3] is None:
+        raise ValueError(
+            f"Invalid project root path: {self.project_root}. Expected format: '/Projects Folders/<phase>/<project>'")
     return names[2], names[3]
 
 

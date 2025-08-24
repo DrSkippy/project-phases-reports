@@ -4,7 +4,7 @@ import uuid
 from datetime import datetime
 
 from reports.configurations import *
-from reports.parser import create_charter_link
+from reports.parser import create_charter_link, extract_params
 from resources.lines import StringLine, AggregateLines
 
 def set_date_obj(_today_date_obj):
@@ -224,22 +224,22 @@ class ProjectFileObject:
                                                           in_reports=False)
 
     ##########################################################################
-    def extract_params(self):
-        """
-        Extract phase and project names for the file path.
-            Assume start one directory above "Projects Folders"
-        """
-        names = self.project_root.split("/")  # phase, project
-        for i_loc, name in enumerate(names):
-            if name == "Projects Folders":
-                break
-        names = names[i_loc - 1:]
-        assert (len(names) == 4 and names[1] == "Projects Folders")
-        logging.info(f"Extracted phase: {names[2]}, project: {names[3]}")
-        if names[2] is None or names[3] is None:
-            raise ValueError(
-                f"Invalid project root path: {self.project_root}. Expected format: '/Projects Folders/<phase>/<project>'")
-        self.phase, self.project = names[2], names[3]
+#    def extract_params(self):
+#        """
+#        Extract phase and project names for the file path.
+#            Assume start one directory above "Projects Folders"
+#        """
+#        names = self.project_root.split("/")  # phase, project
+#        for i_loc, name in enumerate(names):
+#            if name == "Projects Folders":
+#                break
+#        names = names[i_loc - 1:]
+#        assert (len(names) == 4 and names[1] == "Projects Folders")
+#        logging.info(f"Extracted phase: {names[2]}, project: {names[3]}")
+#        if names[2] is None or names[3] is None:
+#            raise ValueError(
+#                f"Invalid project root path: {self.project_root}. Expected format: '/Projects Folders/<phase>/<project>'")
+#        self.phase, self.project = names[2], names[3]
 
     def parse_file(self):
         # Process Project Info file
@@ -247,7 +247,7 @@ class ProjectFileObject:
         with open(os.path.join(self.project_root, project_info_filename), "r") as project_info_file:
             logging.info(f"Processing file {projects_processed_counter} ({self.project_root})")
             projects_processed_counter += 1
-            self.extract_params()  # harvest parameters from path
+            self.phase, self.project = extract_params(self.project_root)  # harvest parameters from path
             ################################################
             ## Meta parameters not parsed from file
             self.params_dict["Phases"] = StringLine(key="Phases", value=self.phase)

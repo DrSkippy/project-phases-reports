@@ -14,7 +14,7 @@ echo "*********************************************"
 echo "Warning-Deleting everything in ${dest}"
 read -p "Hit enter to continue or Ctrl-C to abort"
 echo "*********************************************"
-rm -r *
+rm -rf *
 
 cd "${src}"
 cd ..    # Go up to "Projects Folders" parent directory so the destination has the same structure.
@@ -22,9 +22,9 @@ echo "Creating new snapshot of ${src}..."
 find . -depth 4 -name "PROJECT_INFO.txt" -exec echo {} \;
 # OSX
 echo "Copying files to ${dest}..."
-find . -depth 4 -name "PROJECT_INFO.txt" -exec ditto "{}" "${dest}{}" \;
+find . -depth 4 -name "PROJECT_INFO.txt" -exec ditto "{}" "${dest}/{}" \;
 
-cd "${dest}Projects Folders/"
+cd "${dest}/Projects Folders"
 nfiles=5
 echo "*************************************************************************"
 echo "Culling files to ${nfiles} per phase..."

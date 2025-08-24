@@ -16,19 +16,26 @@ echo "Executable set to ${UPDATE_SUMMARY}"
 # Record the start time.
 dt=$(date +%Y-%m-%d_%H%M)
 
-cd "${PROJECT_PHASES_TEST_SNAPSHOT_DIRECTORY}"
-cd ..
 echo "Working in $(pwd)"
+
+# make directories if they don't exist
+mkdir -p "${PROJECT_PHASES_TEST_SNAPSHOT_DIRECTORY}"
+mkdir -p "${PROJECT_PHASES_TEST_SNAPSHOT_ORIGINAL_DIRECTORY}"
 
 echo "*************************************************************************"
 echo "Remove old snapshot directories if they exist..."
-rm -r projects_snapshot/
-rm -r projects_snapshot_original/
+cd "${PROJECT_PHASES_TEST_SNAPSHOT_DIRECTORY}"
+rm -rf *
+cd "${PROJECT_PHASES_TEST_SNAPSHOT_ORIGINAL_DIRECTORY}"
+rm -rf *
+
+cd "${PROJECT_PHASES_TEST_SNAPSHOT_DIRECTORY}"
+cd ..
 
 echo "Unpacking new snapshot of production data..."
 tar -xvzf projects_snapshot.tar.gz
 echo "Created comparison (original) copy of original snapshot as projects_snapshot_original/"
-cp -r projects_snapshot projects_snapshot_original
+cp -r projects_snapshot/ projects_snapshot_original/
 
 echo "*************************************************************************"
 echo "Updating summary report for initial snapshot..."

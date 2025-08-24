@@ -93,9 +93,7 @@ for i in "${!LINE_MATCH[@]}"; do
   line="${LINE_MATCH[i]}"
   injection="${INJECTION_DATES[i]}"
   echo "Injecting line: ${injection} into project file matching: ${line}"
-  # LINUX sed -i.bak "/${line}/c\\${line} ${injection}" "projects_snapshot/Projects Folders/${LAST_PHASE}/${PROJECT_NAME}/PROJECT_INFO.txt"
   sed -i.bak "s/^${line}.*$/${line} ${injection}/g" "projects_snapshot/Projects Folders/${LAST_PHASE}/${PROJECT_NAME}/PROJECT_INFO.txt"
-  # echo "${line} ${injection}" >> "projects_snapshot/Projects Folders/${LAST_PHASE}/${PROJECT_NAME}/PROJECT_INFO.txt"
   rm "projects_snapshot/Projects Folders/${LAST_PHASE}/${PROJECT_NAME}/PROJECT_INFO.txt.bak"
 done
 
@@ -118,9 +116,7 @@ for j in "${!PHASE_SEQUENCE[@]}"; do
     line="${LINE_MATCH[i]}"
     injection="${INJECTION_DATES[i]}"
     echo "Injecting line: ${injection} into project file matching: ${line}"
-    # LINUX sed -i.bak "/${line}/c\\${line} ${injection}" "projects_snapshot/Projects Folders/${PHASE_SEQUENCE[j]}/${PROJECT_NAME}/PROJECT_INFO.txt"
     sed -i.bak "s/^${line}.*$/${line} ${injection}/g" "projects_snapshot/Projects Folders/${PHASE_SEQUENCE[j]}/${PROJECT_NAME}/PROJECT_INFO.txt"
-    echo "${line} ${injection}" >> "projects_snapshot/Projects Folders/${PHASE_SEQUENCE[j]}/${PROJECT_NAME}/PROJECT_INFO.txt"
     rm "projects_snapshot/Projects Folders/${PHASE_SEQUENCE[j]}/${PROJECT_NAME}/PROJECT_INFO.txt.bak"
   done
 

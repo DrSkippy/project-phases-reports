@@ -4,20 +4,15 @@ USAGE:
   cd /Users/s.hendrickson/Documents/OneDrive - F5, Inc
   python ~/Working/2023-08-23_project_visibility/bin/update_summary.py
   cat "./Project Folders/summary.csv"
-
-# TODO: convert path variables to relative/dynamic paths
-# Locations
-# SH Local Path: /Users/s.hendrickson/Documents/OneDrive - F5, Inc
-# KW Local Path: /Users/ke.wilson/Desktop/test_data_accel
 """
 
 import os
 from datetime import datetime
 
-# Import Project Module(s) Below
-
 """
-USAGE: 
+Moved to ENV variables...
+
+Previously USAGE: 
     Path from SystemInfo() class is based on `os.environ['USER']` and the username following '/Users/' in system path.
     If `os.environ['USER']` & `/Users/[username]` match, AND the user is...
     ...Scott, then Scott's path: "/Users/s.hendrickson/Documents/OneDrive - F5, Inc"
@@ -28,14 +23,7 @@ USAGE:
     ...anyone else: path from user input()
 """
 
-# Moved into main script
-# system_info = SystemInfo()
-# projects_tree_root = system_info.return_system_info()
-# projects_tree_root = "/home/scott/Working/project-phases-reports/tests/projects_snapshot"
-# configure_report_path_globals(projects_tree_root)
-
 today_date_obj = None
-#today_date_obj = datetime.now().date()
 project_folders_root = "Projects Folders"
 project_info_filename = "PROJECT_INFO.txt"
 sharepoint_url = "https://f5.sharepoint.com/"
@@ -53,20 +41,6 @@ owner_views_completed_path = None
 stakeholders_views_active_path = None
 title_phase_views_path = None
 stakeholder_list_path = None
-
-# Files
-# projects_tree_project_folders = os.path.join(projects_tree_root, project_folders_root)
-# summary_path = os.path.join(projects_tree_project_folders, "summary.csv")
-# analytics_summary_path = os.path.join(projects_tree_project_folders, "analytics_summary.csv")
-# data_product_links_path = os.path.join(projects_tree_project_folders, "data_product_links.md")
-# owner_views_active_path = os.path.join(projects_tree_project_folders, "owner_views_active.md")
-# owner_views_commit_path = os.path.join(projects_tree_project_folders, "owner_views_commit.md")
-# weekly_owner_views_active_path = os.path.join(projects_tree_project_folders, "weekly_owner_views_active.html")
-# owner_views_completed_path = os.path.join(projects_tree_project_folders, "owner_views_completed.md")
-# stakeholders_views_active_path = os.path.join(projects_tree_project_folders, "stakeholders_views_active.md")
-# title_phase_views_path = os.path.join(projects_tree_project_folders, "phase_views.md")
-# stakeholder_list_path = os.path.join(projects_tree_project_folders, "stakeholder_list.txt")
-
 
 NOTES_DELIMITER = "**;**"
 DATE_FMT = "%Y-%m-%d"

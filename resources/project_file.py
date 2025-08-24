@@ -170,7 +170,7 @@ class ProjectFileObject:
         else:
             project_start_date = self.params_dict[date_key].date_value
             dt_delta = today_date_obj - project_start_date
-            if self.params_dict[age_key] is None or self.params_dict[age_key] == 0:
+            if self.params_dict[age_key] is None:
                 # First time we processed file since project phase changed to active
                 self.params_dict[age_key] = StringLine(key=age_key,
                                                        value=int(dt_delta.days),

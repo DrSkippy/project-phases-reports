@@ -1,5 +1,6 @@
 import csv
 import logging
+import datetime
 import os
 import pandas as pd
 from collections import defaultdict
@@ -141,7 +142,9 @@ def synthesize_owner_block(project_records_list, owner, phase_filter='active', p
                 result.append(f'<u>Project sponsor(s)</u>: {lines["BUSINESS_SPONSOR"]} ')
                 result.append(f'&nbsp; &nbsp; &nbsp;  👕 <u>Size</u>: {size_repr(lines["T-SHIRT_SIZE"])} \n\n')
                 if project_owner_key != "ANALYTICS_DS_OWNER":
-                    result.append(f'<u>Data Analyst</u>: {lines["ANALYTICS_DS_OWNER"]}\n\n')
+                    result.append(f'<u>Data Analyst</u>: {lines["ANALYTICS_DS_OWNER"]} | '
+                                  f'[Charter]({lines["COMPUTED_CHARTER_LINK"]}) | '
+                                  f'[Project Info]({lines["COMPUTED_PROJECT_INFO_LINK"]})\n\n')
                 notes_block = "\n\n".join(recent_notes(lines["NOTES"]))
                 result.extend(notes_block)
                 result.append("\n\n")
@@ -232,8 +235,8 @@ def create_weekly_owners_views(project_records_list):
 
     This is an HTML document to take advantage of full table formatting control.
     """
-    # Timestamp
-    current_timestamp = today_date_obj.strftime("%Y-%m-%d %H:%M:%S")
+    # Timestamp exception to using common object - this is report generation time
+    current_timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     # find unique owners
     owners = set([lines["ANALYTICS_DS_OWNER"] for lines in project_records_list])
     with open(weekly_owner_views_active_path, "w") as outfile:

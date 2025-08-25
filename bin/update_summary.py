@@ -45,10 +45,6 @@ dictConfig({
 
 datetime_today = dateutil.utils.today()
 
-
-
-
-
 # TODO: Document current outputs and compare against MetricsDefinition.csv to identify needs
 if __name__ == "__main__":
     logging.info("Starting update_summary.py")
@@ -497,4 +493,4 @@ if __name__ == "__main__":
         project_records_list.append(params)
 
     # Create reports based on the processed project records
-    # create_reports(project_records_list)
+    create_reports(project_records_list)

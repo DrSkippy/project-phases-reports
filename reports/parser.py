@@ -175,12 +175,14 @@ def create_charter_link(root, dirs, files):
     Create a link to the charter file.
     """
     res = []  # list of urls to charter files in directory
+    names = extract_params(root)
+    base_url = sharepoint_url + quote(f"{sharepoint_path}/{names[0]}/{names[1]}/")
+    logging.info(f"Base URL: {base_url}")
     for file in files:
         if file.endswith(".docx") and "charter" in file.lower():
-            names = extract_params(root)
             if len(names) == 2:
                 logging.info(f"Found charter file: {file} for phase: {names[0]}, project: {names[1]}")
                 url = sharepoint_url + quote(f"{sharepoint_path}/{names[0]}/{names[1]}/{file}")
                 logging.info(f"Charter URL: {url}")
                 res.append(url)
-    return res
+    return res, base_url

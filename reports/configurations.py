@@ -70,7 +70,6 @@ project_params_dict = {
     "COMPUTED_PROJECT_END_DATE": None,
     "COMPUTED_PREVIOUS_PHASE": None,
     "COMMIT_JUSTIFICATIONS": None,
-    "CharterLink": None,
     # New Columns
     # MIN Date in Stage
     "COMPUTED_DATE_IN_STAGE_0_IDEAS": None,
@@ -102,6 +101,8 @@ project_params_dict = {
     # Metadata
     "Project_ID": None,
     "Report_Date": None,
+    "COMPUTED_CHARTER_LINK": None,
+    "COMPUTED_PROJECT_INFO_LINK": None
 }
 
 """
@@ -158,7 +159,9 @@ name_field_map = {
     "Days Commit to Completion": "COMPUTED_COMMIT_TO_COMPLETION_DAYS",
     # Metadata
     "Project ID": "Project_ID",
-    "Report Date": "Report_Date"
+    "Report Date": "Report_Date",
+    "Charter Link": "COMPUTED_CHARTER_LINK",
+    "Project Info Link": "COMPUTED_PROJECT_INFO_LINK"
 }
 
 # keep a reverse map for lookup

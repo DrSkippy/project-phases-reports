@@ -100,7 +100,9 @@ if __name__ == "__main__":
             params = parse_project_info(project_info_file)
             params["Phases"] = phase
             params["Project"] = project
-            params["CharterLink"] = create_charter_link(root, dirs, files)
+            links, link_base = create_charter_link(root, dirs, files)
+            if len(links) > 0:
+                params["DATA_PRODUCT_LINK"] = links[0]
 
             print(f"Processing file {projects_processed_counter} ({phase}: {project})")
 

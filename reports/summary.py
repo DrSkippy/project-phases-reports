@@ -84,6 +84,7 @@ def recent_notes(notes_text, recent_days=400, limit=200):
     """
     Return a list of notes with the most recent first
     """
+    # Remove "NOTES_" prefix and split into individual notes
     notes = [x.strip()[6:] for x in notes_text.split(NOTES_DELIMITER)]
     # check for recent notes
     recent = today_date_obj - timedelta(days=recent_days)
@@ -153,34 +154,35 @@ def synthesize_owner_block(project_records_list, owner, phase_filter='active', p
     return ret
 
 
-def synthesize_owner_maintenance_block(project_records_list, owner, project_owner_key='ANALYTICS_DS_OWNER'):
-    """
-    Create output units by owner
-        Include items with only recent notes or triggers for maintenance
-    """
-    ret = ""
-    result = [f"### Maintenance Projects\n\n"]
-    counts = defaultdict(lambda: 0)
-    for lines in project_records_list:
-        # step through the project list to find owners and active projects of the ordered type
-        _current_project_phase = project_phases[lines["Phases"]]  # convert phase name to sequence number
-        if (_current_project_phase == 7 or _current_project_phase == 6) and owner in lines[project_owner_key]:
-            recent = recent_notes(lines["NOTES"], 14)
-            if len(recent) > 0:
-                logging.info(f"Processing recent notes for {lines['Project']} in Phase 7 for {owner}")
-                counts[_current_project_phase] += 1
-                result.append(f'### {lines["Project"]}\n\n')
-                result.append(f'<u>Project sponsor(s)</u>: {lines["BUSINESS_SPONSOR"]}\n\n')
-                if project_owner_key != "ANALYTICS_DS_OWNER":
-                    result.append(f'<u>Data Analyst</u>: {lines["ANALYTICS_DS_OWNER"]}\n\n')
-                for note in recent:
-                    result.append(f'{note}\n\n')
-            result.append("\n\n")
-    if len(counts) > 0:
-        # Only include this block if 1 or more projects found
-        result.append(summarize_phase_counts(counts))
-        ret = "".join(result)
-    return ret
+# Deprecated SH 2025-08-25
+#def synthesize_owner_maintenance_block(project_records_list, owner, project_owner_key='ANALYTICS_DS_OWNER'):
+#    """
+#    Create output units by owner
+#        Include items with only recent notes or triggers for maintenance
+#    """
+#    ret = ""
+#    result = [f"### Maintenance Projects\n\n"]
+#    counts = defaultdict(lambda: 0)
+#    for lines in project_records_list:
+#        # step through the project list to find owners and active projects of the ordered type
+#        _current_project_phase = project_phases[lines["Phases"]]  # convert phase name to sequence number
+#        if (_current_project_phase == 7 or _current_project_phase == 6) and owner in lines[project_owner_key]:
+#            recent = recent_notes(lines["NOTES"], 14)
+#            if len(recent) > 0:
+#                logging.info(f"Processing recent notes for {lines['Project']} in Phase 7 for {owner}")
+#                counts[_current_project_phase] += 1
+#                result.append(f'### {lines["Project"]}\n\n')
+#                result.append(f'<u>Project sponsor(s)</u>: {lines["BUSINESS_SPONSOR"]}\n\n')
+#                if project_owner_key != "ANALYTICS_DS_OWNER":
+#                    result.append(f'<u>Data Analyst</u>: {lines["ANALYTICS_DS_OWNER"]}\n\n')
+#                for note in recent:
+#                    result.append(f'{note}\n\n')
+#            result.append("\n\n")
+#    if len(counts) > 0:
+#        # Only include this block if 1 or more projects found
+#        result.append(summarize_phase_counts(counts))
+#        ret = "".join(result)
+#    return ret
 
 
 ########################################################################################
@@ -250,11 +252,15 @@ def create_weekly_owners_views(project_records_list):
                             owner_header = True
                             outfile.write(f'<tr class="tr-owner"><td colspan=2><b>{owner:}</b></td></tr>\n')
                         counts[_phase] += 1
-                        outfile.write(f'<tr class="tr-project"><td>{lines["Project"]}</td>'
+                        outfile.write(f'<tr class="tr-project">'
+                                      f'<td>{lines["Project"]}</td>'
                                       f'<td>[{_phase}] active {lines["COMPUTED_AGE_DAYS"]} days &'
-                                      f' In-progress {lines["COMPUTED_IN_PROGRESS_AGE_DAYS"]} days '
-                                      f' (👕:{size_repr(lines["T-SHIRT_SIZE"])})</td></tr>\n')
-                        notes_block = recent_notes(lines["NOTES"], limit=4)
+                                            f' In-progress {lines["COMPUTED_IN_PROGRESS_AGE_DAYS"]} days '
+                                            f' (👕:{size_repr(lines["T-SHIRT_SIZE"])}) <br/>'
+                                            f'<a href="{lines["COMPUTED_CHARTER_LINK"]}" target="_blank">Charter</a> | '
+                                            f'<a href="{lines["COMPUTED_PROJECT_INFO_LINK"]}" target="_blank">Project Info</a>'
+                                            f'</td></tr>\n')
+                        notes_block = recent_notes(lines["NOTES"], limit=7)
                         for note in notes_block:
                             note = note.strip().replace("|", ":")
                             outfile.write(f'<tr><td></td><td>{note}</td></tr>\n')
@@ -301,7 +307,8 @@ def create_owners_views(project_records_list):
         outfile.write(f"({str(today_date_obj)[:19]})\n\n")
         for owner in owners:
             outfile.write(synthesize_owner_block(project_records_list, owner))
-            outfile.write(synthesize_owner_maintenance_block(project_records_list, owner))
+            # Deprecated SH 2025-08-25
+            # outfile.write(synthesize_owner_maintenance_block(project_records_list, owner))
 
     with open(owner_views_completed_path, "w") as outfile:
         outfile.write("# Data Accelerator - Project Owner Views - COMPLETED & MAINTENANCE\n\n")
@@ -367,7 +374,7 @@ def create_summary_csv(project_records):
 
 def create_analytics_summary_csv(project_records):
     df_proj_records = pd.DataFrame(project_records, columns=project_params_dict.keys())
-    df_proj_records = df_proj_records.drop(['NOTES', 'CharterLink'], axis=1)
+    df_proj_records = df_proj_records.drop(['NOTES', 'COMPUTED_CHARTER_LINK', 'COMPUTED_PROJECT_INFO_LINK'], axis=1)
     df_proj_records.to_csv(analytics_summary_path, index=False)
 
 

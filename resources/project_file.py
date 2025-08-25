@@ -186,6 +186,36 @@ class ProjectFileObject:
         self.set_uuid()
         self.record_timestamp()
         self.determine_phase_change()
+        self.set_charter_link()
+
+    def set_charter_link(self):
+        """
+        Generate a Charter link for the project based on the root path.
+        The link is stored in the params_dict under the key "COMPUTED_CHARTER_LINK".
+        """
+        charter_links, link_base = create_charter_link(self.project_root, "refactor me away", self.files)
+        if charter_links is None or len(charter_links) == 0:
+            logging.warning(f"No charter link found for project {self.project} in {self.project_root}")
+        else:
+            charter_link = charter_links[0]
+            logging.debug(f"{len(charter_links)} found, selected charter link: {charter_link}")
+            if "COMPUTED_CHARTER_LINK" not in self.params_dict or self.params_dict["COMPUTED_CHARTER_LINK"] is None:
+                self.params_dict["COMPUTED_CHARTER_LINK"] = StringLine(key="COMPUTED_CHARTER_LINK",
+                                                               value=charter_link, new=True)
+            else:
+                if self.params_dict["COMPUTED_CHARTER_LINK"].value != charter_link:
+                    self.params_dict["COMPUTED_CHARTER_LINK"].update_value(charter_link)
+                    logging.info(f"Updated charter link for project {self.project} to {charter_link}.")
+
+        project_info_link = f"{link_base}{self.project_info_filepath}"
+        if 'COMPUTED_PROJECT_INFO_LINK' not in self.params_dict or self.params_dict['COMPUTED_PROJECT_INFO_LINK'] is None:
+            self.params_dict['COMPUTED_PROJECT_INFO_LINK'] = StringLine(key='COMPUTED_PROJECT_INFO_LINK',
+                                                                       value=project_info_link, new=True)
+        else:
+            if self.params_dict['COMPUTED_PROJECT_INFO_LINK'].value != project_info_link:
+                self.params_dict['COMPUTED_PROJECT_INFO_LINK'].update_value(project_info_link)
+                logging.info(f"Updated project info link for project {self.project} to {project_info_link}.")
+
 
     def set_uuid(self):
         """
@@ -224,22 +254,6 @@ class ProjectFileObject:
                                                           in_reports=False)
 
     ##########################################################################
-#    def extract_params(self):
-#        """
-#        Extract phase and project names for the file path.
-#            Assume start one directory above "Projects Folders"
-#        """
-#        names = self.project_root.split("/")  # phase, project
-#        for i_loc, name in enumerate(names):
-#            if name == "Projects Folders":
-#                break
-#        names = names[i_loc - 1:]
-#        assert (len(names) == 4 and names[1] == "Projects Folders")
-#        logging.info(f"Extracted phase: {names[2]}, project: {names[3]}")
-#        if names[2] is None or names[3] is None:
-#            raise ValueError(
-#                f"Invalid project root path: {self.project_root}. Expected format: '/Projects Folders/<phase>/<project>'")
-#        self.phase, self.project = names[2], names[3]
 
     def parse_file(self):
         # Process Project Info file
@@ -252,9 +266,7 @@ class ProjectFileObject:
             ## Meta parameters not parsed from file
             self.params_dict["Phases"] = StringLine(key="Phases", value=self.phase)
             self.params_dict["Project"] = StringLine(key="Project", value=self.project)
-            self.params_dict["CharterLink"] = StringLine(key="CharterLink",
-                                                         value=create_charter_link(self.project_root,
-                                                                                   "refactor me away", self.files))
+
             ################################################
             ## Parse the file line by line
             agg_lines = AggregateLines()

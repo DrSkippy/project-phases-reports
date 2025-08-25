@@ -207,7 +207,7 @@ class ProjectFileObject:
                     self.params_dict["COMPUTED_CHARTER_LINK"].update_value(charter_link)
                     logging.info(f"Updated charter link for project {self.project} to {charter_link}.")
 
-        project_info_link = f"{link_base}{self.project_info_filepath}"
+        project_info_link = f"{link_base}{self.project_info_filepath}?web=1"
         if 'COMPUTED_PROJECT_INFO_LINK' not in self.params_dict or self.params_dict['COMPUTED_PROJECT_INFO_LINK'] is None:
             self.params_dict['COMPUTED_PROJECT_INFO_LINK'] = StringLine(key='COMPUTED_PROJECT_INFO_LINK',
                                                                        value=project_info_link, new=True)

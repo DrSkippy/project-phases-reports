@@ -183,6 +183,7 @@ def create_charter_link(root, dirs, files):
             if len(names) == 2:
                 logging.info(f"Found charter file: {file} for phase: {names[0]}, project: {names[1]}")
                 url = sharepoint_url + quote(f"{sharepoint_path}/{names[0]}/{names[1]}/{file}")
+                url += '?web=1'
                 logging.info(f"Charter URL: {url}")
                 res.append(url)
     return res, base_url

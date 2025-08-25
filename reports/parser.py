@@ -92,9 +92,9 @@ def parse_project_info(project_info_file):
     return params_dict
 
 
-def record_timestamp(root, project_info_txt):
+def record_timestamp(root, project_info_txt, date_obj):
     timestamp_key = "Report_Date"
-    timestamp_value = today_date_obj.strftime(DATE_FMT)
+    timestamp_value = date_obj.strftime(DATE_FMT)
 
     file_path = os.path.join(root, project_info_txt)
     updated_lines = []

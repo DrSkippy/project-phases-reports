@@ -77,7 +77,7 @@ class StringLine:
                 self.value = value
             self.line = f"{key}: {value}"  # construct the file line
             self.add_new_variable = new
-        elif key is None or value is None or new is False:
+        elif key is None or value is None:
             if self.line is None or self.line == "":
                 raise ValueError(f"Line must be provided if key or value is not specified. ({self.line}, {key}, {value})")
             self.line = self.line.strip()  # raw line from the file

@@ -5,6 +5,7 @@ import os
 import uuid
 import logging
 import fileinput
+import argparse
 from datetime import datetime
 from logging.config import dictConfig
 
@@ -15,6 +16,9 @@ from resources.path_utils import SystemInfo
 from resources.date_utils import parse_date, days_between_dates
 from reports.parser import *
 from reports.summary import *
+from reports.summary import configure_report_path_globals, create_reports
+from resources.project_file import project_info_filename, project_folders_root, ProjectFileObject, set_date_obj
+
 
 
 dictConfig({
@@ -41,15 +45,39 @@ dictConfig({
 
 datetime_today = dateutil.utils.today()
 
-
 # TODO: Document current outputs and compare against MetricsDefinition.csv to identify needs
 if __name__ == "__main__":
     logging.info("Starting update_summary.py")
 
-    system_info = SystemInfo()
-    projects_tree_root = system_info.return_system_info()
-    configure_report_path_globals(projects_tree_root, datetime_today.date())
-    set_date_obj(datetime_today.date())
+
+    # system_info = SystemInfo()
+    # projects_tree_root = system_info.return_system_info()
+
+    parser = argparse.ArgumentParser(description="Update projects summary script")
+    parser.add_argument('--env', choices=['prod', 'test'], default='test',
+                        help='Set environment path from environment variables')
+    parser.add_argument('--inject-date', type=str, default=None,
+                        help='Inject a specific date (YYYY-MM-DD) instead of today\'s date')
+    args = parser.parse_args()
+
+    global today_date_obj
+    today_date_obj = datetime.today().date()
+
+    if args.env == 'prod':
+        projects_tree_root = os.getenv('PROJECT_PHASES_PROD_PROJECTS_FOLDERS_DIRECTORY')
+    elif args.env == 'test':
+        projects_tree_root = os.getenv('PROJECT_PHASES_TEST_SNAPSHOT_DIRECTORY')
+        # inject a specific date for testing purposes
+        if args.inject_date:
+            today_date_obj = datetime.strptime(args.inject_date, '%Y-%m-%d').date()
+            logging.info(f"Injected date for testing: {today_date_obj}")
+    else:
+        raise ValueError("Invalid environment specified. Use 'prod' or 'test'.")
+
+    set_date_obj(today_date_obj)
+    configure_report_path_globals(projects_tree_root, today_date_obj)
+    print(projects_tree_root)
+
 
     os.chdir(projects_tree_root)
     logging.info(f"Current directory: {os.getcwd()}")
@@ -119,7 +147,7 @@ if __name__ == "__main__":
             if params["COMPUTED_PREVIOUS_PHASE"] is None:
                 params["COMPUTED_PREVIOUS_PHASE"] = phase
 
-            record_timestamp(root, project_info_filename)
+            record_timestamp(root, project_info_filename, today_date_obj)
 
             # Scott
             if project_phases[phase] >= 6:

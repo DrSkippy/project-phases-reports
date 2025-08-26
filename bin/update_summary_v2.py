@@ -75,6 +75,8 @@ if __name__ == "__main__":
         projects_processed_counter += 1
 
     logging.info(f"Processed {len(project_objects_list)} projects.")
+    print(f"Creating reports for {projects_processed_counter: 3} projects...")
     create_reports([p.get_legacy_params() for p in project_objects_list])
     res = {obj.uuid: obj.finalize_file() for obj in project_objects_list}
     logging.debug(f"Finalized files: {res}")
+    print(f'Reports complete! (see reports in "https://f5.sharepoint.com/:f:/r/sites/salesandmktg/mktg/Enterprise%20Analytics/Shared%20Documents/Projects%20Folders?csf=1&web=1")')

@@ -145,6 +145,10 @@ def synthesize_owner_block(project_records_list, owner, phase_filter='active', p
                     result.append(f'<u>Data Analyst</u>: {lines["ANALYTICS_DS_OWNER"]} | '
                                   f'[Charter]({lines["COMPUTED_CHARTER_LINK"]}) | '
                                   f'[Project Info]({lines["COMPUTED_PROJECT_INFO_LINK"]})\n\n')
+                else:
+                     result.append(f'[Charter]({lines["COMPUTED_CHARTER_LINK"]}) | '
+                                   f'[Project Info]({lines["COMPUTED_PROJECT_INFO_LINK"]})\n\n')
+
                 notes_block = "\n\n".join(recent_notes(lines["NOTES"]))
                 result.extend(notes_block)
                 result.append("\n\n")

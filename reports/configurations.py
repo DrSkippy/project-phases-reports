@@ -1,27 +1,5 @@
-"""
-USAGE:
-
-  cd /Users/s.hendrickson/Documents/OneDrive - F5, Inc
-  python ~/Working/2023-08-23_project_visibility/bin/update_summary.py
-  cat "./Project Folders/summary.csv"
-"""
-
 import os
 from datetime import datetime
-
-"""
-Moved to ENV variables...
-
-Previously USAGE: 
-    Path from SystemInfo() class is based on `os.environ['USER']` and the username following '/Users/' in system path.
-    If `os.environ['USER']` & `/Users/[username]` match, AND the user is...
-    ...Scott, then Scott's path: "/Users/s.hendrickson/Documents/OneDrive - F5, Inc"
-    ...Keelor, then record option from user input:
-          ...test: "/Users/ke.wilson/Desktop/test_data_accel"
-          ...OneDrive: "/Users/ke.wilson/Library/CloudStorage/OneDrive-F5,Inc/Documents - Data Accelerator - Enterprise Analytics"
-          ...other: path from user input()
-    ...anyone else: path from user input()
-"""
 
 today_date_obj = None
 project_folders_root = "Projects Folders"
@@ -245,41 +223,3 @@ HTML_FOOTER = """
 </body>
 </html>
 """
-
-
-def size_repr(size_string):
-    """
-    Convert a size string to a standardized size representation.
-
-    Parameters:
-    size_string (str): A string representing the size, which can be "small", "medium",
-                       "large", "extra large", etc., or their abbreviations.
-
-    Returns:
-    str: A standardized one-letter size representation ("S", "M", "L", "XL").
-         Returns "Unsized" if the input does not match any recognized size.
-    """
-    # Trim and convert the input to lower case for standardization
-    standardized_size = size_string.strip().lower()
-
-    # Determine the size representation based on the first character
-    if standardized_size.startswith("s"):
-        return "S"
-    elif standardized_size.startswith("m"):
-        return "M"
-    elif standardized_size.startswith("l"):
-        return "L"
-    elif standardized_size.startswith("x") or standardized_size.startswith("e"):
-        return "XL"
-
-    # Default return value for unrecognized sizes
-    return "Unsized"
-
-
-def order_strings_by_date(string_list):
-    """
-    Used for notes ordering in reports
-        This works as desired if dates are yyyy-mm-dd format
-    """
-    res = sorted(string_list, reverse=True, key=lambda x: x[:16].replace("_", "-"))
-    return res

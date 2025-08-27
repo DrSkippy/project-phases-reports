@@ -6,20 +6,33 @@ from urllib.parse import quote
 # Import Project Module(s) Below
 from reports.configurations import *
 
+
 def set_date_obj(_today_date_obj):
+    """
+    Sets the global date object value for usage across the application.
+
+    Args:
+        _today_date_obj: The date object to be set as the global date object.
+    """
     global today_date_obj
     today_date_obj = _today_date_obj
 
+
 def normalize_note_date(note_line):
     """
-    Extract the date from the note string and return it in a sortable format.
+    Normalizes the date format within a note and appends necessary sequence numbers if present. This
+    function processes the note to ensure it follows the proper "NOTES_yyyy-mm-dd: content" format,
+    handling cases where the note format is inconsistent or dated incorrectly.
 
-    Expected format is "NOTES_yyyy-mm-dd: note text".
-    Occasionally there are types or lapses from the pattern. Deal with these:
-        notes, Notes, or note --> NOTES
-        missing : after date --> add it
-        transposed _ and - in dates --> use - in dates
-        date string not in yyyy-mm-dd format --> correct it when possible
+    Args:
+        note_line (str): The raw note line to be normalized, expected to contain a leading date
+            followed by content separated by a colon or space.
+
+    Returns:
+        str: The normalized note string with the proper format.
+
+    Raises:
+        ValueError: Raised if invalid date formatting is encountered.
     """
     date_re = re.compile(r"\d{4}-\d{1,2}-\d{1,2}")
     date_seq_re = re.compile(r"\d{4}-\d{1,2}-\d{1,2}-\d{1,2}")  # date with sequence number
@@ -57,9 +70,19 @@ def normalize_note_date(note_line):
 
 def parse_project_info(project_info_file):
     """
-    Parse the project information file for required elements.
-        Input is a file object.
-        Output is a list of dictionaries
+    Parses a project information file and extracts relevant fields into a dictionary.
+
+    This function processes each line in the provided project information file, extracts
+    key-value pairs, and stores them in a dictionary. It also processes specific fields like
+    notes and commit justifications with special handling.
+
+    Args:
+        project_info_file: A file-like object representing the project information
+            file. Each line in the file represents a field or comment.
+
+    Returns:
+        dict: A dictionary containing the parsed project information, including
+            standard fields and any additional notes or commit justifications.
     """
     params_dict = project_params_dict.copy()
     for line in project_info_file:
@@ -93,6 +116,18 @@ def parse_project_info(project_info_file):
 
 
 def record_timestamp(root, project_info_txt, date_obj):
+    """
+    Updates or appends a timestamp entry in a project information file.
+
+    This function reads the specified project info file and searches for a specific
+    timestamp key to either update its value or append it if it does not already exist.
+    The timestamp is generated based on the provided `date_obj`.
+
+    Args:
+        root (str): The root directory where the project info file is located.
+        project_info_txt (str): The name of the project info file to be updated.
+        date_obj (datetime): A datetime object used to generate the timestamp value.
+    """
     timestamp_key = "Report_Date"
     timestamp_value = date_obj.strftime(DATE_FMT)
 
@@ -118,44 +153,25 @@ def record_timestamp(root, project_info_txt, date_obj):
             project_info_file.writelines(updated_lines)
 
 
-def compute_stage_date(params, stage_key):
-    """
-    Compute the date for a given stage key in the params dictionary.
-    Returns (stage_date: datetime, needs_write: bool, value_to_write: str or None)
-    """
-    if params[stage_key] is None:
-        # return date as dt & str and flag for future write
-        stage_date = today_date_obj
-        params[stage_key] = stage_date.strftime(DATE_FMT)
-        return stage_date, True, stage_date.strftime(DATE_FMT)
-    else:
-        # Just parse, no write required
-        stage_date = datetime.strptime(params[stage_key][:10], DATE_FMT)
-        return stage_date, False, None
-
-
-def compute_phase_dwell(root, project_info_txt, param_key, phase_date, today):
-    file_path = os.path.join(root, project_info_txt)
-    updated_lines = []
-    key_found = False
-    phase_datetime = datetime.combine(phase_date, time.min)
-    time_in_phase = today - phase_datetime
-    with open(file_path, "r") as project_info_file:
-        for line in project_info_file:
-            if line.startswith(f"{param_key}:"):
-                updated_lines.append(f"{param_key}: {time_in_phase}\n")
-                key_found = True
-            else:
-                updated_lines.append(line)
-    if not key_found:
-        updated_lines.append(f"{param_key}: {time_in_phase}\n")
-    return updated_lines
-
 
 def extract_params(root):
     """
-    Extract phase and project names for the file path.
-        Assume start one directory above "Projects Folders"
+    Extracts phase and project name from the given root path.
+
+    This function takes a file path and parses it to extract specific components:
+    'phase' and 'project'. The expected format of the input path is
+    '/Projects Folders/<phase>/<project>'. The function validates that the path
+    is well-formed and logs the extracted components.
+
+    Args:
+        root (str): The file path to parse and extract phase and project names.
+
+    Returns:
+        Tuple[str, str]: A tuple containing the extracted phase and project name.
+
+    Raises:
+        ValueError: If the provided root path is invalid or does not conform to
+        the expected format.
     """
     names = root.split("/")  # phase, project
     for i_loc, name in enumerate(names):
@@ -172,7 +188,24 @@ def extract_params(root):
 
 def create_charter_link(root, dirs, files):
     """
-    Create a link to the charter file.
+    Generates a list of URLs for charter files located in a specified directory and constructs a base URL.
+
+    The function scans through files in a given directory, identifying charter files based on specific naming
+    criteria. It builds URLs to these files using predefined paths and names extracted from the directory structure.
+    The function also constructs a base URL for linking purposes.
+
+    Args:
+        root (str): The root directory path being scanned.
+        dirs (list[str]): A list of subdirectories in the root directory (unused in this function).
+        files (list[str]): A list of file names in the root directory.
+
+    Returns:
+        tuple[list[str], str]: A tuple containing:
+            - A list of URLs (list[str]) pointing to the charter files found in the directory.
+            - A base URL (str) constructed using the directory structure.
+
+    Raises:
+        None
     """
     res = []  # list of urls to charter files in directory
     names = extract_params(root)
@@ -187,3 +220,24 @@ def create_charter_link(root, dirs, files):
                 logging.info(f"Charter URL: {url}")
                 res.append(url)
     return res, base_url
+
+
+def order_strings_by_date(string_list):
+    """
+    Orders a list of strings by the embedded date in descending order.
+
+    This function processes a list of strings where each string contains a
+    date embedded in a specific format. It extracts and replaces underscores
+    ('_') with hyphens ('-') in the date portion, then sorts the list
+    in reverse chronological order.
+
+    Args:
+        string_list (List[str]): A list of strings, each containing a date
+            substring in the format YYYY_MM_DD_HH_MM.
+
+    Returns:
+        List[str]: A list of strings sorted by their embedded date in
+            descending order.
+    """
+    res = sorted(string_list, reverse=True, key=lambda x: x[:16].replace("_", "-"))
+    return res

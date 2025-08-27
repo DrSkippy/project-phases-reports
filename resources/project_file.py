@@ -8,11 +8,32 @@ from reports.parser import create_charter_link, extract_params
 from resources.lines import StringLine, AggregateLines
 
 def set_date_obj(_today_date_obj):
+    """
+    Sets the global date object for today's date.
+
+    This function assigns the provided date object to the global variable
+    `today_date_obj`. It is intended to manage the application's
+    representation of the current date.
+
+    Args:
+        _today_date_obj: The date object to set as the current date.
+    """
     global today_date_obj
     today_date_obj = _today_date_obj
 
 class ProjectFileObject:
     def __init__(self, root, files, project_info_filename: str):
+        """
+        Initializes an instance of the class and sets up the initial state, including
+        mapping phase identifiers to their respective functions, parsing project-related
+        files, and invoking the corresponding phase function based on the current phase.
+
+        Args:
+            root: The root directory path for the project.
+            files: A collection of files related to the project.
+            project_info_filename: The filename of the project information file.
+
+        """
         self.uuid = None
         self.phase = None
         self.previous_phase = None
@@ -29,9 +50,13 @@ class ProjectFileObject:
         self.project_info_filepath = project_info_filename
         self.project_root = root
         self.files = files
+        # initialize params_dict with default parameters
         self.params_dict = project_params_dict.copy()
+        # 1. Parse the project info file and populate params_dict
         self.parse_file()
+        # 2. Setup special fields like UUID, timestamps, phase changes, and links
         self.setup_special_fields()
+        # 3. Call the appropriate phase function based on the current phase
         self.phase_functions[self.phase]()
 
     ######################## Phase Processing ################################
@@ -183,15 +208,35 @@ class ProjectFileObject:
 
     ##########################################################################
     def setup_special_fields(self):
+        """
+        Executes the setup process for initializing and updating specific fields in the object.
+
+        This method performs a sequence of operations to configure particular fields within the
+        object by calling helper methods. Every helper method invoked is responsible for setting
+        or updating a specific property or association relevant to the object.
+
+        """
         self.set_uuid()
         self.record_timestamp()
         self.determine_phase_change()
-        self.set_charter_link()
+        self.set_charter_and_project_info_link()
 
-    def set_charter_link(self):
+    def set_charter_and_project_info_link(self):
         """
-        Generate a Charter link for the project based on the root path.
-        The link is stored in the params_dict under the key "COMPUTED_CHARTER_LINK".
+        Sets or updates the charter link and project information link in the parameter dictionary.
+
+        This method creates and sets the appropriate charter and project information links for the current project
+        by using specific base paths and filenames. If no charter link is found, it logs a warning. If the generated
+        links differ from the existing values in the parameter dictionary, the method updates them and logs the changes.
+
+        Args:
+            None
+
+        Raises:
+            None
+
+        Returns:
+            None
         """
         charter_links, link_base = create_charter_link(self.project_root, "refactor me away", self.files)
         if charter_links is None or len(charter_links) == 0:
@@ -219,14 +264,36 @@ class ProjectFileObject:
 
     def set_uuid(self):
         """
-        Generate a UUID for the project based on the root path.
-        The UUID is stored in the params_dict under the key "UUID".
+        Sets the UUID for the instance based on the presence of "Project_ID" in the params_dict.
+
+        If "Project_ID" is not found in the `params_dict` dictionary or its value is `None`, it will be created with a
+        randomly generated UUID. The generated or existing UUID will then be set as the instance's `uuid`.
+
+        Args:
+            None
+
+        Raises:
+            None
         """
         if "Project_ID" not in self.params_dict or self.params_dict["Project_ID"] is None:
             self.params_dict["Project_ID"] = StringLine(key="Project_ID", value=str(uuid.uuid4()), new=True)
         self.uuid = self.params_dict["Project_ID"].value
 
     def record_timestamp(self):
+        """
+        Updates or records the current timestamp in the `params_dict` under the "Report_Date" key.
+
+        This method ensures that the "Report_Date" key in the `params_dict` dictionary has the current
+        datetime value. If the key does not exist or if its value is `None`, a new `StringLine` object
+        is created with the current timestamp as its value. If the key exists, its value is updated
+        with the current timestamp.
+
+        Args:
+            None
+
+        Returns:
+            None
+        """
         if "Report_Date" not in self.params_dict or self.params_dict["Report_Date"] is None:
             self.params_dict["Report_Date"] = StringLine(key="Report_Date", value=datetime.now().strftime(DATE_FMT),
                                                          new=True)
@@ -235,8 +302,15 @@ class ProjectFileObject:
 
     def determine_phase_change(self):
         """
-        Determine if the phase or project has changed based on the file path.
-        If the phase or project has changed, update the params_dict accordingly.
+        Analyzes and determines phase changes for a project by comparing the current phase
+        with the previously recorded phase. Logs relevant information about phase transitions
+        and updates internal tracking structures accordingly.
+
+        Args:
+            None
+
+        Raises:
+            None
         """
         if "COMPUTED_PREVIOUS_PHASE" not in self.params_dict or self.params_dict["COMPUTED_PREVIOUS_PHASE"] is None:
             self.params_dict["COMPUTED_PREVIOUS_PHASE"] = StringLine(key="COMPUTED_PREVIOUS_PHASE",
@@ -256,6 +330,26 @@ class ProjectFileObject:
     ##########################################################################
 
     def parse_file(self):
+        """
+        Parses a project information file line by line and processes its content.
+
+        The method processes a file located in `self.project_root` alongside additional
+        metadata inferred from the file path. It updates `self.params_dict` with parsed
+        key-value pairs and aggregates lines as needed. Empty lines are skipped, and
+        comments are logged, while missing keys are logged as errors. Parsed data is
+        based on both specific keys in the file and additional metadata not contained
+        within the file.
+
+        Raises:
+            FileNotFoundError: If the project information file is not found.
+            KeyError: If a required key is missing during parsing.
+
+        Args:
+            None
+
+        Returns:
+            None
+        """
         # Process Project Info file
         projects_processed_counter = 0
         with open(os.path.join(self.project_root, project_info_filename), "r") as project_info_file:
@@ -287,8 +381,16 @@ class ProjectFileObject:
 
     def get_legacy_params(self):
         """
-        Get legacy parameters from the params_dict.
-        Returns a dictionary with keys as parameter names and values as StringLine objects.
+        Generates a dictionary of legacy parameters from the current parameters dictionary.
+
+        This method processes each entry in the `params_dict` dictionary, checks the type
+        of each line object, and determines if it should be included in the legacy parameters.
+        Objects of type `StringLine` or `AggregateLines` are included only if they are marked
+        as being in reports. If a line object does not satisfy these conditions, it will
+        either be skipped with logging or added directly to the legacy parameters.
+
+        Returns:
+            dict: A dictionary containing the legacy parameters based on the criteria above.
         """
         legacy_params = {}
         for key, line_obj in self.params_dict.items():
@@ -304,13 +406,30 @@ class ProjectFileObject:
         return legacy_params
 
     def finalize_file(self):
+        """
+        Processes and finalizes the content of a specified project file by performing in-place modifications
+        for existing variables and appending new variables at the end of the file if necessary.
+
+        This method checks for updates in a dictionary of parameters and modifies the corresponding lines
+        in the project information file. It replaces lines in-place for already existing variables that were
+        updated and appends new lines for variables marked as new. The function returns a tuple indicating
+        whether any replacements or appends were performed during the process.
+
+        Args:
+            None
+
+        Returns:
+            Tuple[bool, bool]: A tuple indicating two boolean values:
+                - replaced_in_file (bool): True if any existing lines were replaced in the file, False otherwise.
+                - appended_in_file (bool): True if any new lines were appended to the file, False otherwise.
+        """
         # In place changes
         replaced_in_file = False
         appended_in_file = False
         for line in fileinput.input(os.path.join(self.project_root, project_info_filename), inplace=True):
             for key, obj in self.params_dict.items():
                 if isinstance(obj, StringLine) and obj.existing_variable_updated and line.startswith(key):
-                    print(f"{key}: {obj.value}")
+                    print(f"{obj.line}")
                     replaced_in_file = True
                     break
             else:

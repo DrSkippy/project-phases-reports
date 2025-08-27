@@ -1,6 +1,6 @@
 import csv
-import logging
 import datetime
+import logging
 import os
 import pandas as pd
 from collections import defaultdict
@@ -146,8 +146,8 @@ def synthesize_owner_block(project_records_list, owner, phase_filter='active', p
                                   f'[Charter]({lines["COMPUTED_CHARTER_LINK"]}) | '
                                   f'[Project Info]({lines["COMPUTED_PROJECT_INFO_LINK"]})\n\n')
                 else:
-                     result.append(f'[Charter]({lines["COMPUTED_CHARTER_LINK"]}) | '
-                                   f'[Project Info]({lines["COMPUTED_PROJECT_INFO_LINK"]})\n\n')
+                    result.append(f'[Charter]({lines["COMPUTED_CHARTER_LINK"]}) | '
+                                  f'[Project Info]({lines["COMPUTED_PROJECT_INFO_LINK"]})\n\n')
 
                 notes_block = "\n\n".join(recent_notes(lines["NOTES"]))
                 result.extend(notes_block)
@@ -162,7 +162,7 @@ def synthesize_owner_block(project_records_list, owner, phase_filter='active', p
 
 
 # Deprecated SH 2025-08-25
-#def synthesize_owner_maintenance_block(project_records_list, owner, project_owner_key='ANALYTICS_DS_OWNER'):
+# def synthesize_owner_maintenance_block(project_records_list, owner, project_owner_key='ANALYTICS_DS_OWNER'):
 #    """
 #    Create output units by owner
 #        Include items with only recent notes or triggers for maintenance
@@ -262,11 +262,11 @@ def create_weekly_owners_views(project_records_list):
                         outfile.write(f'<tr class="tr-project">'
                                       f'<td>{lines["Project"]}</td>'
                                       f'<td>[{_phase}] active {lines["COMPUTED_AGE_DAYS"]} days &'
-                                            f' In-progress {lines["COMPUTED_IN_PROGRESS_AGE_DAYS"]} days '
-                                            f' (👕:{size_repr(lines["T-SHIRT_SIZE"])}) <br/>'
-                                            f'<a href="{lines["COMPUTED_CHARTER_LINK"]}" target="_blank">Charter</a> | '
-                                            f'<a href="{lines["COMPUTED_PROJECT_INFO_LINK"]}" target="_blank">Project Info</a>'
-                                            f'</td></tr>\n')
+                                      f' In-progress {lines["COMPUTED_IN_PROGRESS_AGE_DAYS"]} days '
+                                      f' (👕:{size_repr(lines["T-SHIRT_SIZE"])}) <br/>'
+                                      f'<a href="{lines["COMPUTED_CHARTER_LINK"]}" target="_blank">Charter</a> | '
+                                      f'<a href="{lines["COMPUTED_PROJECT_INFO_LINK"]}" target="_blank">Project Info</a>'
+                                      f'</td></tr>\n')
                         notes_block = recent_notes(lines["NOTES"], limit=7)
                         for note in notes_block:
                             note = note.strip().replace("|", ":")
@@ -451,3 +451,32 @@ def configure_report_path_globals(projects_tree_root, today_dt):
     stakeholders_views_active_path = os.path.join(projects_tree_project_folders, "stakeholders_views_active.md")
     title_phase_views_path = os.path.join(projects_tree_project_folders, "phase_views.md")
     stakeholder_list_path = os.path.join(projects_tree_project_folders, "stakeholder_list.txt")
+
+
+def size_repr(size_string):
+    """
+    Convert a size string to a standardized size representation.
+
+    Parameters:
+    size_string (str): A string representing the size, which can be "small", "medium",
+                       "large", "extra large", etc., or their abbreviations.
+
+    Returns:
+    str: A standardized one-letter size representation ("S", "M", "L", "XL").
+         Returns "Unsized" if the input does not match any recognized size.
+    """
+    # Trim and convert the input to lower case for standardization
+    standardized_size = size_string.strip().lower()
+
+    # Determine the size representation based on the first character
+    if standardized_size.startswith("s"):
+        return "S"
+    elif standardized_size.startswith("m"):
+        return "M"
+    elif standardized_size.startswith("l"):
+        return "L"
+    elif standardized_size.startswith("x") or standardized_size.startswith("e"):
+        return "XL"
+
+    # Default return value for unrecognized sizes
+    return "Unsized"

@@ -1,5 +1,5 @@
 #!/usr/bin/env -S poetry run python
-__version__ = "2.0.0"
+__version__ = "2.0.1"
 
 import argparse
 import logging
@@ -79,4 +79,5 @@ if __name__ == "__main__":
     create_reports([p.get_legacy_params() for p in project_objects_list])
     res = {obj.uuid: obj.finalize_file() for obj in project_objects_list}
     logging.debug(f"Finalized files: {res}")
-    print(f'Reports complete! (see reports in "https://f5.sharepoint.com/:f:/r/sites/salesandmktg/mktg/Enterprise%20Analytics/Shared%20Documents/Projects%20Folders?csf=1&web=1")')
+    print(
+        f'Reports complete! (see reports in "https://f5.sharepoint.com/:f:/r/sites/salesandmktg/mktg/Enterprise%20Analytics/Shared%20Documents/Projects%20Folders?csf=1&web=1")')

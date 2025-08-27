@@ -1,13 +1,13 @@
-# Folder Based Project Reporting Tool
+# Folder-Based Project Reporting Tool
 
-This tool is designed to generate reports based on the structure and contents of a folder-based project. It scans through the directories and files, extracting relevant information to create a comprehensive report.
+This tool is designed to generate reports based on the structure and contents of a portfolio of folder-based projects. It scans through the directories (project phases)/(projects) and files, extracting relevant information to create a comprehensive report.
 ## Features
 
-Eech project folder must contain a copy of the sample file:
+Eech project folder must contain a copy of the sample file into the project base directory:
 
 [clean_sample_PROJECT_INFO.txt](tests/clean_sample_PROJECT_INFO.txt)
 
-Structure of phases and reports after running the script with one project in teh Completed Phase will look like:
+Structure of phases and reports after running the script with one project in the Completed Phase will look like:
 ```
 projects_snapshot
 └── Projects Folders

@@ -17,7 +17,6 @@ from resources.date_utils import parse_date, days_between_dates
 from reports.parser import *
 from reports.summary import *
 from reports.summary import configure_report_path_globals, create_reports
-from resources.project_file import project_info_filename, project_folders_root, ProjectFileObject, set_date_obj
 
 
 
@@ -47,7 +46,8 @@ datetime_today = dateutil.utils.today()
 
 # TODO: Document current outputs and compare against MetricsDefinition.csv to identify needs
 if __name__ == "__main__":
-    logging.info("Starting update_summary.py")
+    print(f"Starting update_summary Verion {__version__}")
+    logging.info(f"Starting update_summary Version {__version__}")
 
 
     # system_info = SystemInfo()

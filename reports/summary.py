@@ -161,37 +161,6 @@ def synthesize_owner_block(project_records_list, owner, phase_filter='active', p
     return ret
 
 
-# Deprecated SH 2025-08-25
-# def synthesize_owner_maintenance_block(project_records_list, owner, project_owner_key='ANALYTICS_DS_OWNER'):
-#    """
-#    Create output units by owner
-#        Include items with only recent notes or triggers for maintenance
-#    """
-#    ret = ""
-#    result = [f"### Maintenance Projects\n\n"]
-#    counts = defaultdict(lambda: 0)
-#    for lines in project_records_list:
-#        # step through the project list to find owners and active projects of the ordered type
-#        _current_project_phase = project_phases[lines["Phases"]]  # convert phase name to sequence number
-#        if (_current_project_phase == 7 or _current_project_phase == 6) and owner in lines[project_owner_key]:
-#            recent = recent_notes(lines["NOTES"], 14)
-#            if len(recent) > 0:
-#                logging.info(f"Processing recent notes for {lines['Project']} in Phase 7 for {owner}")
-#                counts[_current_project_phase] += 1
-#                result.append(f'### {lines["Project"]}\n\n')
-#                result.append(f'<u>Project sponsor(s)</u>: {lines["BUSINESS_SPONSOR"]}\n\n')
-#                if project_owner_key != "ANALYTICS_DS_OWNER":
-#                    result.append(f'<u>Data Analyst</u>: {lines["ANALYTICS_DS_OWNER"]}\n\n')
-#                for note in recent:
-#                    result.append(f'{note}\n\n')
-#            result.append("\n\n")
-#    if len(counts) > 0:
-#        # Only include this block if 1 or more projects found
-#        result.append(summarize_phase_counts(counts))
-#        ret = "".join(result)
-#    return ret
-
-
 ########################################################################################
 # Reports
 ########################################################################################

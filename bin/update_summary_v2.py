@@ -1,5 +1,5 @@
 #!/usr/bin/env -S poetry run python
-__version__ = "2.0.1"
+__version__ = "2.0.2"
 
 import argparse
 import logging
@@ -34,6 +34,7 @@ dictConfig({
 
 if __name__ == "__main__":
     logging.info(f"Starting update_summary Version {__version__}")
+    print(f"Starting update_summary Version {__version__}")
 
     parser = argparse.ArgumentParser(description="Update projects summary script")
     parser.add_argument('--env', choices=['prod', 'test'], default='test',

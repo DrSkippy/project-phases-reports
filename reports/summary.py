@@ -377,7 +377,59 @@ def create_complete_stakeholder_list(project_records):
         wrt = csv.writer(outfile)
         wrt.writerows(stakeholderlist)
 
+def create_kanban_board(project_records):
+    """ Use makrup language from Mermaid to create a kanban board of active projects
+    E.g.
 
+---
+config:
+  kanban:
+    ticketBaseUrl: 'https://mermaidchart.atlassian.net/browse/#TICKET#'
+---
+kanban
+  Todo
+    [Create Documentation]
+    docs[Create Blog about the new diagram]
+  [In progress]
+    id6[Create renderer so that it works in all cases. We also add some extra text here for testing purposes. And some more just for the extra flare.]
+  id9[Ready for deploy]
+    id8[Design grammar]@{ assigned: 'knsv' }
+  id10[Ready for test]
+    id4[Create parsing tests]@{ ticket: MC-2038, assigned: 'K.Sveidqvist', priority: 'High' }
+    id66[last item]@{ priority: 'Very Low', assigned: 'knsv' }
+  id11[Done]
+    id5[define getData]
+    id2[Title of diagram is more than 100 chars when user duplicates diagram with 100 char]@{ ticket: MC-2036, priority: 'Very High'}
+    id3[Update DB function]@{ ticket: MC-2037, assigned: knsv, priority: 'High' }
+
+  id12[Can't reproduce]
+    id3[Weird flickering in Firefox]
+"""
+    projects_by_phases = defaultdict(list)
+    for lines in project_records:
+        projects_by_phases[lines["Phases"]].append((lines["Project"], lines["ANALYTICS_DS_OWNER"]))
+
+    base_url = sharepoint_url + sharepoint_path
+    with open(kanban_board_path, "w") as outfile:
+        outfile.write(f"""---
+config:
+  kanban:
+    ticketBaseUrl:{base_url}/#TICKET#'
+---
+kanban
+""")
+        for _phase, index in project_phases.items():
+            if index in [0, 6, 7,  8, 9]:
+                continue
+            id_cnt = index*100
+            outfile.write(f'  cid{id_cnt}[{_phase.split("-")[1]}]\n')
+            for project, owner in projects_by_phases[_phase]:
+                project = project.replace("[", "").replace("]", "").replace("(", "").replace(")", "")
+                owner = owner.split('(')[0].strip()
+                id_cnt += 1
+                outfile.write(f'    pid{id_cnt}[{project}]@{{ assigned: \'{owner}\' }}\n')
+
+    
 def create_reports(project_records_list):
     # Create all the standard reports
     create_summary_csv(project_records_list)
@@ -389,6 +441,7 @@ def create_reports(project_records_list):
     create_stakeholders_views(project_records_list)
     create_title_phase_views(project_records_list)
     create_complete_stakeholder_list(project_records_list)
+    create_kanban_board(project_records_list)
 
 
 def configure_report_path_globals(projects_tree_root, today_dt):
@@ -404,6 +457,7 @@ def configure_report_path_globals(projects_tree_root, today_dt):
     global stakeholders_views_active_path
     global title_phase_views_path
     global stakeholder_list_path
+    global kanban_board_path
     today_date_obj = today_dt
     # TODO fix this between test and prod
     if projects_tree_root.endswith("Projects Folders"):
@@ -420,6 +474,7 @@ def configure_report_path_globals(projects_tree_root, today_dt):
     stakeholders_views_active_path = os.path.join(projects_tree_project_folders, "stakeholders_views_active.md")
     title_phase_views_path = os.path.join(projects_tree_project_folders, "phase_views.md")
     stakeholder_list_path = os.path.join(projects_tree_project_folders, "stakeholder_list.txt")
+    kanban_board_path = os.path.join(projects_tree_project_folders, "kanban_board.mermaid")
 
 
 def size_repr(size_string):

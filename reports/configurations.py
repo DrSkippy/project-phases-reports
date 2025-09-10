@@ -19,6 +19,7 @@ owner_views_completed_path = None
 stakeholders_views_active_path = None
 title_phase_views_path = None
 stakeholder_list_path = None
+kanban_board_path = None
 
 NOTES_DELIMITER = "**;**"
 DATE_FMT = "%Y-%m-%d"

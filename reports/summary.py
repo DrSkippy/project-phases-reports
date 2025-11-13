@@ -18,8 +18,8 @@ def extract_stakeholders(stake_str):
     Stakeholders are comma-separated in the project_info_file
     Extract and return a list of stakeholders
     """
-    sh_list = stake_str.split(",")
-    sh_list = [x.strip() for x in sh_list]
+    sh_list = stake_str.strip().split(",")
+    sh_list = [x.strip() for x in sh_list if x.strip() is not None and x.strip() != '']
     return sh_list
 
 
@@ -170,6 +170,7 @@ def create_stakeholders_views(project_records_list):
     for lines in project_records_list:
         owners.extend(extract_stakeholders(lines["BUSINESS_SPONSOR"]))
     owners = set(owners)
+    logging.debug(f"Processing {len(owners)} stakeholders: {owners}")
 
     with open(stakeholders_views_active_path, "w") as outfile:
         outfile.write("# Data Accelerator - Project Stakeholders Views - ACTIVE\n\n")

@@ -57,7 +57,15 @@ done
 echo
 echo "Files with duplicate ids:"
 echo "*************************************************************************"
-grep "^Project_ID" "${BASE_DIR}"/*/*/PROJECT_INFO.txt | cut -d":" -f2,3 | sort | uniq -d
+for ids in $(grep "^Project_ID" "${BASE_DIR}"/*/*/PROJECT_INFO.txt | cut -d":" -f2,3 | sort | uniq -d | cut -d" " -f2); do
+  echo "For ID=${ids}:"
+  for fl in  "${BASE_DIR}"/*/*/PROJECT_INFO.txt; do
+    if grep -e "${ids}" "$fl" > /dev/null
+    then
+      echo $fl
+    fi
+  done
+done
 
 
 echo

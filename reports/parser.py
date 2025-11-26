@@ -1,21 +1,20 @@
 import logging
 import re
-from datetime import datetime, time
 from urllib.parse import quote
 
 # Import Project Module(s) Below
 from reports.configurations import *
 
 
-def set_date_obj(_today_date_obj):
-    """
-    Sets the global date object value for usage across the application.
-
-    Args:
-        _today_date_obj: The date object to be set as the global date object.
-    """
-    global today_date_obj
-    today_date_obj = _today_date_obj
+# 2025-11-26 def set_date_obj(_today_date_obj):
+# 2025-11-26     """
+# 2025-11-26     Sets the global date object value for usage across the application.
+# 2025-11-26
+# 2025-11-26     Args:
+# 2025-11-26         _today_date_obj: The date object to be set as the global date object.
+# 2025-11-26     """
+# 2025-11-26     global today_date_obj
+# 2025-11-26     today_date_obj = _today_date_obj
 
 
 def normalize_note_date(note_line):
@@ -68,91 +67,89 @@ def normalize_note_date(note_line):
     return ":".join(["NOTES_" + conforming_head_date, " " + tail.strip()])
 
 
-def parse_project_info(project_info_file):
-    """
-    Parses a project information file and extracts relevant fields into a dictionary.
-
-    This function processes each line in the provided project information file, extracts
-    key-value pairs, and stores them in a dictionary. It also processes specific fields like
-    notes and commit justifications with special handling.
-
-    Args:
-        project_info_file: A file-like object representing the project information
-            file. Each line in the file represents a field or comment.
-
-    Returns:
-        dict: A dictionary containing the parsed project information, including
-            standard fields and any additional notes or commit justifications.
-    """
-    params_dict = project_params_dict.copy()
-    for line in project_info_file:
-        if line.startswith("#") or len(line.strip()) == 0:
-            # comment lines
-            continue
-        logging.info(f"Processing line: {line.strip()}")
-        fields = [x.strip() for x in line.split(":")]
-        if fields[0] in params_dict:
-            # In Split on ":", so reassemble the rest of the line in case there were colons in it
-            params_dict[fields[0].strip()] = ":".join(fields[1:]).strip().strip('"')
-            logging.info(f"Found {fields[0].strip()} in project info file")
-        elif fields[0].startswith("NOTE"):
-            if params_dict["NOTES"] is None:
-                params_dict["NOTES"] = []
-            params_dict["NOTES"].append(normalize_note_date(line))  # records include date field and colon
-            logging.info(f"Found NOTE in project info file")
-        elif fields[0].startswith("COMMIT_JUSTIFICATION"):
-            if params_dict["COMMIT_JUSTIFICATIONS"] is None:
-                params_dict["COMMIT_JUSTIFICATIONS"] = []
-            params_dict["COMMIT_JUSTIFICATIONS"].append(fields[1])
-            logging.info(f"Found COMMIT_JUSTIFICATION in project info file")
-    # order the notes by date
-    if params_dict["NOTES"] is not None:
-        params_dict["NOTES"] = order_strings_by_date(params_dict["NOTES"])
-
-    if params_dict["ANALYTICS_DS_OWNER"] is None:
-        logging.error("ERROR: No owner specified. This is required! (Check of typos in file tags!)")
-
-    return params_dict
-
-
-def record_timestamp(root, project_info_txt, date_obj):
-    """
-    Updates or appends a timestamp entry in a project information file.
-
-    This function reads the specified project info file and searches for a specific
-    timestamp key to either update its value or append it if it does not already exist.
-    The timestamp is generated based on the provided `date_obj`.
-
-    Args:
-        root (str): The root directory where the project info file is located.
-        project_info_txt (str): The name of the project info file to be updated.
-        date_obj (datetime): A datetime object used to generate the timestamp value.
-    """
-    timestamp_key = "Report_Date"
-    timestamp_value = date_obj.strftime(DATE_FMT)
-
-    file_path = os.path.join(root, project_info_txt)
-    updated_lines = []
-    key_found = False
-
-    with open(file_path, "r") as project_info_file:
-        for line in project_info_file:
-            if line.startswith(f"{timestamp_key}:"):
-                # Overwrite existing timestamp key in updated_line list
-                updated_lines.append(f"{timestamp_key}: {timestamp_value}\n")
-                key_found = True
-            else:
-                updated_lines.append(line)
-
-        # If key not found, append to file
-        if not key_found:
-            updated_lines.append(f"{timestamp_key}: {timestamp_value}\n")
-
-        # Write updated lines from list back to the file
-        with open(file_path, "w") as project_info_file:
-            project_info_file.writelines(updated_lines)
-
-
+# 2025-11-26 def parse_project_info(project_info_file):
+# 2025-11-26     """
+# 2025-11-26     Parses a project information file and extracts relevant fields into a dictionary.
+# 2025-11-26
+# 2025-11-26     This function processes each line in the provided project information file, extracts
+# 2025-11-26     key-value pairs, and stores them in a dictionary. It also processes specific fields like
+# 2025-11-26     notes and commit justifications with special handling.
+# 2025-11-26
+# 2025-11-26     Args:
+# 2025-11-26         project_info_file: A file-like object representing the project information
+# 2025-11-26             file. Each line in the file represents a field or comment.
+# 2025-11-26
+# 2025-11-26     Returns:
+# 2025-11-26         dict: A dictionary containing the parsed project information, including
+# 2025-11-26             standard fields and any additional notes or commit justifications.
+# 2025-11-26     """
+# 2025-11-26     params_dict = project_params_dict.copy()
+# 2025-11-26     for line in project_info_file:
+# 2025-11-26         if line.startswith("#") or len(line.strip()) == 0:
+# 2025-11-26             # comment lines
+# 2025-11-26             continue
+# 2025-11-26         logging.info(f"Processing line: {line.strip()}")
+# 2025-11-26         fields = [x.strip() for x in line.split(":")]
+# 2025-11-26         if fields[0] in params_dict:
+# 2025-11-26             # In Split on ":", so reassemble the rest of the line in case there were colons in it
+# 2025-11-26             params_dict[fields[0].strip()] = ":".join(fields[1:]).strip().strip('"')
+# 2025-11-26             logging.info(f"Found {fields[0].strip()} in project info file")
+# 2025-11-26         elif fields[0].startswith("NOTE"):
+# 2025-11-26             if params_dict["NOTES"] is None:
+# 2025-11-26                 params_dict["NOTES"] = []
+# 2025-11-26             params_dict["NOTES"].append(normalize_note_date(line))  # records include date field and colon
+# 2025-11-26             logging.info(f"Found NOTE in project info file")
+# 2025-11-26         elif fields[0].startswith("COMMIT_JUSTIFICATION"):
+# 2025-11-26             if params_dict["COMMIT_JUSTIFICATIONS"] is None:
+# 2025-11-26                 params_dict["COMMIT_JUSTIFICATIONS"] = []
+# 2025-11-26             params_dict["COMMIT_JUSTIFICATIONS"].append(fields[1])
+# 2025-11-26             logging.info(f"Found COMMIT_JUSTIFICATION in project info file")
+# 2025-11-26     # order the notes by date
+# 2025-11-26     if params_dict["NOTES"] is not None:
+# 2025-11-26         params_dict["NOTES"] = order_strings_by_date(params_dict["NOTES"])
+# 2025-11-26
+# 2025-11-26     if params_dict["ANALYTICS_DS_OWNER"] is None:
+# 2025-11-26         logging.error("ERROR: No owner specified. This is required! (Check of typos in file tags!)")
+# 2025-11-26
+# 2025-11-26     return params_dict
+# 2025-11-26
+# 2025-11-26
+# 2025-11-26 def record_timestamp(root, project_info_txt, date_obj):
+# 2025-11-26     """
+# 2025-11-26     Updates or appends a timestamp entry in a project information file.
+# 2025-11-26
+# 2025-11-26     This function reads the specified project info file and searches for a specific
+# 2025-11-26     timestamp key to either update its value or append it if it does not already exist.
+# 2025-11-26     The timestamp is generated based on the provided `date_obj`.
+# 2025-11-26
+# 2025-11-26     Args:
+# 2025-11-26         root (str): The root directory where the project info file is located.
+# 2025-11-26         project_info_txt (str): The name of the project info file to be updated.
+# 2025-11-26         date_obj (datetime): A datetime object used to generate the timestamp value.
+# 2025-11-26     """
+# 2025-11-26     timestamp_key = "Report_Date"
+# 2025-11-26     timestamp_value = date_obj.strftime(DATE_FMT)
+# 2025-11-26
+# 2025-11-26     file_path = os.path.join(root, project_info_txt)
+# 2025-11-26     updated_lines = []
+# 2025-11-26     key_found = False
+# 2025-11-26
+# 2025-11-26     with open(file_path, "r") as project_info_file:
+# 2025-11-26         for line in project_info_file:
+# 2025-11-26             if line.startswith(f"{timestamp_key}:"):
+# 2025-11-26                 # Overwrite existing timestamp key in updated_line list
+# 2025-11-26                 updated_lines.append(f"{timestamp_key}: {timestamp_value}\n")
+# 2025-11-26                 key_found = True
+# 2025-11-26             else:
+# 2025-11-26                 updated_lines.append(line)
+# 2025-11-26
+# 2025-11-26         # If key not found, append to file
+# 2025-11-26         if not key_found:
+# 2025-11-26             updated_lines.append(f"{timestamp_key}: {timestamp_value}\n")
+# 2025-11-26
+# 2025-11-26         # Write updated lines from list back to the file
+# 2025-11-26         with open(file_path, "w") as project_info_file:
+# 2025-11-26             project_info_file.writelines(updated_lines)
 
 def extract_params(root):
     """

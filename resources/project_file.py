@@ -1,11 +1,11 @@
 import fileinput
 import logging
 import uuid
-from datetime import datetime
 
 from reports.configurations import *
 from reports.parser import create_charter_link, extract_params
 from resources.lines import StringLine, AggregateLines
+
 
 def set_date_obj(_today_date_obj):
     """
@@ -20,6 +20,7 @@ def set_date_obj(_today_date_obj):
     """
     global today_date_obj
     today_date_obj = _today_date_obj
+
 
 class ProjectFileObject:
     def __init__(self, root, files, project_info_filename: str):
@@ -164,7 +165,6 @@ class ProjectFileObject:
             logging.debug(f"Current date: {today_date_obj}")
             self._new_or_update_days(prev_date_key, prev_age_key)
 
-
     def _new_or_update_days(self, key, age_key):
         phase_start_date = self.params_dict[key].date_value
         dt_delta = today_date_obj - phase_start_date
@@ -246,21 +246,21 @@ class ProjectFileObject:
             logging.debug(f"{len(charter_links)} found, selected charter link: {charter_link}")
             if "COMPUTED_CHARTER_LINK" not in self.params_dict or self.params_dict["COMPUTED_CHARTER_LINK"] is None:
                 self.params_dict["COMPUTED_CHARTER_LINK"] = StringLine(key="COMPUTED_CHARTER_LINK",
-                                                               value=charter_link, new=True)
+                                                                       value=charter_link, new=True)
             else:
                 if self.params_dict["COMPUTED_CHARTER_LINK"].value != charter_link:
                     self.params_dict["COMPUTED_CHARTER_LINK"].update_value(charter_link)
                     logging.info(f"Updated charter link for project {self.project} to {charter_link}.")
 
         project_info_link = f"{link_base}{self.project_info_filepath}?web=1"
-        if 'COMPUTED_PROJECT_INFO_LINK' not in self.params_dict or self.params_dict['COMPUTED_PROJECT_INFO_LINK'] is None:
+        if 'COMPUTED_PROJECT_INFO_LINK' not in self.params_dict or self.params_dict[
+            'COMPUTED_PROJECT_INFO_LINK'] is None:
             self.params_dict['COMPUTED_PROJECT_INFO_LINK'] = StringLine(key='COMPUTED_PROJECT_INFO_LINK',
-                                                                       value=project_info_link, new=True)
+                                                                        value=project_info_link, new=True)
         else:
             if self.params_dict['COMPUTED_PROJECT_INFO_LINK'].value != project_info_link:
                 self.params_dict['COMPUTED_PROJECT_INFO_LINK'].update_value(project_info_link)
                 logging.info(f"Updated project info link for project {self.project} to {project_info_link}.")
-
 
     def set_uuid(self):
         """

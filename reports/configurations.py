@@ -1,6 +1,3 @@
-import os
-from datetime import datetime
-
 today_date_obj = None
 project_folders_root = "Projects Folders"
 project_info_filename = "PROJECT_INFO.txt"

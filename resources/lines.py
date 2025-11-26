@@ -1,5 +1,5 @@
 import logging
-from datetime import datetime, date
+from datetime import date
 
 from reports.configurations import *
 from reports.parser import normalize_note_date, order_strings_by_date

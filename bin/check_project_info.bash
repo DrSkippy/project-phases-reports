@@ -54,6 +54,11 @@ for fl in  "${BASE_DIR}"/*/*/PROJECT_INFO.txt; do
   fi
 done
 
+echo
+echo "Files with duplicate ids:"
+echo "*************************************************************************"
+grep "^Project_ID" "${BASE_DIR}"/*/*/PROJECT_INFO.txt | cut -d":" -f2,3 | sort | uniq -d
+
 
 echo
 echo "Cleaning files with repeated None metrics:"

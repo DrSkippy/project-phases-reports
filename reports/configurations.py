@@ -168,6 +168,23 @@ active_projects_order = [
     "5-Rollout"
 ]
 
+mermaid_kanban_prefix = """
+<!doctype html>
+<html lang="en">
+  <body>
+    <H1>D&I Analytics and Data Science Phases - KANBAN </H1>
+    <pre class="mermaid">
+"""
+
+mermaid_kanban_posfix = """
+    </pre>
+    <script type="module">
+      import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
+    </script>
+  </body>
+</html>
+"""
+
 # colors https://coolors.co/eef0f2-c6c7c4-a2999e-846a6a-353b3c
 CSS_STYLE = """
 <!DOCTYPE html>

@@ -412,13 +412,8 @@ kanban
 
     base_url = sharepoint_url + sharepoint_path
     with open(kanban_board_path, "w") as outfile:
-        outfile.write(f"""---
-config:
-  kanban:
-    ticketBaseUrl:{base_url}/#TICKET#'
----
-kanban
-""")
+        outfile.write(mermaid_kanban_prefix)
+        outfile.write("kanban\n")
         for _phase, index in project_phases.items():
             if index in [0, 6, 7,  8, 9]:
                 continue
@@ -429,6 +424,7 @@ kanban
                 owner = owner.split('(')[0].strip()
                 id_cnt += 1
                 outfile.write(f'    pid{id_cnt}[{project}]@{{ assigned: \'{owner}\' }}\n')
+        outfile.write(mermaid_kanban_posfix)
 
     
 def create_reports(project_records_list):
@@ -475,7 +471,7 @@ def configure_report_path_globals(projects_tree_root, today_dt):
     stakeholders_views_active_path = os.path.join(projects_tree_project_folders, "stakeholders_views_active.md")
     title_phase_views_path = os.path.join(projects_tree_project_folders, "phase_views.md")
     stakeholder_list_path = os.path.join(projects_tree_project_folders, "stakeholder_list.txt")
-    kanban_board_path = os.path.join(projects_tree_project_folders, "kanban_board.mermaid")
+    kanban_board_path = os.path.join(projects_tree_project_folders, "kanban_board.html")
 
 
 def size_repr(size_string):

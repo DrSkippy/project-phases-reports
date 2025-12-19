@@ -287,7 +287,7 @@ td {{
 
 /* project name cell only */
 .tr-project td:first-child {{
-  font-weight: 520;
+  font-weight: 500;
 }}
 
 /* ensure details stay normal weight */

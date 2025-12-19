@@ -252,15 +252,27 @@ def create_gtm_r1_weekly_owners_views(project_records_list):
       1) GTM R1 Projects (Project starts with 'GTM R1 -')
       2) Non-GTM R1 Projects
     """
+
+    def softwrap_project_name(name: str) -> str:
+        # Allow wrapping at spaces naturally, plus add extra wrap opportunities:
+        # - after " - "
+        # - after underscores
+        zwsp = "&#8203;"  # zero-width space
+        return (name
+                .replace(" - ", f" - {zwsp}")
+                .replace("_", f"_{zwsp}"))
+
     current_timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     owners = set([lines["ANALYTICS_DS_OWNER"] for lines in project_records_list])
     gtm_prefix = "GTM R1 -"
 
     with open(gtm_r1_weekly_owner_views_active_path, "w") as outfile:
-        outfile.write(CSS_STYLE)
+        outfile.write(css_style_gtm)
         outfile.write("<h1>DA Weekly - Project Owner Views - ACTIVE</h1>\n\n")
 
+        # -----------------------------
         # GTM R1 Projects
+        # -----------------------------
         outfile.write("<h2>GTM R1 Projects</h2>\n\n")
         outfile.write('<table border=0.1>\n')
         outfile.write(f"<tr><th>Projects</th><th>Info <span>(updated: {current_timestamp})</span></th></tr>\n")
@@ -273,27 +285,40 @@ def create_gtm_r1_weekly_owners_views(project_records_list):
                     if (lines["ANALYTICS_DS_OWNER"] == owner
                             and _phase == next_phase
                             and lines["Project"].startswith(gtm_prefix)):
+
                         if not owner_header:
                             owner_header = True
                             outfile.write(f'<tr class="tr-owner"><td colspan=2><b>{owner:}</b></td></tr>\n')
 
-                        outfile.write(f'<tr class="tr-project">'
-                                      f'<td>{lines["Project"]}</td>'
-                                      f'<td>[{_phase}] active {lines["COMPUTED_AGE_DAYS"]} days &'
-                                      f' In-progress {lines["COMPUTED_IN_PROGRESS_AGE_DAYS"]} days '
-                                      f' (👕:{size_repr(lines["T-SHIRT_SIZE"])}) <br/>'
-                                      f'<a href="{lines["COMPUTED_CHARTER_LINK"]}" target="_blank">Charter</a> | '
-                                      f'<a href="{lines["COMPUTED_PROJECT_INFO_LINK"]}" target="_blank">Project Info</a>'
-                                      f'</td></tr>\n')
+                        outfile.write(
+                            f'<tr class="tr-project">'
+                            f'<td><div class="project-name">{softwrap_project_name(lines["Project"])}</div></td>'
+                            f'<td>'
+                            f'  <div class="info-block">'
+                            f'    <div class="info-phase">'
+                            f'      [{_phase}] active {lines["COMPUTED_AGE_DAYS"]} days &'
+                            f'      In-progress {lines["COMPUTED_IN_PROGRESS_AGE_DAYS"]} days '
+                            f'      (👕:{size_repr(lines["T-SHIRT_SIZE"])})'
+                            f'    </div>'
+                            f'    <div class="info-links">'
+                            f'      <a href="{lines["COMPUTED_CHARTER_LINK"]}" target="_blank">Charter</a> | '
+                            f'      <a href="{lines["COMPUTED_PROJECT_INFO_LINK"]}" target="_blank">Project Info</a>'
+                            f'    </div>'
+                            f'  </div>'
+                            f'</td>'
+                            f'</tr>\n'
+                        )
 
                         notes_block = recent_notes(lines["NOTES"], limit=7)
                         for note in notes_block:
                             note = note.strip().replace("|", ":")
-                            outfile.write(f'<tr><td></td><td>{note}</td></tr>\n')
+                            outfile.write(f'<tr><td></td><td><div class="info-block">{note}</div></td></tr>\n')
 
         outfile.write("</table>\n\n")
 
-        # Non-GTM R1 Projects
+        # -----------------------------
+        # Non-GTM R1 Projects (unchanged formatting)
+        # -----------------------------
         outfile.write("<h2>Non-GTM R1 Projects</h2>\n\n")
         outfile.write('<table border=0.1>\n')
         outfile.write(f"<tr><th>Projects</th><th>Info <span>(updated: {current_timestamp})</span></th></tr>\n")
@@ -306,18 +331,21 @@ def create_gtm_r1_weekly_owners_views(project_records_list):
                     if (lines["ANALYTICS_DS_OWNER"] == owner
                             and _phase == next_phase
                             and not lines["Project"].startswith(gtm_prefix)):
+
                         if not owner_header:
                             owner_header = True
                             outfile.write(f'<tr class="tr-owner"><td colspan=2><b>{owner:}</b></td></tr>\n')
 
-                        outfile.write(f'<tr class="tr-project">'
-                                      f'<td>{lines["Project"]}</td>'
-                                      f'<td>[{_phase}] active {lines["COMPUTED_AGE_DAYS"]} days &'
-                                      f' In-progress {lines["COMPUTED_IN_PROGRESS_AGE_DAYS"]} days '
-                                      f' (👕:{size_repr(lines["T-SHIRT_SIZE"])}) <br/>'
-                                      f'<a href="{lines["COMPUTED_CHARTER_LINK"]}" target="_blank">Charter</a> | '
-                                      f'<a href="{lines["COMPUTED_PROJECT_INFO_LINK"]}" target="_blank">Project Info</a>'
-                                      f'</td></tr>\n')
+                        outfile.write(
+                            f'<tr class="tr-project">'
+                            f'<td>{lines["Project"]}</td>'
+                            f'<td>[{_phase}] active {lines["COMPUTED_AGE_DAYS"]} days &'
+                            f' In-progress {lines["COMPUTED_IN_PROGRESS_AGE_DAYS"]} days '
+                            f' (👕:{size_repr(lines["T-SHIRT_SIZE"])}) <br/>'
+                            f'<a href="{lines["COMPUTED_CHARTER_LINK"]}" target="_blank">Charter</a> | '
+                            f'<a href="{lines["COMPUTED_PROJECT_INFO_LINK"]}" target="_blank">Project Info</a>'
+                            f'</td></tr>\n'
+                        )
 
                         notes_block = recent_notes(lines["NOTES"], limit=7)
                         for note in notes_block:

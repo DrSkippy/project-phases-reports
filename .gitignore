@@ -168,3 +168,4 @@ cython_debug/
 projects_snapshot/
 projects_snapshot_original/
 .DS_Store
+scratch/

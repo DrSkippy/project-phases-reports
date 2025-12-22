@@ -245,6 +245,67 @@ def create_weekly_owners_views(project_records_list):
         outfile.write(HTML_FOOTER)
 
 
+def create_gtm_r1_weekly_owners_views(project_records_list):
+    """
+    Create output units by owner for weekly meeting update table (ACTIVE)
+    Split into two sections:
+      1) GTM R1 Projects (Project starts with 'GTM R1 -')
+      2) Non-GTM R1 Projects
+
+    Both sections use identical table/row formatting.
+    """
+    current_timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    owners = set([lines["ANALYTICS_DS_OWNER"] for lines in project_records_list])
+    gtm_prefix = "GTM R1 -"
+
+    def _write_section(outfile, heading, want_gtm):
+        outfile.write(f"<h2>{heading}</h2>\n\n")
+        outfile.write('<table border=0.1>\n')
+        outfile.write(f"<tr><th>Projects</th><th>Info <span>(updated: {current_timestamp})</span></th></tr>\n")
+
+        for owner in owners:
+            owner_header = False
+            for next_phase in active_projects_order:
+                for lines in project_records_list:
+                    _phase = lines["Phases"]
+                    is_gtm = lines["Project"].startswith(gtm_prefix)
+
+                    if is_gtm != want_gtm:
+                        continue
+
+                    if lines["ANALYTICS_DS_OWNER"] == owner and _phase == next_phase:
+                        if not owner_header:
+                            owner_header = True
+                            outfile.write(f'<tr class="tr-owner"><td colspan=2><b>{owner:}</b></td></tr>\n')
+
+                        outfile.write(
+                            f'<tr class="tr-project">'
+                            f'<td>{lines["Project"]}</td>'
+                            f'<td>[{_phase}] active {lines["COMPUTED_AGE_DAYS"]} days &'
+                            f' In-progress {lines["COMPUTED_IN_PROGRESS_AGE_DAYS"]} days '
+                            f' (👕:{size_repr(lines["T-SHIRT_SIZE"])}) <br/>'
+                            f'<a href="{lines["COMPUTED_CHARTER_LINK"]}" target="_blank">Charter</a> | '
+                            f'<a href="{lines["COMPUTED_PROJECT_INFO_LINK"]}" target="_blank">Project Info</a>'
+                            f'</td></tr>\n'
+                        )
+
+                        notes_block = recent_notes(lines["NOTES"], limit=7)
+                        for note in notes_block:
+                            note = note.strip().replace("|", ":")
+                            outfile.write(f'<tr><td></td><td>{note}</td></tr>\n')
+
+        outfile.write("</table>\n\n")
+
+    with open(gtm_r1_weekly_owner_views_active_path, "w") as outfile:
+        outfile.write(css_style_gtm)
+        outfile.write("<h1>DA Weekly - Project Owner Views - ACTIVE</h1>\n\n")
+
+        _write_section(outfile, "GTM R1 Projects", want_gtm=True)
+        _write_section(outfile, "Non-GTM R1 Projects", want_gtm=False)
+
+        outfile.write(HTML_FOOTER)
+
+
 def create_owners_commit_views(project_records_list):
     """
     Creates a file with synthesized owner blocks for each unique project owner.
@@ -439,7 +500,7 @@ def create_reports(project_records_list):
     create_title_phase_views(project_records_list)
     create_complete_stakeholder_list(project_records_list)
     create_kanban_board(project_records_list)
-
+    create_gtm_r1_weekly_owners_views(project_records_list)
 
 def configure_report_path_globals(projects_tree_root, today_dt):
     global today_date_obj
@@ -455,6 +516,7 @@ def configure_report_path_globals(projects_tree_root, today_dt):
     global title_phase_views_path
     global stakeholder_list_path
     global kanban_board_path
+    global gtm_r1_weekly_owner_views_active_path
     today_date_obj = today_dt
     # TODO fix this between test and prod
     if projects_tree_root.endswith("Projects Folders"):
@@ -472,6 +534,7 @@ def configure_report_path_globals(projects_tree_root, today_dt):
     title_phase_views_path = os.path.join(projects_tree_project_folders, "phase_views.md")
     stakeholder_list_path = os.path.join(projects_tree_project_folders, "stakeholder_list.txt")
     kanban_board_path = os.path.join(projects_tree_project_folders, "kanban_board.html")
+    gtm_r1_weekly_owner_views_active_path = os.path.join(projects_tree_project_folders, "gtm_r1_weekly_owner_views_active.html")
 
 
 def size_repr(size_string):

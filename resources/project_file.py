@@ -354,9 +354,9 @@ class ProjectFileObject:
         """
         # Process Project Info file
         projects_processed_counter = 0
-        with open(os.path.join(self.project_root, project_info_filename), "r") as project_info_file:
+        with open(os.path.join(self.project_root, project_info_filename), "r", encoding="utf-8-sig") as project_info_file:
             logging.info(f"Processing file {projects_processed_counter} ({self.project_root})")
-            projects_processed_counter += 1
+            projects_processed_counter += 1 # TODO: Is this redundant with the counter in update_summary_v2.py? Seems like this would reset with every file and not actually count up.
             self.phase, self.project = extract_params(self.project_root)  # harvest parameters from path
             ################################################
             ## Meta parameters not parsed from file
@@ -428,7 +428,7 @@ class ProjectFileObject:
         # In place changes
         replaced_in_file = False
         appended_in_file = False
-        for line in fileinput.input(os.path.join(self.project_root, project_info_filename), inplace=True):
+        for line in fileinput.input(os.path.join(self.project_root, project_info_filename), inplace=True, encoding="utf-8"):
             for key, obj in self.params_dict.items():
                 if isinstance(obj, StringLine) and obj.existing_variable_updated and line.startswith(key):
                     print(f"{obj.line}")
@@ -437,10 +437,10 @@ class ProjectFileObject:
             else:
                 print(line, end='')
         # Append new lines to the file
-        with open(os.path.join(self.project_root, project_info_filename), "a") as project_info_file:
+        with open(os.path.join(self.project_root, project_info_filename), "a", encoding="utf-8") as project_info_file:
             for key, obj in self.params_dict.items():
                 if isinstance(obj, StringLine) and obj.add_new_variable:
-                    append_in_file = True
+                    append_in_file = True # TODO: variable name elsewhere is `appended_in_file`
                     project_info_file.write(str(obj) + "\n")
 
         return replaced_in_file, appended_in_file

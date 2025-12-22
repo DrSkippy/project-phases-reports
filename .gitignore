@@ -167,3 +167,5 @@ cython_debug/
 .idea/
 projects_snapshot/
 projects_snapshot_original/
+.DS_Store
+scratch/

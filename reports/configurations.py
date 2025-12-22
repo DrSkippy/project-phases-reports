@@ -233,6 +233,83 @@ span {
 
 """
 
+color_primary = "#56596b"
+color_secondary = "#8ea6b7"
+color_tertiary = "#CFCFCF"
+color_heading = "#111424"
+color_background = "#eef0f2"
+color_font = "#353b3c"
+
+css_style_gtm = f"""
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+body {{
+    background-color: {color_background};
+    margin: 20px 20px;
+    font-family: Arial, Helvetica, sans-serif;
+}}
+h1 {{ color: {color_heading}; }}
+h2 {{ color: {color_heading}; }}
+p  {{ color: {color_background}; }}
+
+table {{
+  border: 1px solid {color_tertiary};
+  border-collapse: collapse;
+  padding: 8px;
+  width: 100%;
+}}
+
+th {{
+  height: 50px;
+  background-color: {color_primary};
+  font-size: large;
+  font-color: {color_font};
+}}
+
+td {{
+  padding: 8px;
+  font-size: medium;
+  font-color: {color_font};
+  overflow-wrap: anywhere;
+}}
+
+.tr-owner {{
+    height: 50px;
+    background-color: {color_secondary};
+    font-size: large;
+}}
+
+.tr-project {{
+    background-color: {color_tertiary};
+}}
+
+/* project name cell only */
+.tr-project td:first-child {{
+  font-weight: 500;
+}}
+
+/* ensure details stay normal weight */
+.tr-project td:nth-child(2) {{
+  font-weight: normal;
+}}
+
+span {{
+    font-size: small;
+    font-weight: normal;
+}}
+
+/* Optional: bias column widths */
+th:first-child, td:first-child {{ width: 15%; }}
+th:nth-child(2), td:nth-child(2) {{ width: 85%; }}
+
+</style>
+</head>
+<body>
+"""
+
+
 HTML_FOOTER = """
 
 </body>

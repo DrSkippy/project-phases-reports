@@ -1,4 +1,5 @@
 import csv
+import tqdm
 import datetime
 import logging
 import os
@@ -490,17 +491,21 @@ kanban
     
 def create_reports(project_records_list):
     # Create all the standard reports
-    create_summary_csv(project_records_list)
-    create_analytics_summary_csv(project_records_list)
-    create_data_product_links(project_records_list)
-    create_owners_views(project_records_list)
-    create_owners_commit_views(project_records_list)
-    create_weekly_owners_views(project_records_list)
-    create_stakeholders_views(project_records_list)
-    create_title_phase_views(project_records_list)
-    create_complete_stakeholder_list(project_records_list)
-    create_kanban_board(project_records_list)
-    create_gtm_r1_weekly_owners_views(project_records_list)
+    reports_list  = [
+    create_summary_csv,
+    create_analytics_summary_csv,
+    create_data_product_links,
+    create_owners_views,
+    create_owners_commit_views,
+    create_weekly_owners_views,
+    create_stakeholders_views,
+    create_title_phase_views,
+    create_complete_stakeholder_list,
+    create_kanban_board,
+    create_gtm_r1_weekly_owners_views
+    ]
+    for func_idx in tqdm.trange(len(reports_list), desc="Creating Reports"):
+        reports_list[func_idx](project_records_list)
 
 def configure_report_path_globals(projects_tree_root, today_dt):
     global today_date_obj

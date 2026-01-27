@@ -20,6 +20,7 @@ kanban_board_path = None
 
 NOTES_DELIMITER = "**;**"
 DATE_FMT = "%Y-%m-%d"
+FILE_RETRY = 4  # max retries for file read
 
 """
 These are the data elements to populate columns of the output csv for the status spreadsheet

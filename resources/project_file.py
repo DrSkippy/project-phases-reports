@@ -2,6 +2,7 @@ import fileinput
 import logging
 import uuid
 import os
+import time
 from datetime import datetime
 
 from reports.configurations import *
@@ -362,24 +363,33 @@ class ProjectFileObject:
             ## Meta parameters not parsed from file
             self.params_dict["Phases"] = StringLine(key="Phases", value=self.phase)
             self.params_dict["Project"] = StringLine(key="Project", value=self.project)
-
             ################################################
             ## Parse the file line by line
             agg_lines = AggregateLines()
-            for line in project_info_file:
-                if line.strip() == "":
-                    # skip empty lines
-                    continue
-                obj = StringLine(line)
-                if obj.key is not None and obj.key in self.params_dict:
-                    self.params_dict[obj.key] = obj
-                elif obj.aggregate_key is not None and obj.aggregate_key in self.params_dict:
-                    agg_lines.add_line(obj)
-                    self.params_dict[obj.aggregate_key] = agg_lines
-                elif obj.is_comment:
-                    logging.info(f"Comment line found: {obj.line}")
-                else:
-                    logging.error(f"Key {obj.key} not found in params_dict, line: {line.strip()}")
+            attempts = 0
+            while attempts < FILE_RETRY:
+                try:
+                    for line in project_info_file:
+                        if line.strip() == "":
+                            # skip empty lines
+                            continue
+                        obj = StringLine(line)
+                        if obj.key is not None and obj.key in self.params_dict:
+                            self.params_dict[obj.key] = obj
+                        elif obj.aggregate_key is not None and obj.aggregate_key in self.params_dict:
+                            agg_lines.add_line(obj)
+                            self.params_dict[obj.aggregate_key] = agg_lines
+                        elif obj.is_comment:
+                            logging.info(f"Comment line found: {obj.line}")
+                        else:
+                            logging.error(f"Key {obj.key} not found in params_dict, line: {line.strip()}")
+                    break   # done successfully
+                except TimeoutError as e:
+                    attempts += 1
+                    logging.warning(f"File read operation timed out. Retry #{attempts} with exponential backoff.")
+                    time.sleep(2**attempts)   # exponential backoff
+                    if attempts == FILE_RETRY:
+                        logging.error(f"Skipping file {self.project_info_filepath}. Operation timed out - Giving up after {attempts}")
 
     def get_legacy_params(self):
         """
@@ -400,7 +410,7 @@ class ProjectFileObject:
                 if not line_obj.is_in_reports:
                     logging.info(f'In "{self.project_root}": at key={key} line_obj={line_obj} is not in reports')
                     continue
-                legacy_params[key] = line_obj.get(key)
+                legacy_params[key] = line_obj.get(key, self.project_info_filepath)
             else:
                 logging.info(
                     f'In "{self.project_root}": at key={key} line_obj={line_obj} is not a StringLine or AggregateLines')

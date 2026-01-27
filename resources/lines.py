@@ -26,7 +26,7 @@ class AggregateLines:
             self.aggregate_dict[line_obj.aggregate_key] = []
         self.aggregate_dict[line_obj.aggregate_key].append(line_obj)
 
-    def get_notes(self):
+    def get_notes(self, project_file_name=None):
         """
         Retrieves and processes notes from the aggregate dictionary.
 
@@ -40,7 +40,7 @@ class AggregateLines:
             defined delimiter, or a default message if no notes are available.
         """
         if "NOTES" in self.aggregate_dict:
-            notes_list = [normalize_note_date(obj.line) for obj in self.aggregate_dict["NOTES"]]
+            notes_list = [normalize_note_date(obj.line, project_file_name) for obj in self.aggregate_dict["NOTES"]]
             notes_list = order_strings_by_date(notes_list)
             return NOTES_DELIMITER.join(notes_list) + "\n\n"
         else:
@@ -65,7 +65,7 @@ class AggregateLines:
         else:
             return "No commit justifications found.\n\n"
 
-    def get(self, key):
+    def get(self, key, project_file_name=None):
         """
         Fetches a value based on the provided key. If the key matches specific patterns,
         such as those starting with "note" or "commit_justification", it retrieves
@@ -80,7 +80,7 @@ class AggregateLines:
             predefined patterns.
         """
         if key.lower().startswith("note"):
-            return self.get_notes()
+            return self.get_notes(project_file_name)
         elif key.lower().startswith("commit_justification"):
             # Return the list of StringLine objects for the specified key
             return self.get_commit_justifications()

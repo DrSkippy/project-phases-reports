@@ -18,7 +18,7 @@ from reports.configurations import *
 # 2025-11-26     today_date_obj = _today_date_obj
 
 
-def normalize_note_date(note_line):
+def normalize_note_date(note_line, project_file_name=None):
     """
     Normalizes the date format within a note and appends necessary sequence numbers if present. This
     function processes the note to ensure it follows the proper "NOTES_yyyy-mm-dd: content" format,
@@ -40,7 +40,7 @@ def normalize_note_date(note_line):
     try:
         head, tail = note_line.strip().split(":", 1)
     except ValueError:
-        logging.warning(f"WARN: Note is poorly formed ({note_line})")
+        logging.warning(f"WARN: Note is poorly formed ({note_line}) [{project_file_name}]")
         # assume first space is between head and tail
         head, tail = note_line.strip().split(" ", 1)
     head = head.replace("_", "-")  # in case someone transposed in typing
@@ -52,18 +52,18 @@ def normalize_note_date(note_line):
         logging.info(f"Sequence number {sequence_number} found")
         tail += f"::{sequence_number}::"  # append a sequence number to build bulleted list
     except (ValueError, AttributeError):
-        logging.warn(f"WARNING:  Note date is not in yyyy-mm-dd format: {head}")
+        logging.warning(f"WARNING:  Note date is not in yyyy-mm-dd format: {head} [{project_file_name}]")
         try:
             head_date = date_re.search(head).group(0)
             y, m, d = head_date.split("-")
             conforming_head_date = f"{y}-{m.zfill(2)}-{d.zfill(2)}"
         except ValueError:
-            logging.error(f"ERROR: Note date is not in yyyy-mm-dd format: {head}")
+            logging.error(f"ERROR: Note date is not in yyyy-mm-dd format: {head} [{project_file_name}]")
 
     try:
         d = datetime.strptime(conforming_head_date, "%Y-%m-%d")
     except ValueError:
-        logging.error(f"ERROR: Invalid date ({conforming_head_date})")
+        logging.error(f"ERROR: Invalid date ({conforming_head_date}) [{project_file_name}]")
 
     return ":".join(["NOTES_" + conforming_head_date, " " + tail.strip()])
 

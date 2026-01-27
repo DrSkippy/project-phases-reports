@@ -249,7 +249,7 @@ class StringLine:
             self.parse_date_if_present()
             self.parse_int_if_present()
 
-    def get(self, key: str = None):
+    def get(self, key: str = None, project_file_name=None):
         """
         Gets the relevant parsed value associated with the given key, if the key matches this object's key.
         Returns the most significant parsed value available (date_value, int_value, or value) in a prioritized order.
@@ -263,7 +263,7 @@ class StringLine:
             available or the keys do not match, returns None.
         """
         if key != self.key:
-            logging.error(f"Key {key} does not match the key of the line: {self.key}")
+            logging.error(f"Key {key} does not match the key of the line: {self.key} [{project_file_name}]")
             return None
         # Return highest info parsed value of line
         if self.date_value is not None:

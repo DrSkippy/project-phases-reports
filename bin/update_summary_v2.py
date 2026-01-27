@@ -9,7 +9,8 @@ from datetime import datetime
 from logging.config import dictConfig
 
 from reports.summary import configure_report_path_globals, create_reports
-from resources.project_file import project_info_filename, project_folders_root, ProjectFileObject, set_date_obj
+from reports.configurations import project_info_filename, project_folders_root
+from resources.project_file import ProjectFileObject, set_date_obj
 
 dictConfig({
     'version': 1,

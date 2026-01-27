@@ -410,7 +410,7 @@ class ProjectFileObject:
                 if not line_obj.is_in_reports:
                     logging.info(f'In "{self.project_root}": at key={key} line_obj={line_obj} is not in reports')
                     continue
-                legacy_params[key] = line_obj.get(key, self.project_info_filepath)
+                legacy_params[key] = line_obj.get(key, self.project_root + "/" + self.project_info_filepath)
             else:
                 logging.info(
                     f'In "{self.project_root}": at key={key} line_obj={line_obj} is not a StringLine or AggregateLines')

@@ -1,9 +1,10 @@
 #!/usr/bin/env -S poetry run python
-__version__ = 0.0.1
+__version__ = "0.0.1"
 import logging
 import tqdm
 import argparse
 import os
+import re
 from datetime import datetime
 from reports.configurations import project_info_filename, project_folders_root
 from logging.config import dictConfig
@@ -105,17 +106,47 @@ if __name__ == "__main__":
 
     for root, dirs, files in os.walk(projects_tree_root, topdown=False):
         if project_info_filename not in files or project_folders_root not in root:
-            logging.warning(f"Skipping {root}")
+            logging.info(f"Skipping {root}")
             continue
 
-        with open(os.path.join(root, project_info_filename), "r",
+        file_path = os.path.join(root, project_info_filename)
+
+        no_lines_changed = True
+        with open(file_path, "r",
                                 encoding="utf-8-sig") as project_info_file:
             logging.debug(f'Processing root={root}')
             project_file_lines = []
-            for line in tqdm(project_info_file):
+            for line in project_info_file:
                 new_line = clean_line(line, os.path.join(root, project_info_filename))
+                if line.strip() != newline:
+                    no_lines_changed = False
                 project_file_lines.append(new_line)
+        
+        if no_lines_changed:
+            logging.info(f"No lines modified, skipping backup and update for {file_path}.")
+            continue
+
         # create backup and new file
-        print("### New file")
-        print("\n".join(project_file_lines))
-        projects_processed_counter += 1
+        if len(project_file_lines) > 5:
+            backup_file_path = os.path.join(root, f'backup_project_info_{datetime.now().strftime("%Y-%m-%d_%M%S")}.bak')
+            try:
+                os.rename(file_path, backup_file_path)
+                logging.info(f"File '{file_path}' renamed to '{backup_file_path}' successfully.")
+            except FileNotFoundError:
+                logging.error(f"Error: The file '{file_path}' was not found.")
+                sys.exit("File not found")
+            except FileExistsError:
+                logging.error(f"Error: The file '{backup_file_path}' already exists.")
+                sys.exit("Destination file exists")
+            except PermissionError:
+                logging.error("Error: Permission denied. Unable to rename the file.")
+                sys.exit("File permission denied.")
+            else:
+                with open(file_path, "w") as outfile:
+                    outfile.write("\n".join(project_file_lines))
+                projects_processed_counter += 1
+        else:
+            logging.error("Error: file too short! Not doing anything")
+            sys.exit("File too short. Not changing file contents")
+
+    logging.info(f"Processed {projects_processed_counter} projects.")

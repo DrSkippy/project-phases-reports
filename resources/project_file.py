@@ -445,12 +445,12 @@ class ProjectFileObject:
                     replaced_in_file = True
                     break
             else:
-                print(line, end='')
+                print(line.strip())
         # Append new lines to the file
         with open(os.path.join(self.project_root, project_info_filename), "a", encoding="utf-8") as project_info_file:
             for key, obj in self.params_dict.items():
                 if isinstance(obj, StringLine) and obj.add_new_variable:
-                    append_in_file = True # TODO: variable name elsewhere is `appended_in_file`
+                    appended_in_file = True # TODO: variable name elsewhere is `appended_in_file`
                     project_info_file.write(str(obj) + "\n")
 
         return replaced_in_file, appended_in_file

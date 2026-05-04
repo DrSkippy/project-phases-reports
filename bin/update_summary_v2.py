@@ -71,7 +71,10 @@ if __name__ == "__main__":
             logging.warning(f"Skipping {root}")
             continue
 
-        proj = ProjectFileObject(root, files, project_info_filename)
+        try:
+            proj = ProjectFileObject(root, files, project_info_filename)
+        except ValueError as e:
+            logging.warning(f"[{e}] Skipping {root}")
         print(f"Processing file {projects_processed_counter: 3} ({proj.phase}: {proj.project})")
         logging.debug(f'Processing root={root}: {str(proj)}')
         project_objects_list.append(proj)

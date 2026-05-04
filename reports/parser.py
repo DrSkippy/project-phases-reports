@@ -176,11 +176,13 @@ def extract_params(root):
         if name == "Projects Folders":
             break
     names = names[i_loc - 1:]
-    assert (len(names) == 4 and names[1] == "Projects Folders")
+    if not (len(names) == 4 and names[1] == "Projects Folders"):
+        raise ValueError(
+            f"Invalid project root path depth {root}. Expected format: '/Projects Folders/<phase>/<project>'")
     logging.info(f"Extracted phase: {names[2]}, project: {names[3]}")
     if names[2] is None or names[3] is None:
         raise ValueError(
-            f"Invalid project root path: {self.project_root}. Expected format: '/Projects Folders/<phase>/<project>'")
+            f"Invalid project root path: {root}. Expected format: '/Projects Folders/<phase>/<project>'")
     return names[2], names[3]
 
 

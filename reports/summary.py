@@ -524,7 +524,7 @@ def configure_report_path_globals(projects_tree_root, today_dt):
     global gtm_r1_weekly_owner_views_active_path
     today_date_obj = today_dt
     # TODO fix this between test and prod
-    if projects_tree_root.endswith("Projects Folders"):
+    if projects_tree_root.endswith(project_folders_root):
         projects_tree_project_folders = projects_tree_root
     else:
         projects_tree_project_folders = os.path.join(projects_tree_root, project_folders_root)

@@ -173,16 +173,16 @@ def extract_params(root):
     """
     names = root.split("/")  # phase, project
     for i_loc, name in enumerate(names):
-        if name == "Projects Folders":
+        if name == project_folders_root:
             break
     names = names[i_loc - 1:]
-    if not (len(names) == 4 and names[1] == "Projects Folders"):
+    if not (len(names) == 4 and names[1] == project_folders_root):
         raise ValueError(
-            f"Invalid project root path depth {root}. Expected format: '/Projects Folders/<phase>/<project>'")
+            f"Invalid project root path depth {root}. Expected format: '/{project_folders_root}/<phase>/<project>'")
     logging.info(f"Extracted phase: {names[2]}, project: {names[3]}")
     if names[2] is None or names[3] is None:
         raise ValueError(
-            f"Invalid project root path: {root}. Expected format: '/Projects Folders/<phase>/<project>'")
+            f"Invalid project root path: {root}. Expected format: '/{project_folders_root}/<phase>/<project>'")
     return names[2], names[3]
 
 

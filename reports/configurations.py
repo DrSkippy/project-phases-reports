@@ -1,8 +1,8 @@
 today_date_obj = None
-project_folders_root = "Projects Folders"
+project_folders_root = "Projects Folders_Pre_ADO"
 project_info_filename = "PROJECT_INFO.txt"
 sharepoint_url = "https://f5.sharepoint.com"
-sharepoint_path = "/:w:/r/sites/salesandmktg/mktg/Enterprise Analytics/Shared Documents/Projects Folders"
+sharepoint_path = "/:w:/r/sites/salesandmktg/mktg/Enterprise Analytics/Shared Documents/Projects Folders_Pre_ADO"
 
 # Report Files
 projects_tree_project_folders = None

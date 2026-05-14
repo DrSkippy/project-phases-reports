@@ -86,4 +86,4 @@ if __name__ == "__main__":
     res = {obj.uuid: obj.finalize_file() for obj in tqdm.tqdm(project_objects_list, desc="Updating Project Files")}
     logging.debug(f"Finalized files: {res}")
     print(
-        f'Reports complete! (see reports in "https://f5.sharepoint.com/:f:/r/sites/salesandmktg/mktg/Enterprise%20Analytics/Shared%20Documents/Projects%20Folders?csf=1&web=1")')
+        f'Reports complete! (see reports in "https://f5.sharepoint.com/:f:/r/sites/salesandmktg/mktg/Enterprise%20Analytics/Shared%20Documents/Projects%20Folders_Pre_ADO?csf=1&web=1")')
